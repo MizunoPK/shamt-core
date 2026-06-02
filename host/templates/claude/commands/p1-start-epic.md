@@ -18,7 +18,7 @@ description: Phase 1 of the PO flow — resolve a slug, fetch the tracker payloa
 
 ## Arguments
 
-- `{slug}` (required) — epic slug. Globally unique across `epics/` (flat layout per [INFRASTRUCTURE.md §2.1](../../../../../INFRASTRUCTURE.md#21-what-epicfeature-work-actually-needs)). Form depends on the active tracker profile:
+- `{slug}` (required) — epic slug. Globally unique across `epics/` (flat layout). Form depends on the active tracker profile:
   - **ado** — leading-numeric (`8421-billing-revamp`) so the slug can resolve to an Epic work-item ID.
   - **github / local / none** — any descriptive kebab-case slug; resolved by folder glob.
 - `--tracker={ado|github|local}` (optional) — one-off override of the project's default `work_item_tracker` for this invocation only. Same semantics as `/e1-start-story`'s override. Legal values: any profile file in [`reference/trackers/`](../../../../reference/trackers/). The default comes from `.shamt-core/shamt-config.json`. Per [`reference/trackers/_contract.md`](../../../../reference/trackers/_contract.md).
@@ -77,11 +77,11 @@ Apply the profile's `## Slug resolution` rule. If the slug does not parse to a t
 
 #### B. Profile-driven fetch
 
-1. Check `## Supported work-item types` in the active profile. `/p1-start-epic` requires **Epic** (or `Any`). If the profile does not declare `Epic` support, surface the **freeform-fallback notice** — instantiate the contract template from [`reference/trackers/_contract.md`](../../../../reference/trackers/_contract.md) freeform-fallback rule (`tracker profile <name> has no <Type> work-item type — proceeding freeform`) with `<Type>` = `Epic` and `<name>` = the active profile's filename stem, yielding: `tracker profile {name} has no Epic work-item type — proceeding freeform`. Skip to sub-step C. Same instantiation pattern as `/e1-start-story` (which substitutes `<Type>` = `Story`); see the parallel check in [`commands/e1-start-story.md`](e1-start-story.md) under `### Step 4 — Fetch (or fall through to freeform)` → `#### B. Profile-driven fetch` (numbered item 1). Per [INFRASTRUCTURE.md §1.11](../../../../../INFRASTRUCTURE.md#111-issue-tracker-integration-ado--github-cli) `Field mapping` row.
+1. Check `## Supported work-item types` in the active profile. `/p1-start-epic` requires **Epic** (or `Any`). If the profile does not declare `Epic` support, surface the **freeform-fallback notice** — instantiate the contract template from [`reference/trackers/_contract.md`](../../../../reference/trackers/_contract.md) freeform-fallback rule (`tracker profile <name> has no <Type> work-item type — proceeding freeform`) with `<Type>` = `Epic` and `<name>` = the active profile's filename stem, yielding: `tracker profile {name} has no Epic work-item type — proceeding freeform`. Skip to sub-step C. Same instantiation pattern as `/e1-start-story` (which substitutes `<Type>` = `Story`); see the parallel check in [`commands/e1-start-story.md`](e1-start-story.md) under `### Step 4 — Fetch (or fall through to freeform)` → `#### B. Profile-driven fetch` (numbered item 1).
    - GitHub currently has **no** native Epic type — `/p1-start-epic` against the GitHub profile always falls through here.
    - ADO supports Epic natively (`System.WorkItemType = "Epic"`) — fetch proceeds.
 2. Run the profile's `## Primary fetch` command, substituting `{id}` from sub-step A.
-3. **Do not write `raw/issue.json`.** Per [INFRASTRUCTURE.md §2.1](../../../../../INFRASTRUCTURE.md#21-what-epicfeature-work-actually-needs) "Epic/feature/story folder structure", epic folders contain **only** `epic.md` — no `raw/` subfolder, no `feedback/`. Hold the payload in memory while populating the artifact; the fetched JSON is not persisted to disk.
+3. **Do not write `raw/issue.json`.** Epic folders contain **only** `epic.md` — no `raw/` subfolder, no `feedback/`. Hold the payload in memory while populating the artifact; the fetched JSON is not persisted to disk.
 4. Apply the profile's `## Field mapping` to populate the corresponding sections of [`templates/epic.template.md`](../../../../templates/epic.template.md):
    - **Title / Type / State / Assignee / Project / Iteration/Milestone** → used to seed the H1 line and to inform the agent (not their own section in `epic.template.md`; record them in the **All Remaining Fields** appendix described in sub-step (5)).
    - **Description** → narrative input for the `Goal` section; the agent rewrites it as "what this epic exists to accomplish" rather than verbatim paste.
@@ -98,7 +98,7 @@ The freeform path is **not** field-by-field paste; it is the open-questions iter
 
 ### Step 5 — Consult `.shamt-core/project-specific-files/ARCHITECTURE.md` (advisory)
 
-Per [INFRASTRUCTURE.md §1.12](../../../../../INFRASTRUCTURE.md#112-architecture--coding-standards-maintenance) PO-threading row:
+Thread architecture / coding-standards consultation at the PO altitude as follows:
 
 1. Read `.shamt-core/project-specific-files/ARCHITECTURE.md` (project root) while drafting. **If the file does not exist**, note its absence in chat (a single line: `.shamt-core/project-specific-files/ARCHITECTURE.md not found — proceeding without architecture consult; bootstrap via init-shamt is the canonical fix per §1.12.`) and continue. Do **not** halt — `.shamt-core/project-specific-files/ARCHITECTURE.md` is governing when present (per the SHAMT_RULES Standards check invariant) but the epic-altitude consult is advisory; missing the file degrades the consult, not the command. Per the SHAMT_RULES Global Story Invariants "Standards check" rule.
 2. If the epic implies architectural change — a new service, a new boundary, a new data store, a new external integration, an auth/tenant boundary shift, etc. — flag it **inline** in `Scope / Non-Scope` as a single line at the top of that section: `**Architecture impact:** {one-line description of the architectural change implied}`. Omit the flag entirely when no architectural change is implied (or when `.shamt-core/project-specific-files/ARCHITECTURE.md` is absent and the impact cannot be assessed against a baseline — note the same in chat).
@@ -147,9 +147,9 @@ After validation appends the footer, `/p2-decompose-epic {slug}` can run. This c
 
 ## Tracker integration
 
-`/p1-start-epic` mirrors `/e1-start-story`'s tracker plumbing at the Epic altitude. The active profile's `## Supported work-item types` section is authoritative — if it does not declare **Epic**, this command **falls through to freeform mode** with a one-line notice (the contract template instantiated at this altitude: `tracker profile {name} has no Epic work-item type — proceeding freeform`) and continues per Step 4 sub-step C. Per the freeform-fallback rule in [`reference/trackers/_contract.md`](../../../../reference/trackers/_contract.md) (which defines the template generically as `tracker profile <name> has no <Type> work-item type — proceeding freeform`, instantiated here with `<Type>` = `Epic`) and the `Field mapping` row in [INFRASTRUCTURE.md §1.11](../../../../../INFRASTRUCTURE.md#111-issue-tracker-integration-ado--github-cli). Do **not** silently fail; do **not** halt.
+`/p1-start-epic` mirrors `/e1-start-story`'s tracker plumbing at the Epic altitude. The active profile's `## Supported work-item types` section is authoritative — if it does not declare **Epic**, this command **falls through to freeform mode** with a one-line notice (the contract template instantiated at this altitude: `tracker profile {name} has no Epic work-item type — proceeding freeform`) and continues per Step 4 sub-step C. Per the freeform-fallback rule in [`reference/trackers/_contract.md`](../../../../reference/trackers/_contract.md) (which defines the template generically as `tracker profile <name> has no <Type> work-item type — proceeding freeform`, instantiated here with `<Type>` = `Epic`). Do **not** silently fail; do **not** halt.
 
-When the fetch succeeds, raw payload data is preserved inline in `epic.md`'s **All Remaining Fields** appendix (Step 4 sub-step B.5) — there is no `raw/` subfolder at the epic altitude per [INFRASTRUCTURE.md §2.1](../../../../../INFRASTRUCTURE.md#21-what-epicfeature-work-actually-needs) "Epic/feature/story folder structure".
+When the fetch succeeds, raw payload data is preserved inline in `epic.md`'s **All Remaining Fields** appendix (Step 4 sub-step B.5) — there is no `raw/` subfolder at the epic altitude.
 
 ## Exit criteria
 
@@ -162,7 +162,7 @@ When the fetch succeeds, raw payload data is preserved inline in `epic.md`'s **A
 ## Notes
 
 - **Fresh-agent runnable.** Every input lives on disk (`.shamt-core/shamt-config.json`, the tracker profile, `.shamt-core/project-specific-files/ARCHITECTURE.md`, the prior draft when re-entering). No conversation history required.
-- **Epic-level validation is `/validate-artifact`.** Per [INFRASTRUCTURE.md §2.1](../../../../../INFRASTRUCTURE.md#21-what-epicfeature-work-actually-needs) epic-level review row, epics have no review phase — Pattern 1 validation only. The decomposition exit gate run inside `/p2-decompose-epic` is a stub-batch check on that command's output and is **distinct from `/validate-artifact`**; do not conflate.
+- **Epic-level validation is `/validate-artifact`.** Epics have no review phase — Pattern 1 validation only. The decomposition exit gate run inside `/p2-decompose-epic` is a stub-batch check on that command's output and is **distinct from `/validate-artifact`**; do not conflate.
 - **No `Target Features` work here.** This command writes the epic with the decomposition sections empty; `/p2-decompose-epic` fills them. Two reasons: keeps single-session sizing tight (Principle 1 — single-session sizing constraint), and keeps deep dialog at the right altitude per §2.1 stub-list-then-drill-in.
 - **No `.shamt-core/project-specific-files/CODING_STANDARDS.md` consult.** Coding style is irrelevant at the epic altitude per §1.12 PO-threading row. The story-level Phase 2 / 6 / 7 cycle handles coding-standards alignment for the eventual code work.
 - The `--tracker=` flag is **one-off**, not persisted. The project default in `.shamt-core/shamt-config.json` is unchanged.

@@ -9,7 +9,7 @@ description: Phase 6 (Review) — story-mode review of a story's own changes aga
 - **Story mode** — `/e6-review-changes {slug}`: review the code just built for a story against its own spec / plan / Build Checklist. The primary agent runs the 16-category sweep at story altitude. Output lives in `stories/{slug}/feedback/review_vN.md`.
 - **Formal mode** — `/e6-review-changes --branch=<name>` or `/e6-review-changes --pr=<id>`: review someone else's branch or PR. Hands off to the `review-executor` Opus persona. Output lives in `code_reviews/<sanitized-branch>/overview.md` + `review_vN.md`.
 
-The artifact is **local only** in both modes. Even when the active tracker profile documents a PR-comment command, this command does not invoke it (per [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md#pattern-4-code-review-process) and INFRASTRUCTURE.md §1.11).
+The artifact is **local only** in both modes. Even when the active tracker profile documents a PR-comment command, this command does not invoke it (per [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md#pattern-4-code-review-process)).
 
 **Recommended models:**
 
@@ -91,7 +91,7 @@ Hard checks (Pattern 1 code-review dimensions in [`SHAMT_RULES.template.md`](../
 
 ### Step 4 — Documentation Impact Assessment
 
-Per INFRASTRUCTURE.md §1.12 — at the end of the sweep, answer **explicitly**: does this change require an `.shamt-core/project-specific-files/ARCHITECTURE.md` or `.shamt-core/project-specific-files/CODING_STANDARDS.md` update?
+At the end of the sweep, answer **explicitly**: does this change require an `.shamt-core/project-specific-files/ARCHITECTURE.md` or `.shamt-core/project-specific-files/CODING_STANDARDS.md` update?
 
 Triggers include: new service / boundary / data store added; deprecated pattern; new convention introduced; or this change actually touches a doc whose `Last Updated` field is stale (older than `.shamt-core/shamt-config.json` → `doc_staleness_threshold_days`). Story-level Doc Impact only fires when this change touches the doc — pure staleness without a touching change is the framework audit's §3.5 D6 dimension, not Phase 6's responsibility.
 

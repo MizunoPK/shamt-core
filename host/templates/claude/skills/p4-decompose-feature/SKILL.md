@@ -45,7 +45,7 @@ Follow the canonical `/p4-decompose-feature` command body verbatim — see [`com
 
    Derive `{story-slug}` (kebab-case from title) and `{brief}` (kebab-case from scope one-liner) per entry — re-decomposition Kept exception reuses the existing folder via `stories/{story-slug}-*/` glob. Draft the **parallelization analysis**: `Recommended order` (sequenced by dependency) and `Parallelizable` (concurrent-work callout, or `None — strictly sequential.`).
 5. **Gate the whole batch once** with the user. Surface the list + derived slugs + per-candidate rubric verdict + parallelization analysis together. Iterate as a single batch — add / remove / reword / re-sequence / fix testability gaps. Per-story deep dialog is **deferred to `/e1-start-story` (stub-aware)** — do not start drafting per-story acceptance criteria, spec sections, or implementation plans here. Open-questions dialog applies only to global scoping / rubric / parallelization questions at this altitude.
-6. **Decomposition exit gate** (per INFRASTRUCTURE.md §2.3) — **2-condition check, run before stubs are written**: (1) every story stub has an individually-testable scope one-liner per the rubric above; (2) every story appears in the parent feature's `Sequencing & Parallelization` analysis. **Distinct from `/validate-artifact`**.
+6. **Decomposition exit gate** — **2-condition check, run before stubs are written**: (1) every story stub has an individually-testable scope one-liner per the rubric above; (2) every story appears in the parent feature's `Sequencing & Parallelization` analysis. **Distinct from `/validate-artifact`**.
 7. **Detect global story-slug collisions** — `stories/{story-slug}-*/` glob on the **New** partition; halt and return to Step 5 if any New candidate slug collides. **Kept** slugs are exempt — their collision with the prior stub of the same feature is expected.
 8. **Write the story-ticket stubs** from the active tracker's per-provider ticket template — read `work_item_tracker` from `.shamt-core/shamt-config.json`:
    - `ado` → [`templates/ticket.ado.template.md`](../../../../../templates/ticket.ado.template.md)
@@ -59,7 +59,7 @@ Follow the canonical `/p4-decompose-feature` command body verbatim — see [`com
 
 ## Key distinctions
 
-- **Decomposition exit gate ≠ `/validate-artifact`.** Per INFRASTRUCTURE.md §2.1 (which applies at the feature altitude as at the epic altitude), the gate is a 2-condition stub-batch check run **before** stubs land on disk. `/validate-artifact` runs the full Pattern 1 loop against `feature.md` (already, before this command) and against each story-level artifact (later, via the Engineer flow). Do not conflate.
+- **Decomposition exit gate ≠ `/validate-artifact`.** The gate is a 2-condition stub-batch check run **before** stubs land on disk. `/validate-artifact` runs the full Pattern 1 loop against `feature.md` (already, before this command) and against each story-level artifact (later, via the Engineer flow). Do not conflate.
 - **The individually-testable rubric is the hard constraint** on output. The Engineer flow can refuse a story that violates this; PO-flow enforcement at decomposition time is the contract.
 - **Development-order dependencies between siblings are allowed** — they live in the parallelization analysis, not as a testability violation.
 - **No tracker fetch** at this altitude — `/p4-decompose-feature` operates entirely on the already-written `feature.md`. The active tracker is read only to pick the **ticket template** for the stub bodies (Step 8).

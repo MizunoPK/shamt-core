@@ -49,7 +49,7 @@ Follow the canonical `/p3-start-feature` command body verbatim — see [`command
 
 ## Tracker fallback
 
-When the active profile lacks Feature support (GitHub today), surface the one-line freeform-fallback notice (`tracker profile {name} has no Feature work-item type — proceeding freeform`) and fall through to Mode A (if a stub exists) or Mode B. **Do not silently fail; do not halt.** Per the freeform-fallback rule in [`reference/trackers/_contract.md`](../../../../../reference/trackers/_contract.md) (and INFRASTRUCTURE.md §1.11 for the design rationale).
+When the active profile lacks Feature support (GitHub today), surface the one-line freeform-fallback notice (`tracker profile {name} has no Feature work-item type — proceeding freeform`) and fall through to Mode A (if a stub exists) or Mode B. **Do not silently fail; do not halt.** Per the freeform-fallback rule in [`reference/trackers/_contract.md`](../../../../../reference/trackers/_contract.md).
 
 ## Recommended model
 

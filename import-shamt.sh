@@ -13,8 +13,8 @@
 # master-owned. Master wins on every diff. Anything under <child>/.shamt-core/
 # that is NOT in the sync set is preserved with a warning.
 #
-# This is a pragmatic interpretation of INFRASTRUCTURE.md §4.7 which proposed a
-# per-file "Managed by Shamt" footer contract: most canonical files under
+# This is a pragmatic interpretation of an earlier proposed per-file
+# "Managed by Shamt" footer contract: most canonical files under
 # shamt-core/ do not currently carry that footer, so a strict reading would
 # leave the bulk of canonical content un-synced. The subtree-level
 # interpretation — "anything in the sync set is master-owned" — gives child

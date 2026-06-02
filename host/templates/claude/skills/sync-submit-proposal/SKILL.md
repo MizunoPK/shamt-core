@@ -8,8 +8,8 @@ description: >
   context), prints the proposal content with the master-side target path
   (proposals/incoming/{project}-{slug}.md) for manual copy-paste, and moves the
   local copy to .shamt-core/proposals/submitted/{slug}.md to mark "awaiting decision". Does
-  NOT push to master, open PRs, or file issues — the submission is manual copy
-  per INFRASTRUCTURE.md §4.3 Option B. Invoke when the user wants to send a
+  NOT push to master, open PRs, or file issues — the submission is manual copy.
+  Invoke when the user wants to send a
   proposal upstream, ship a proposal to master, submit a framework change, or
   push a proposal up.
 triggers:

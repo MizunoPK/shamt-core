@@ -44,7 +44,7 @@ A child project that has installed Shamt looks like this:
 └── code_reviews/                   # formal-mode review output
 ```
 
-The master repo has additional `proposals/` subfolders that **never appear in a child project**: `incoming/` (child-submitted proposals awaiting triage per [§4.8](../INFRASTRUCTURE.md#48-new-artifactsfolders-on-master)), `archive/` (implemented proposals), `rejected/` (closed with a top-of-file note), and `deferred/` (on hold). Master's presence is what `/sync-submit-proposal` and `/sync-triage-proposals` use to discriminate the two sides — child projects rely on the absence of `proposals/incoming/` as the master-side check.
+The master repo has additional `proposals/` subfolders that **never appear in a child project**: `incoming/` (child-submitted proposals awaiting triage), `archive/` (implemented proposals), `rejected/` (closed with a top-of-file note), and `deferred/` (on hold). Master's presence is what `/sync-submit-proposal` and `/sync-triage-proposals` use to discriminate the two sides — child projects rely on the absence of `proposals/incoming/` as the master-side check.
 
 Files with a `Managed by Shamt` footer (or files in `.shamt-core/`'s master sync set) are owned by master / regen — they get overwritten by `import-shamt` and `/f4-regen-framework`. Files outside that set are user-owned and preserved.
 
@@ -59,9 +59,7 @@ Shamt is a master/child framework with deliberately constrained sync directions:
 | Child → master | **Proposals only.** Manual copy-paste via `/sync-submit-proposal`. | A single proposal file (`proposals/incoming/{project_name}-{slug}.md` on master). |
 | Master → child | **Framework pull only.** Scripted via `/sync-import-shamt`. Always-latest, no pinning. | Master's canonical sources under `shamt-core/`. |
 
-No bidirectional guide-editing sync. No `export.sh`. The child's project work (stories, epics, features, code reviews) never syncs to master and isn't carried by Shamt at all — it lives in the child's own git repo per [INFRASTRUCTURE.md §4.11](../INFRASTRUCTURE.md#411-cross-machine-sync-for-project-work).
-
-See [INFRASTRUCTURE.md Part 4](../INFRASTRUCTURE.md#part-4-masterchild-sync) for the full design.
+No bidirectional guide-editing sync. No `export.sh`. The child's project work (stories, epics, features, code reviews) never syncs to master and isn't carried by Shamt at all — it lives in the child's own git repo.
 
 ---
 
@@ -105,7 +103,7 @@ Four commands at two altitudes — Epic (top) and Feature (one level down). Each
 | `/p3-start-feature {slug}` | Feature intake/define | shipped |
 | `/p4-decompose-feature {slug}` | Feature → story stubs | shipped |
 
-Every command above is **slug-first** and **fresh-agent runnable** per Principle 1: pass a slug, the command resolves the folder, reads on-disk state, executes its phase. Each one mirrors `/e1-start-story`'s tracker plumbing per [INFRASTRUCTURE.md §1.11](../INFRASTRUCTURE.md#111-issue-tracker-integration-ado--github-cli): when the active profile (read from `.shamt-core/shamt-config.json`) declares the matching work-item type (e.g., ADO supports Epic + Feature + Story; GitHub supports Issue only), the slug-to-ID parse and payload fetch happen — otherwise the command falls through to freeform mode with a one-line notice (`tracker profile {name} has no {Type} work-item type — proceeding freeform`).
+Every command above is **slug-first** and **fresh-agent runnable** per Principle 1: pass a slug, the command resolves the folder, reads on-disk state, executes its phase. Each one mirrors `/e1-start-story`'s tracker plumbing: when the active profile (read from `.shamt-core/shamt-config.json`) declares the matching work-item type (e.g., ADO supports Epic + Feature + Story; GitHub supports Issue only), the slug-to-ID parse and payload fetch happen — otherwise the command falls through to freeform mode with a one-line notice (`tracker profile {name} has no {Type} work-item type — proceeding freeform`).
 
 #### Hierarchy + folder layout
 
@@ -143,7 +141,7 @@ Linking is plain-markdown header lines under the H1 — no parser, no sidecar fi
 >
 > **Rubric exception:** development-order dependencies between siblings are allowed. They live in the parallelization analysis (`Recommended order`), not as a testability violation.
 
-The rubric is the contract between PO flow and Engineer flow. The Engineer flow can refuse a story that violates it; the decomposition exit gate catches violations before stubs land on disk. See [INFRASTRUCTURE.md §2.1](../INFRASTRUCTURE.md#21-what-epicfeature-work-actually-needs) for the full rubric, the `/p4-decompose-feature` command body for inline enforcement details.
+The rubric is the contract between PO flow and Engineer flow. The Engineer flow can refuse a story that violates it; the decomposition exit gate catches violations before stubs land on disk. See the `/p4-decompose-feature` command body for the full rubric and inline enforcement details.
 
 #### Architecture-impact flag (§1.12 PO-threading)
 
@@ -159,8 +157,6 @@ The status line surfaces PO-flow context by falling back through altitudes — f
 4. Otherwise → `Shamt | idle`.
 
 "Active" at every altitude resolves the same way: `{altitude}/.active` (single-line override pinning a folder) if present, else most-recently-modified subdirectory. See the [Status-line registration](#status-line-registration) table below for the full layout.
-
-See [INFRASTRUCTURE.md §2.1](../INFRASTRUCTURE.md#21-what-epicfeature-work-actually-needs), [§2.2](../INFRASTRUCTURE.md#22-slash-commands), and [§2.3](../INFRASTRUCTURE.md#23-open-meta-questions-specific-to-this-layer) for the full PO-flow design context.
 
 ### Framework update flow (Part 3 — master-side)
 
@@ -263,7 +259,7 @@ Or via `/sync-import-shamt`. Behavior:
 
 ## Regen
 
-`.shamt-core/scripts/regenerate-framework.sh` renders canonical Claude wiring (`.shamt-core/host/templates/claude/`) into a child project's `.claude/` directory. Bash-first per [INFRASTRUCTURE.md §1.6](../INFRASTRUCTURE.md#16-scripts-regen--framework-maintenance); a PowerShell wrapper may follow later.
+`.shamt-core/scripts/regenerate-framework.sh` renders canonical Claude wiring (`.shamt-core/host/templates/claude/`) into a child project's `.claude/` directory. Bash-first; a PowerShell wrapper may follow later.
 
 ### Modes
 

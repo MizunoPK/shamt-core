@@ -102,7 +102,6 @@ These are intentional patterns. The expanded audit must recognize them and recor
 - **"finding" vs "issue".** The audit says "finding"; Pattern 1 says "issue". They are interchangeable by design (stated in the command body) — **not** a D7 terminology violation.
 - **`local` tracker profile has no ticket template.** D5 records no finding for the absence of a `ticket.local.template.md` — the `local` ticket is hand-authored or PO-flow-produced.
 - **Phase count varies with the testing flag.** 6 phases when `testing: "disabled"`, 7 when `"enabled"`. D10 treats both as correct — a body must match the count *for the configuration it describes*, not a single fixed number.
-- **INFRASTRUCTURE.md is out of the audit surface.** The audit sweeps `shamt-core/` canonical sources. The repo-root `../INFRASTRUCTURE.md` planning log (with its `Resolved:` / `(was X)` history) is not a regenerated canonical source and is not swept — its historical notes are not D11 findings.
 
 When a genuinely-new intentional pattern emerges that the audit keeps re-flagging, add it here through `/f1-propose-update` rather than weakening a dimension.
 

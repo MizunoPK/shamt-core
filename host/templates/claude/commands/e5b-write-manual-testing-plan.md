@@ -4,7 +4,7 @@ description: Post-Build optional artifact — produce and validate manual_test_p
 
 # /e5b-write-manual-testing-plan
 
-**Purpose:** Produce and validate `stories/{slug}/manual_test_plan.md` — a human-walkthrough artifact for verification that automated tests cannot cover. Per INFRASTRUCTURE.md §1.15: invocable any time after Phase 4 (Build) completes, **orthogonal to the project-level automated-testing opt-in** (no `.shamt-core/shamt-config.json` no-op check — this command is always available).
+**Purpose:** Produce and validate `stories/{slug}/manual_test_plan.md` — a human-walkthrough artifact for verification that automated tests cannot cover. Invocable any time after Phase 4 (Build) completes, **orthogonal to the project-level automated-testing opt-in** (no `.shamt-core/shamt-config.json` no-op check — this command is always available).
 
 Slug-resumable: if the artifact already exists, re-validate or patch on request rather than starting from scratch.
 
@@ -61,7 +61,7 @@ State the chosen mode in one line before drafting.
 
 ### Step 2 — Draft `manual_test_plan.md`
 
-Write `stories/{slug}/manual_test_plan.md` from [`templates/manual_test_plan.template.md`](../../../../templates/manual_test_plan.template.md). Required sections (per [INFRASTRUCTURE.md §1.15](../../../../../INFRASTRUCTURE.md#115-manual-testing-plan-optional-story-level)):
+Write `stories/{slug}/manual_test_plan.md` from [`templates/manual_test_plan.template.md`](../../../../templates/manual_test_plan.template.md). Required sections:
 
 - Header metadata (`Created`, `Story`, `Spec`, `Implementation Plan`, `Testing Plan`, `Path`, `Baseline`).
 - `## Open Questions` — populated and resolved one-at-a-time per the open-questions iterative dialog.
@@ -74,7 +74,7 @@ Write `stories/{slug}/manual_test_plan.md` from [`templates/manual_test_plan.tem
 
 ### Step 3 — Inline validation loop (4 dimensions)
 
-Run Pattern 1 inline — do **not** delegate to `/validate-artifact` here, because the dimension set is artifact-specific. Per [INFRASTRUCTURE.md §1.15](../../../../../INFRASTRUCTURE.md#validation-dimensions) and [`templates/manual_test_plan.template.md`](../../../../templates/manual_test_plan.template.md), the 4 dimensions are:
+Run Pattern 1 inline — do **not** delegate to `/validate-artifact` here, because the dimension set is artifact-specific. Per [`templates/manual_test_plan.template.md`](../../../../templates/manual_test_plan.template.md), the 4 dimensions are:
 
 1. **Scope coverage** — every risk area named in the spec's `Scope` / Requirements / Review Prevention Gates has at least one scenario that exercises it. A gap is **HIGH**.
 2. **Step reproducibility** — each step is unambiguous enough that someone unfamiliar with the codebase can execute it without asking a question. Vague steps ("navigate to the admin page") are **MEDIUM**.

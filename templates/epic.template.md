@@ -1,4 +1,4 @@
-<!-- Epic artifact. Lives at epics/{slug}-{brief}/epic.md (flat layout; globally unique slug per INFRASTRUCTURE.md §2.1). -->
+<!-- Epic artifact. Lives at epics/{slug}-{brief}/epic.md (flat layout; globally unique slug). -->
 # Epic {slug}
 
 ## Open Questions

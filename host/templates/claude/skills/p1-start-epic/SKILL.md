@@ -43,7 +43,7 @@ Follow the canonical `/p1-start-epic` command body verbatim — see [`commands/p
 
 ## Tracker fallback
 
-When the active profile lacks Epic support (GitHub today), surface the one-line freeform-fallback notice and continue. **Do not silently fail; do not halt.** Per the freeform-fallback rule in [`reference/trackers/_contract.md`](../../../../../reference/trackers/_contract.md) (and INFRASTRUCTURE.md §1.11 for the design rationale).
+When the active profile lacks Epic support (GitHub today), surface the one-line freeform-fallback notice and continue. **Do not silently fail; do not halt.** Per the freeform-fallback rule in [`reference/trackers/_contract.md`](../../../../../reference/trackers/_contract.md).
 
 ## Recommended model
 

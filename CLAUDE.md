@@ -2,7 +2,7 @@
 
 This is the canonical home of the **Shamt** framework: rules, references, templates, and Claude Code host wiring that child projects import. Treat this file as the north star for working **on the framework itself**. For day-to-day project work that *uses* Shamt, see `CHEATSHEET.md` (commands + skills + personas) and `templates/SHAMT_RULES.template.md` (the rules a child project installs).
 
-This file is for shamt-core contributors. The repo-root `CLAUDE.md` (one level up, in the v2 development container) is a separate document — it primes the v2-development context and references this folder.
+This file is for shamt-core contributors. shamt-core is its own standalone git repository.
 
 ---
 
@@ -70,7 +70,7 @@ No bulk question-bombing. No silent assumption-making. No placeholders surviving
 
 ## What's deliberately out of scope
 
-Carried forward from v1 lessons (see `../INFRASTRUCTURE.md` for full rationale):
+Carried forward from v1 lessons:
 
 - **No multi-host support.** Claude Code is the only first-class host. Codex / Cursor / IDE integrations are not regenerated. If a second host ever becomes a real need, propose it through the framework-update flow.
 - **No MCP server, no OTel collector, no SDK CI templates.** v1 had these and the cost outweighed the use.
@@ -84,7 +84,7 @@ If a request would pull shamt-core back toward any of these, pause and confirm w
 
 ## Commit conventions (TBD)
 
-Not pinned yet. Decide before the first feature commit and document here. The repo-root `CLAUDE.md` calls out the same TBD; resolve them together.
+Not pinned yet. Decide before the first feature commit and document here.
 
 ---
 
@@ -92,13 +92,3 @@ Not pinned yet. Decide before the first feature commit and document here. The re
 
 Every artifact change in this folder goes through a Pattern 1 validation loop before merge. The `templates/SHAMT_RULES.template.md` file defines Pattern 1 normatively — read it once and apply it consistently. Sub-agent confirmations always use cheap-tier (Haiku); a sub-agent finding any issue (even one LOW) resets the validation counter.
 
----
-
-## Working alongside `_reference/`
-
-While shamt-core is being built inside the `shamt-ai-dev-v2/` development container, the sibling `_reference/` folder (one level up) holds two read-only prior-art trees:
-
-- `_reference/shamt-lite-transfer/` — the lightweight standalone bundle this rewrite is based on. Primary baseline.
-- `_reference/shamt-ai-dev/` — the full v1 master repo. Mine for patterns; do not copy structure wholesale.
-
-Both are **gitignored** in v2. Never edit, never stage, never delete. Once shamt-core is extracted into its own repository, `_reference/` won't follow; this folder must stand on its own.

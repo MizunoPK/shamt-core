@@ -6,7 +6,7 @@ description: Child-side. Prepare a validated, child-local proposal for upstream 
 
 **Purpose:** Run the child-side submit step of the v2 master/child sync (Part 4). Resolve a slug to `proposals/{slug}.md`, confirm the proposal is validated (Phase 2 footer present), display the content with the master-side target path so the user can copy it into master's `proposals/incoming/`, then move the local copy to `proposals/submitted/{slug}.md` so the child tracks "submitted, awaiting decision" state.
 
-The submission itself is **manual copy-paste** per [INFRASTRUCTURE.md §4.3 Option B](../../../../../INFRASTRUCTURE.md#43-child--master-proposal-submission). This command does not push to master, does not open PRs, does not file issues. It produces the artifact the user pastes upstream.
+The submission itself is **manual copy-paste**. This command does not push to master, does not open PRs, does not file issues. It produces the artifact the user pastes upstream.
 
 **Recommended model:** Cheap (Haiku). The command reads a file, checks a footer, prints to chat, and moves a file. No design judgment. See [`reference/model_selection.md`](../../../../reference/model_selection.md).
 
@@ -24,7 +24,7 @@ The submission itself is **manual copy-paste** per [INFRASTRUCTURE.md §4.3 Opti
 
 ## Prerequisites
 
-- This command runs **on the child side**. Master-side projects do not submit upstream — they author proposals locally and run the framework-update flow directly. Detect master vs. child by checking for `proposals/incoming/` at the cwd: the incoming folder is master's per [§4.4 / §4.8](../../../../../INFRASTRUCTURE.md#44-masters-handling-of-imported-proposals), and child projects never have it. If `proposals/incoming/` exists, halt and direct the user to `/f1-propose-update` + `/validate-artifact` + the rest of the Part 3 framework-update flow (Phase 8) instead.
+- This command runs **on the child side**. Master-side projects do not submit upstream — they author proposals locally and run the framework-update flow directly. Detect master vs. child by checking for `proposals/incoming/` at the cwd: the incoming folder is master's, and child projects never have it. If `proposals/incoming/` exists, halt and direct the user to `/f1-propose-update` + `/validate-artifact` + the rest of the Part 3 framework-update flow (Phase 8) instead.
 - `.shamt-core/shamt-config.json` exists at the project root and declares `project_name`. If missing, halt and direct the user to set it: `project_name` namespaces upstream submissions per §4.3 / §4.4.
 - `.shamt-core/proposals/{slug}.md` exists, is non-empty, and carries a Phase 2 validation footer (`Validated YYYY-MM-DD — N rounds[, 1 adversarial sub-agent confirmed]`). If the footer is missing, halt and direct the user to `/validate-artifact .shamt-core/proposals/{slug}.md` first — master will not promote an un-validated proposal.
 - `.shamt-core/proposals/submitted/{slug}.md` does **not** already exist. If it does, halt: this slug has already been submitted. Either wait for master's decision, or rename the slug and re-author via `/f1-propose-update`.

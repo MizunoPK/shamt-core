@@ -1,4 +1,4 @@
-<!-- Feature artifact. Lives at features/{slug}-{brief}/feature.md (flat layout; globally unique slug per INFRASTRUCTURE.md §2.1). -->
+<!-- Feature artifact. Lives at features/{slug}-{brief}/feature.md (flat layout; globally unique slug). -->
 # Feature {slug}
 
 **Parent Epic:** [{epic-slug} — leave blank for standalone features created via `/p3-start-feature` from scratch (no parent epic). Plain markdown; no parser.]

@@ -6,7 +6,7 @@ description: Child-side. Pull master HEAD canonical sources into <child>/.shamt-
 
 **Purpose:** Run the child-side framework pull. Invoke `.shamt-core/import-shamt.sh` to clone (or local-copy) master, overwrite child-side canonical sources from master's sync set, auto-move any child-local proposals whose slugs match master's archive into `.shamt-core/proposals/already-merged/`, and re-run `regenerate-framework.sh` so `<child>/.claude/` reflects the new canonical state. Surface a summary of changes plus any preserved-unmanaged warnings.
 
-Per [INFRASTRUCTURE.md §4.5 / §4.6 / §4.13](../../../../../INFRASTRUCTURE.md#45-master--child-framework-pull), the pull is **always-latest**: it pulls master HEAD with no version pinning.
+The pull is **always-latest**: it pulls master HEAD with no version pinning.
 
 **Recommended model:** Cheap (Haiku). The command is a script wrapper: invoke the shell script, parse its output, surface warnings, report. No design judgment. See [`reference/model_selection.md`](../../../../reference/model_selection.md).
 

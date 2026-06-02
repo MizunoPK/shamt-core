@@ -4,7 +4,7 @@ description: Phase 4 of the PO flow — break a validated feature into N story-t
 
 # /p4-decompose-feature
 
-**Purpose:** Run Phase 4 of the PO flow. Read a validated `feature.md`, propose a list of stories (title + one-line scope each), enforce the **individually-testable rubric** per [INFRASTRUCTURE.md §2.1](../../../../../INFRASTRUCTURE.md#21-what-epicfeature-work-actually-needs), gate the whole list with the user once, derive story slugs, run the decomposition exit gate, then write N story-ticket-stub folders under `stories/` (each carrying `**Parent Feature:**` and `**Parent Epic:**` back-ref headers + scope one-liner) and append `Target Stories` + `Sequencing & Parallelization` back onto the parent feature. Per-story deep dialog is deferred to `/e1-start-story` (stub-aware).
+**Purpose:** Run Phase 4 of the PO flow. Read a validated `feature.md`, propose a list of stories (title + one-line scope each), enforce the **individually-testable rubric**, gate the whole list with the user once, derive story slugs, run the decomposition exit gate, then write N story-ticket-stub folders under `stories/` (each carrying `**Parent Feature:**` and `**Parent Epic:**` back-ref headers + scope one-liner) and append `Target Stories` + `Sequencing & Parallelization` back onto the parent feature. Per-story deep dialog is deferred to `/e1-start-story` (stub-aware).
 
 **Recommended model:** Reasoning (Opus). Decomposition involves the individually-testable rubric, dependency analysis, parallelization callout, and global-slug discipline — all benefit from Opus's reasoning depth. Same justification as `/p2-decompose-epic`. See [`reference/model_selection.md`](../../../../reference/model_selection.md).
 
@@ -63,7 +63,7 @@ On first decomposition (no prior `Decomposed …` line), every approved story is
 
 1. Read `feature.md`: `Goal`, `Success Criteria`, `Scope / Non-Scope` (including any `**Architecture impact:** …` line), `**Parent Epic:**` back-ref header (if present — needed for the back-ref headers in Step 8), and (when present) the **All Remaining Fields** appendix.
 2. Draft a proposed story list. Each entry: **title** + **one-line scope**. Capture the list as a flat enumerated proposal — no nested sub-stories, no per-story deep dialog (that is `/e1-start-story`'s job).
-3. **Enforce the individually-testable rubric** per [§2.1](../../../../../INFRASTRUCTURE.md#21-what-epicfeature-work-actually-needs) parallelization row and the §2.3 decomposition exit-criterion resolution. **The rubric, in full:**
+3. **Enforce the individually-testable rubric** — **the rubric, in full:**
 
    > A story is **individually testable** when it carries a self-contained verification path (automated or manual) that exercises its own contribution without re-verifying any sibling story's success criterion.
    >
@@ -84,15 +84,15 @@ On first decomposition (no prior `Decomposed …` line), every approved story is
      - **ado / github** — descriptive kebab-case is allowed at the stub stage (the engineer can rename to the tracker-native form during `/e1-start-story` if a ticket is later filed). The PO flow does not create tracker work items.
      - **local / none** — any descriptive kebab-case slug.
    - `{brief}` suffix — kebab-case from the scope one-liner. Keep `{brief}` short — 2–4 words.
-   - **Re-decomposition Kept exception:** if a prior `Decomposed …` line is present (Step 3) and the derived `{story-slug}` matches one of its entries, **do not** re-derive `{brief}`. Resolve the existing folder via `stories/{story-slug}-*/` glob (slugs are globally unique per [§2.1](../../../../../INFRASTRUCTURE.md#21-what-epicfeature-work-actually-needs); the prior line records slugs only, so the actual `{brief}` is read off the existing folder name) and reuse that folder verbatim. Same Kept-exception rule as `/p2-decompose-epic`.
+   - **Re-decomposition Kept exception:** if a prior `Decomposed …` line is present (Step 3) and the derived `{story-slug}` matches one of its entries, **do not** re-derive `{brief}`. Resolve the existing folder via `stories/{story-slug}-*/` glob (slugs are globally unique; the prior line records slugs only, so the actual `{brief}` is read off the existing folder name) and reuse that folder verbatim. Same Kept-exception rule as `/p2-decompose-epic`.
 
-5. Draft the **parallelization analysis** per [INFRASTRUCTURE.md §2.1](../../../../../INFRASTRUCTURE.md#21-what-epicfeature-work-actually-needs) parallelization row:
+5. Draft the **parallelization analysis**:
    - **Recommended order** — sequenced enumeration of stories by dependency; for each, a one-line "why this comes first; dependencies" note. Development-order dependencies between siblings (rubric exception above) live here.
    - **Parallelizable** — which stories can be worked concurrently and why, or `None — strictly sequential.`
 
 ### Step 5 — Gate the whole batch with the user (once)
 
-Per [INFRASTRUCTURE.md §2.1](../../../../../INFRASTRUCTURE.md#21-what-epicfeature-work-actually-needs) stub-list pattern, the user gates **the entire list at once** — not per-story.
+Per the stub-list pattern, the user gates **the entire list at once** — not per-story.
 
 Present, in chat:
 
@@ -108,7 +108,7 @@ Iterate with the user until they approve: they may add / remove / reword entries
 
 ### Step 6 — Decomposition exit gate
 
-Per [INFRASTRUCTURE.md §2.3](../../../../../INFRASTRUCTURE.md#23-open-meta-questions-specific-to-this-layer), check **before** writing any stubs to disk. The gate is a **2-condition check** on the approved batch — distinct from `/validate-artifact`:
+Check **before** writing any stubs to disk. The gate is a **2-condition check** on the approved batch — distinct from `/validate-artifact`:
 
 1. **Every story stub has an individually-testable scope one-liner** per the rubric in Step 4 sub-step 3. No blanks, no "TBD", no placeholder text, no rubric-failing candidates surviving into the approved list.
 2. **Every story appears in the parent feature's `Sequencing & Parallelization` analysis** — either in the `Recommended order` enumeration, or in the `Parallelizable` callout, or both.
@@ -117,7 +117,7 @@ If either condition fails, surface the gap to the user and return to Step 5. Do 
 
 ### Step 7 — Detect global story-slug collisions
 
-Story slug uniqueness is **global** per [INFRASTRUCTURE.md §2.1](../../../../../INFRASTRUCTURE.md#21-what-epicfeature-work-actually-needs) (flat layout). Before writing:
+Story slug uniqueness is **global** (flat layout). Before writing:
 
 1. **For stories in the New partition** (per Step 3 — and for all stories on first decomposition): glob `stories/{story-slug}-*/` and `stories/{story-slug}/`. If **any** candidate slug collides with an existing story folder, halt with: `story slug "{slug}" collides with existing story at stories/{existing-folder}/. Choose a different title, or rename the existing story.` Surface the conflict and let the user adjust the title (return to Step 5).
 2. **Exemption — re-decomposition Kept partition.** A Kept slug (per Step 3) is expected to collide with its own prior stub folder under the current feature. That is not a collision in the gate sense — proceed without halting and reuse the existing folder in Step 8. Apply the exemption only when the colliding folder appears in the prior `Decomposed …` line of *this* feature; collisions against stories outside that prior list (e.g., a stub created by a different feature that happens to share the slug) are real and still halt.
@@ -148,7 +148,7 @@ Update `feature.md`:
 1. **Rewrite `## Target Stories` wholesale** with the approved list — one bullet per story: `` `{story-slug}` — {one-line scope} ``. If this is a re-decomposition (Step 3), replace the prior section's content entirely.
 2. **Rewrite `## Sequencing & Parallelization` wholesale** with the approved analysis (recommended order + parallelizable callout). Same wholesale-replace rule on re-decomposition.
 3. **Add (or replace) a `Decomposed YYYY-MM-DD — N story stubs at stories/{slug-1}, stories/{slug-2}, …` line** immediately **above** the `Validated …` footer, so the validation footer remains the last line of the file. Use today's date.
-   - **Slug-only format.** Record the slug portion of each folder (`{story-slug}`), not the full `{story-slug}-{brief}` path. Slugs are globally unique per [§2.1](../../../../../INFRASTRUCTURE.md#21-what-epicfeature-work-actually-needs), so the actual folder is always recoverable via `stories/{slug}-*/` glob — recording only the slug keeps the line parseable on re-decomposition (Step 3 reads slugs directly without having to split a slug-brief concatenation, which is ambiguous because both are kebab-case). Same format as `/p2-decompose-epic` Step 9.
+   - **Slug-only format.** Record the slug portion of each folder (`{story-slug}`), not the full `{story-slug}-{brief}` path. Slugs are globally unique, so the actual folder is always recoverable via `stories/{slug}-*/` glob — recording only the slug keeps the line parseable on re-decomposition (Step 3 reads slugs directly without having to split a slug-brief concatenation, which is ambiguous because both are kebab-case). Same format as `/p2-decompose-epic` Step 9.
    - On first decomposition: insert the line.
    - On re-decomposition: replace the prior `Decomposed …` line in place. Only the latest decomposition is recorded.
 4. **Preserve the existing validation footer** as-is. The feature was validated before decomposition; decomposition does not re-invalidate it. Do not strip or duplicate the footer.
@@ -197,7 +197,7 @@ Surface, but do **not** auto-invoke:
 /e1-start-story {story-slug-2}     # ...and so on
 ```
 
-Per [INFRASTRUCTURE.md §2.1](../../../../../INFRASTRUCTURE.md#21-what-epicfeature-work-actually-needs), each story stub is **independently resumable**. The engineer can drive `/e1-start-story` on each stub in sequence, or run them in parallel by opening additional terminal tabs (the framework provides no runtime coordination machinery per §2.3). Order is suggested by the `Recommended order` line just written to the feature. `/e1-start-story` is **stub-aware** — it detects the back-ref headers in `ticket.md` and preserves them when fleshing out the rest of the Intake content (see `commands/e1-start-story.md`).
+Each story stub is **independently resumable**. The engineer can drive `/e1-start-story` on each stub in sequence, or run them in parallel by opening additional terminal tabs (the framework provides no runtime coordination machinery per §2.3). Order is suggested by the `Recommended order` line just written to the feature. `/e1-start-story` is **stub-aware** — it detects the back-ref headers in `ticket.md` and preserves them when fleshing out the rest of the Intake content (see `commands/e1-start-story.md`).
 
 ## Exit criteria
 
@@ -210,14 +210,14 @@ Per [INFRASTRUCTURE.md §2.1](../../../../../INFRASTRUCTURE.md#21-what-epicfeatu
 ## Notes
 
 - **Fresh-agent runnable.** Every input lives on disk (`feature.md`, the active tracker's ticket template, the existing `stories/` tree, `.shamt-core/shamt-config.json`). No conversation history required.
-- **Decomposition exit gate ≠ `/validate-artifact`.** Per [INFRASTRUCTURE.md §2.1](../../../../../INFRASTRUCTURE.md#21-what-epicfeature-work-actually-needs) epic-level review row (which applies identically at the feature altitude), the gate in Step 6 is a 2-condition stub-batch check run **before** stubs are written; `/validate-artifact` is the full Pattern 1 loop that runs against `feature.md` (already, before `/p4-decompose-feature`) and against each story-level artifact (later, after `/e2-define-spec`, `/e3-plan-implementation`, etc. — Engineer-flow validations). Do not conflate the two.
+- **Decomposition exit gate ≠ `/validate-artifact`.** The gate in Step 6 is a 2-condition stub-batch check run **before** stubs are written; `/validate-artifact` is the full Pattern 1 loop that runs against `feature.md` (already, before `/p4-decompose-feature`) and against each story-level artifact (later, after `/e2-define-spec`, `/e3-plan-implementation`, etc. — Engineer-flow validations). Do not conflate the two.
 - **The individually-testable rubric is the hard constraint** on output. The Engineer flow can refuse a story that violates this; PO-flow enforcement at decomposition time is the contract. The rubric is reproduced in full inline in Step 4 sub-step 3 — not just by reference — so a fresh agent reading this command can apply it without external lookup.
 - **Development-order dependencies between siblings are allowed.** They live in the parallelization analysis (`Recommended order`) and are not testability violations. Do not reject candidate stories that have sibling build-order dependencies.
 - **No tracker fetch at this altitude.** This command operates entirely on the already-written `feature.md`. The §1.11 freeform-fallback rule does not apply at this altitude — there is no tracker payload to fall through from. The active tracker is read only to pick the **ticket template** for the stub bodies (Step 8 — `ado` vs. `github` vs. baseline).
 - **No per-story deep dialog here.** That is `/e1-start-story` (stub-aware)'s job per §2.1 stub-list-then-drill-in. Resist the urge to start drafting story acceptance criteria, spec sections, or implementation plans — it produces low-value batched dialog at this altitude and pre-empts the open-questions iterative dialog at the next altitude.
 - **No feature-level review phase.** Per §2.1, the 16-category code-review framework stays story-level. This command does not invoke `/e6-review-changes`.
 - **No `/e1-start-story` auto-invocation.** Per Principle 1, every command stays independently runnable. Chaining would force a multi-phase session and would couple resumability across altitudes.
-- **Parallelization is PO-flow output, not runtime coordination.** Per [INFRASTRUCTURE.md §2.1](../../../../../INFRASTRUCTURE.md#21-what-epicfeature-work-actually-needs) parallelization row and §2.3 resolution. The `Parallelizable` callout informs the engineer; running stories concurrently is a "second terminal tab" exercise.
+- **Parallelization is PO-flow output, not runtime coordination.** The `Parallelizable` callout informs the engineer; running stories concurrently is a "second terminal tab" exercise.
 - **Parent Epic back-ref propagation.** Step 8 reads the parent feature's `**Parent Epic:** {epic-slug}` header and copies it onto each new story stub. When the parent feature is standalone (no parent epic), the `**Parent Epic:**` line is **omitted** from the stub — not written as blank — so the back-ref headers remain grep-clean.
 
 ---

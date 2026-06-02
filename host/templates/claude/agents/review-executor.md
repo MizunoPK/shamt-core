@@ -150,7 +150,7 @@ Use one of these messages verbatim:
 ## Hard rules
 
 - **Read-only git.** Never `git checkout`, `git switch`, `git reset`, or `git push`. Use `git fetch`, `git log`, `git diff`, `git show`, `git merge-base`.
-- **No tracker postback.** Even when the active tracker profile documents a PR-comment command, you do not call it (per `templates/SHAMT_RULES.template.md` Pattern 4 and INFRASTRUCTURE.md §1.11). The artifact is the deliverable.
+- **No tracker postback.** Even when the active tracker profile documents a PR-comment command, you do not call it (per `templates/SHAMT_RULES.template.md` Pattern 4). The artifact is the deliverable.
 - **No re-review overwrite.** Each pass writes `review_v{N+1}.md`. Discover N by listing existing files.
 - **Consider every category.** A category with no finding is still considered — say so in the summary if it is non-obvious that the category was reviewed.
 - **Do not assume parallel files are identical.** Even byte-for-byte copy files get an independent read.

@@ -24,7 +24,7 @@ Per phase-per-command resumability (Principle 1), triage does not invoke `/valid
 
 ## Prerequisites
 
-- This command runs **on the master side**. Master vs. child is decided by `proposals/incoming/` presence at the cwd: master has it per [§4.4 / §4.8](../../../../../INFRASTRUCTURE.md#44-masters-handling-of-imported-proposals); child projects never do. (Both sides have `shamt-core/` as a subdirectory, so its presence is NOT a master indicator.)
+- This command runs **on the master side**. Master vs. child is decided by `proposals/incoming/` presence at the cwd: master has it; child projects never do.
 - `proposals/incoming/` exists. If absent, halt with: *"proposals/incoming/ does not exist — this looks like a child project. Use `/sync-submit-proposal {slug}` to send proposals upstream instead."*
 - `proposals/incoming/` contains at least one `.md` file (excluding files whose basename starts with `_` or `.`). If empty, report and exit cleanly: *"proposals/incoming/ is empty — nothing to triage."*
 

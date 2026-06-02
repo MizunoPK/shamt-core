@@ -37,7 +37,7 @@ Read `.shamt-core/shamt-config.json` → `testing`.
   ```
 - `"enabled"` → continue.
 
-Per INFRASTRUCTURE.md §1.14 / [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md#when-automated-testing-is-enabled), this command is safe to invoke unconditionally — the no-op keeps automation simple.
+Per [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md#when-automated-testing-is-enabled), this command is safe to invoke unconditionally — the no-op keeps automation simple.
 
 ## Prerequisites (testing enabled)
 
@@ -121,7 +121,7 @@ Also suggest `/e5b-write-manual-testing-plan {slug}` when the story touched UI /
 ## Notes
 
 - This command is **fresh-agent runnable**: the active spec, plan, testing plan, and active-artifacts pointer all live on disk. State is determined by the `## Results Log` rows.
-- **Blocks-until-pass is intentional** — INFRASTRUCTURE.md §1.14 explicitly forbids "if failure appears environmental, document and skip." Resolve the environment instead. There is no `--skip-failing` flag, no per-step opt-out.
+- **Blocks-until-pass is intentional** — the framework explicitly forbids "if failure appears environmental, document and skip." Resolve the environment instead. There is no `--skip-failing` flag, no per-step opt-out.
 - The **architect/builder split** still applies for Story-bug failures: the orchestrator (this command + the user) decides what to fix; the builder (re-invoked via `/e4-execute-plan`) applies the fix.
 - **No tracker postback.** Test results stay in the artifact. The user posts to the tracker manually if they want to.
 - Per `reference/model_selection.md`, mis-tiering the executor (e.g., spawning Sonnet for mechanical test execution) is a configuration finding — fix the tier and re-invoke.

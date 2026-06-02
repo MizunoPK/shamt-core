@@ -66,14 +66,14 @@ On first decomposition (no prior `Decomposed …` line), every approved feature 
 3. For each entry, derive:
    - `{feature-slug}` — kebab-case from the title (e.g., "Billing integration" → `billing-integration`).
    - `{brief}` suffix — kebab-case from the goal one-liner (e.g., goal "wire Stripe webhooks into the ledger service" → `stripe-webhook-ledger`). Keep `{brief}` short — 2–4 words.
-   - **Re-decomposition Kept exception:** if a prior `Decomposed …` line is present (Step 3) and the derived `{feature-slug}` matches one of its entries, **do not** re-derive `{brief}`. Resolve the existing folder via `features/{feature-slug}-*/` glob (slugs are globally unique per [§2.1](../../../../../INFRASTRUCTURE.md#21-what-epicfeature-work-actually-needs); the prior line records slugs only, so the actual `{brief}` is read off the existing folder name) and reuse that folder verbatim. Step 5 user iteration may move entries in or out of this set; the final Kept partition is the slug match against the prior list at the moment Step 5 approval lands (per Step 3.4). Downstream: Step 7 exempts Kept slugs from the collision halt; Step 8 preserves the existing `feature.md`; Step 9 cites the slug in the new `Decomposed …` line (the folder is recoverable via the same glob).
-4. Draft the **parallelization analysis** per [INFRASTRUCTURE.md §2.1](../../../../../INFRASTRUCTURE.md#21-what-epicfeature-work-actually-needs) parallelization row:
+   - **Re-decomposition Kept exception:** if a prior `Decomposed …` line is present (Step 3) and the derived `{feature-slug}` matches one of its entries, **do not** re-derive `{brief}`. Resolve the existing folder via `features/{feature-slug}-*/` glob (slugs are globally unique; the prior line records slugs only, so the actual `{brief}` is read off the existing folder name) and reuse that folder verbatim. Step 5 user iteration may move entries in or out of this set; the final Kept partition is the slug match against the prior list at the moment Step 5 approval lands (per Step 3.4). Downstream: Step 7 exempts Kept slugs from the collision halt; Step 8 preserves the existing `feature.md`; Step 9 cites the slug in the new `Decomposed …` line (the folder is recoverable via the same glob).
+4. Draft the **parallelization analysis**:
    - **Recommended order** — sequenced enumeration of features by dependency; for each, a one-line "why this comes first; dependencies" note.
    - **Parallelizable** — which features can be worked concurrently and why, or `None — strictly sequential.`
 
 ### Step 5 — Gate the whole batch with the user (once)
 
-Per [INFRASTRUCTURE.md §2.1](../../../../../INFRASTRUCTURE.md#21-what-epicfeature-work-actually-needs) stub-list pattern, the user gates **the entire list at once** — not per-feature.
+Per the stub-list pattern, the user gates **the entire list at once** — not per-feature.
 
 Present, in chat:
 
@@ -88,7 +88,7 @@ Iterate with the user until they approve: they may add / remove / reword entries
 
 ### Step 6 — Decomposition exit gate
 
-Per [INFRASTRUCTURE.md §2.3](../../../../../INFRASTRUCTURE.md#23-open-meta-questions-specific-to-this-layer), check **before** writing any stubs to disk. The gate is a **2-condition check** on the approved batch — distinct from `/validate-artifact`:
+Check **before** writing any stubs to disk. The gate is a **2-condition check** on the approved batch — distinct from `/validate-artifact`:
 
 1. **Every feature stub has a stated goal one-liner.** No blanks, no "TBD", no placeholder text.
 2. **Every feature appears in the parent epic's `Sequencing & Parallelization` analysis** — either in the `Recommended order` enumeration, or in the `Parallelizable` callout, or both.
@@ -97,7 +97,7 @@ If either condition fails, surface the gap to the user and return to Step 5. Do 
 
 ### Step 7 — Detect global feature-slug collisions
 
-Feature slug uniqueness is **global** per [INFRASTRUCTURE.md §2.1](../../../../../INFRASTRUCTURE.md#21-what-epicfeature-work-actually-needs) (flat layout). Before writing:
+Feature slug uniqueness is **global** (flat layout). Before writing:
 
 1. **For features in the New partition** (per Step 3 — and for all features on first decomposition): glob `features/{feature-slug}-*/` and `features/{feature-slug}/`. If **any** candidate slug collides with an existing feature folder, halt with: `feature slug "{slug}" collides with existing feature at features/{existing-folder}/. Choose a different title, or rename the existing feature.` Surface the conflict and let the user adjust the title (return to Step 5).
 2. **Exemption — re-decomposition Kept partition.** A Kept slug (per Step 3) is expected to collide with its own prior stub folder under the current epic. That is not a collision in the gate sense — proceed without halting and reuse the existing folder in Step 8. Apply the exemption only when the colliding folder appears in the prior `Decomposed …` line of *this* epic; collisions against features outside that prior list (e.g., a stub created by a different epic that happens to share the slug) are real and still halt.
@@ -121,7 +121,7 @@ Update `epic.md`:
 1. **Rewrite `## Target Features` wholesale** with the approved list — one bullet per feature: `` `{feature-slug}` — {one-line goal} ``. If this is a re-decomposition (Step 3), replace the prior section's content entirely.
 2. **Rewrite `## Sequencing & Parallelization` wholesale** with the approved analysis (recommended order + parallelizable callout). Same wholesale-replace rule on re-decomposition.
 3. **Add (or replace) a `Decomposed YYYY-MM-DD — N feature stubs at features/{slug-1}, features/{slug-2}, …` line** immediately **above** the `Validated …` footer, so the validation footer remains the last line of the file. Use today's date.
-   - **Slug-only format.** Record the slug portion of each folder (`{feature-slug}`), not the full `{feature-slug}-{brief}` path. Slugs are globally unique per [§2.1](../../../../../INFRASTRUCTURE.md#21-what-epicfeature-work-actually-needs), so the actual folder is always recoverable via `features/{slug}-*/` glob — recording only the slug keeps the line parseable on re-decomposition (Step 3 reads slugs directly without having to split a slug-brief concatenation, which is ambiguous because both are kebab-case).
+   - **Slug-only format.** Record the slug portion of each folder (`{feature-slug}`), not the full `{feature-slug}-{brief}` path. Slugs are globally unique, so the actual folder is always recoverable via `features/{slug}-*/` glob — recording only the slug keeps the line parseable on re-decomposition (Step 3 reads slugs directly without having to split a slug-brief concatenation, which is ambiguous because both are kebab-case).
    - On first decomposition: insert the line.
    - On re-decomposition: replace the prior `Decomposed …` line in place. Only the latest decomposition is recorded.
 4. **Preserve the existing validation footer** as-is. The epic was validated before decomposition; decomposition does not re-invalidate it. Do not strip or duplicate the footer.
@@ -169,7 +169,7 @@ Surface, but do **not** auto-invoke:
 /p3-start-feature {feature-slug-2}     # ...and so on
 ```
 
-Per [INFRASTRUCTURE.md §2.1](../../../../../INFRASTRUCTURE.md#21-what-epicfeature-work-actually-needs), each feature stub is **independently resumable**. The PO can drive `/p3-start-feature` on each stub in sequence, or run them in parallel by opening additional terminal tabs (the framework provides no runtime coordination machinery per §2.3). Order is suggested by the `Recommended order` line just written to the epic.
+Each feature stub is **independently resumable**. The PO can drive `/p3-start-feature` on each stub in sequence, or run them in parallel by opening additional terminal tabs (the framework provides no runtime coordination machinery per §2.3). Order is suggested by the `Recommended order` line just written to the epic.
 
 ## Exit criteria
 
@@ -181,12 +181,12 @@ Per [INFRASTRUCTURE.md §2.1](../../../../../INFRASTRUCTURE.md#21-what-epicfeatu
 ## Notes
 
 - **Fresh-agent runnable.** Every input lives on disk (`epic.md`, `feature.template.md`, the existing `features/` tree). No conversation history required.
-- **Decomposition exit gate ≠ `/validate-artifact`.** Per [INFRASTRUCTURE.md §2.1](../../../../../INFRASTRUCTURE.md#21-what-epicfeature-work-actually-needs) epic-level review row, the gate in Step 6 is a 2-condition stub-batch check run **before** stubs are written; `/validate-artifact` is the full Pattern 1 loop that runs against `epic.md` (already, before `/p2-decompose-epic`) and against each `feature.md` (later, after `/p3-start-feature` completes its dialog). Do not conflate the two.
+- **Decomposition exit gate ≠ `/validate-artifact`.** The gate in Step 6 is a 2-condition stub-batch check run **before** stubs are written; `/validate-artifact` is the full Pattern 1 loop that runs against `epic.md` (already, before `/p2-decompose-epic`) and against each `feature.md` (later, after `/p3-start-feature` completes its dialog). Do not conflate the two.
 - **No tracker fetch.** This command operates entirely on the already-written `epic.md`. The §1.11 freeform-fallback rule does not apply at this altitude — there is no tracker payload to fall through from.
 - **No per-feature deep dialog here.** That is `/p3-start-feature`'s job per §2.1 stub-list-then-drill-in. Resist the urge to start drafting feature scope or success criteria — it produces low-value batched dialog at this altitude and pre-empts the open-questions iterative dialog at the next altitude.
 - **No epic-level review phase.** Per §2.1, the 16-category code-review framework stays story-level. This command does not invoke `/e6-review-changes`.
 - **No `/p3-start-feature` auto-invocation.** Per Principle 1, every command stays independently runnable. Chaining would force a multi-phase session and would couple resumability across altitudes.
-- **Parallelization is PO-flow output, not runtime coordination.** Per [INFRASTRUCTURE.md §2.1](../../../../../INFRASTRUCTURE.md#21-what-epicfeature-work-actually-needs) parallelization row and §2.3 resolution. The `Parallelizable` callout informs the PO; running features concurrently is a "second terminal tab" exercise.
+- **Parallelization is PO-flow output, not runtime coordination.** The `Parallelizable` callout informs the PO; running features concurrently is a "second terminal tab" exercise.
 
 ---
 <!-- Managed by Shamt — do not edit. Regenerate from shamt-core/host/templates/claude/commands/p2-decompose-epic.md. -->

@@ -72,7 +72,7 @@ A failed auxiliary fetch must not abort the command. Per the contract, record th
 
 ## Field mapping
 
-Unified target sections follow [INFRASTRUCTURE.md §1.11 "What gets unified"](../../../INFRASTRUCTURE.md#what-gets-unified-in-the-ticket-template). The same mapping will populate the corresponding sections of `epic.md` / `feature.md` once `/p1-start-epic` / `/p3-start-feature` land — the cross-altitude notes below describe that future reuse, but those commands and their artifact templates are not yet shipped.
+Unified target sections follow the field-mapping contract (Title, Type, State, Assignee, Project, Iteration/Milestone, Description, Acceptance Criteria, URL — defined in `_contract.md`). The same mapping will populate the corresponding sections of `epic.md` / `feature.md` once `/p1-start-epic` / `/p3-start-feature` land — the cross-altitude notes below describe that future reuse, but those commands and their artifact templates are not yet shipped.
 
 | ADO raw field | Target section in unified artifact |
 |---------------|------------------------------------|

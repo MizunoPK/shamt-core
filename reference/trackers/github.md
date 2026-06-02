@@ -73,7 +73,7 @@ A failed auxiliary fetch must not abort the command. Per the contract, record th
 
 ## Field mapping
 
-Unified target sections follow [INFRASTRUCTURE.md §1.11 "What gets unified"](../../../INFRASTRUCTURE.md#what-gets-unified-in-the-ticket-template). The mapping populates the `ticket.md` sections that [`templates/ticket.github.template.md`](../../templates/ticket.github.template.md) defines. (Forward-looking: when `/p1-start-epic` / `/p3-start-feature` land, the same mapping would feed `epic.md` / `feature.md` for profiles that support those types — which on GitHub does not apply, since both fall through to freeform per the rule below.)
+Unified target sections follow the field-mapping contract (Title, Type, State, Assignee, Project, Iteration/Milestone, Description, Acceptance Criteria, URL — defined in `_contract.md`). The mapping populates the `ticket.md` sections that [`templates/ticket.github.template.md`](../../templates/ticket.github.template.md) defines. (Forward-looking: when `/p1-start-epic` / `/p3-start-feature` land, the same mapping would feed `epic.md` / `feature.md` for profiles that support those types — which on GitHub does not apply, since both fall through to freeform per the rule below.)
 
 | GitHub raw field | Target section in unified artifact |
 |------------------|------------------------------------|

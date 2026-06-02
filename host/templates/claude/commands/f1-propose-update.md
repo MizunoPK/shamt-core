@@ -22,7 +22,7 @@ description: Phase 1 of the framework-update flow — author or edit a proposal 
 
 ## Prerequisites
 
-- Run from a project root that has `shamt-core/` (master-side) or a synced framework + `.shamt-core/proposals/` folder (child-side). If neither exists, halt and direct the user to either run this from `shamt-core/` or install Shamt first.
+- Run from the shamt-core repository root (master-side) — the repo with a top-level `proposals/` directory — or from a project with a synced framework + `.shamt-core/proposals/` folder (child-side). If neither exists, halt and direct the user to either run this from the shamt-core repo root or install Shamt first.
 - `.shamt-core/proposals/_template.md` must exist. If not, halt and report — the template is the source of truth for proposal shape.
 
 ## Slug resolution

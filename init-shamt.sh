@@ -34,7 +34,7 @@
 #
 # Exit status: 0 on success, non-zero on any failure.
 #
-# Per Phase 9 / INFRASTRUCTURE.md §4.12: no remote-hosted curl-bash; invoked
+# Per Phase 9: no remote-hosted curl-bash; invoked
 # locally with master cloned in advance.
 
 set -euo pipefail

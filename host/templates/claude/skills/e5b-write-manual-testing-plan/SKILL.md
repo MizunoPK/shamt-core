@@ -6,7 +6,7 @@ description: >
   infra, external integrations, multi-user flows). Slug-resumable: Author /
   Patch / Re-validate / Author-continue modes depending on existing state.
   Orthogonal to .shamt-core/shamt-config.json testing — always available, every story. The
-  inline validation loop uses the 4 dimensions in INFRASTRUCTURE.md §1.15.
+  inline validation loop uses the 4 dimensions in templates/manual_test_plan.template.md.
   Invoke when the user wants to write a manual test plan, document manual test
   scenarios, draft a tester walkthrough, or capture UI / infra / multi-user
   verification steps.
