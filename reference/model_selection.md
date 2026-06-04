@@ -10,9 +10,9 @@ Adapted from v1's SHAMT-27 (`model_selection.md`); trimmed hard for v2.
 
 | Tier | Model | When to use |
 |------|-------|-------------|
-| **Cheap** | Haiku | File ops, git ops, mechanical execution, sub-agent confirmations, status rollups, intake / freeform ticket capture |
+| **Cheap** | Haiku | File ops, git ops, mechanical execution, sub-agent confirmations, status rollups, intake / freeform ticket capture, test execution |
 | **Balanced** | Sonnet | Code reading, structural analysis, spec research, plan creation, medium-complexity validation, formal-mode code review metadata, manual-test-plan drafting |
-| **Reasoning** | Opus | Primary validation loops (artifact validation), root-cause analysis, design decisions, multi-dimensional checks, formal-mode review issue-finding, design dialog (Gate 2a) |
+| **Reasoning** | Opus | Primary validation loops (artifact validation), root-cause analysis, design decisions, multi-dimensional checks, formal-mode review issue-finding, design dialog (Gate 2a), epic/feature decomposition |
 
 **Sub-agent confirmations always use Cheap tier.** These are zero-bias re-reads, not deep reasoning. See `validation_exit_criteria.md`.
 
@@ -52,6 +52,7 @@ Personas declare their tier in the persona body (e.g., a frontmatter `model:` fi
 | 7. Polish — code edits | Balanced | Apply reviewer feedback; mechanical fixes |
 | 7. Polish — root cause / upstream proposals | Reasoning | Generalize recurring feedback into framework-update proposals; multi-piece synthesis |
 | Manual-test-plan drafting (`/e5b-write-manual-testing-plan`) | Balanced | Drafting + validation loop per `§1.15` |
+| Framework update — Phase 0 (`/f0-draft-proposal`) | Cheap | Quick-capture an unrefined DRAFT proposal from a blurb: resolve a slug, seed a bare file, drop the blurb into Scratch Notes; no design judgment, no open-questions dialog |
 | Framework update — Phase 1 (`/f1-propose-update`) | Balanced | Drafting a proposal: structural reading of canonical sources, naming files precisely, applying the open-questions iterative dialog |
 | Framework update — Phase 2 (proposal validation via `/validate-artifact`) | Reasoning | Primary Pattern 1 loop; sub-agent (Cheap) via `validation-checker` |
 | Framework update — Phase 3 (`/f2-plan-update-implementation`) | Balanced | Architect — mechanical step decomposition of the Proposed Changes table |
@@ -87,3 +88,4 @@ Every sub-agent invocation explicitly states the tier in the prompt or the perso
 ---
 Validated 2026-05-27 — 5 rounds, 1 adversarial sub-agent confirmed (Phase 2 reference-library loop)
 Touched 2026-05-28 — added framework-update phase rows (Phase 1 `/f1-propose-update` through Phase 7 `/f6-archive-proposal`) to the per-phase guidance table. Re-validated under the Phase 8 implementation loop.
+Touched 2026-06-02 — added the Phase 0 (`/f0-draft-proposal`, Cheap) row to the framework-update per-phase guidance table. Per proposals/audit-continuous-f0-draft-capture.md (change-list amended to row 11).

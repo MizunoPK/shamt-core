@@ -4,9 +4,9 @@ description: Phase 6 of the framework-update flow (slugless) — sweep the frame
 
 # /f5-audit-framework
 
-**Purpose:** Run the framework-wide audit. Sweeps every canonical surface against eleven dimensions (sync drift, cross-doc consistency, bidirectional coverage, reference validity, template-protocol alignment, project-doc currency, terminology consistency, content completeness, duplication/contradiction, count/claim accuracy, scope-clarity), classifies findings with CRITICAL/HIGH/MEDIUM/LOW severity per Pattern 2, and exits on **Pattern 1's loop — 1 primary clean round plus 1 adversarial Haiku sub-agent confirmation** (the `audit-checker` persona). Acts as post-implementation verification when invoked inside the framework-update flow (after `/f4-regen-framework`); also runnable standalone for periodic sweeps.
+**Purpose:** Run the framework-wide audit — a **single continuous improvement loop, master / self-host only** — that pursues two goals at once: keep applying small, targeted *simple* fixes (completeness / correctness / consistency) **and** keep surfacing *intricate* findings as proposal candidates, halting only when it can find no more of **either**. Sweeps every canonical surface against eleven dimensions (sync drift, cross-doc consistency, bidirectional coverage, reference validity, template-protocol alignment, project-doc currency, terminology consistency, content completeness, duplication/contradiction, count/claim accuracy, scope-clarity), classifies findings with CRITICAL/HIGH/MEDIUM/LOW severity per Pattern 2, auto-fixes simple findings in place and **captures each intricate finding as an f0 draft proposal** (via `/f0-draft-proposal`) so the loop continues instead of halting, and exits on **Pattern 1's exit *shape* — 1 primary clean round plus 1 adversarial Haiku sub-agent confirmation** (the `audit-checker` persona) with a *clean-round condition adapted for the capture track* (defined below). Acts as post-implementation verification when invoked inside the framework-update flow (after `/f4-regen-framework`); also runnable standalone for periodic sweeps. **Invoked in a child project it halts immediately and redirects** to `/f0-draft-proposal` → `/f1-propose-update` → `/sync-submit-proposal` (see Step 0) — the audit's two clearing actions (auto-fix, f0-capture) both require editable canonical sources, which a child's read-only imported `.shamt-core/` lacks.
 
-The audit's loop is Pattern 1's exit verbatim (see `templates/SHAMT_RULES.template.md` §Pattern 1): the primary agent sweeps until a clean round, then one adversarial Haiku sub-agent (`audit-checker`) re-runs the sweep with zero bias — any finding it surfaces (even a single LOW; no one-LOW allowance for the sub-agent) resets the loop. The dimensions D2 and D7/D9 then check the framework's own bodies against that same Pattern 1 definition. Findings are reported in chat only — there are no `audit_logs/{date}.md` artifacts in v2.
+The audit keeps **Pattern 1's exit *shape*** (see `templates/SHAMT_RULES.template.md` §Pattern 1): the primary agent sweeps until a clean round, then one adversarial Haiku sub-agent (`audit-checker`) re-runs the sweep with zero bias and any finding it surfaces (even a single LOW; no one-LOW allowance for the sub-agent) resets the loop. But it uses an **adapted clean-round definition** for the capture track: a round is *clean* when it needed **no new auto-fix AND no new f0 draft**. Unlike canonical Pattern 1's "zero issues / one LOW" clean round, a clean *audit* round may still **report captured intricate findings** — intricate findings that already have an addressing draft in `proposals/` (the agent reads the folder and judges this, exactly as it judges every other finding). This adaptation is stated explicitly here so the audit's own D2/D9 checks do not later flag the f5 body as self-contradictory. The dimensions D2 and D7/D9 then check the framework's own bodies against the Pattern 1 definition **as adapted here**. This is the same best-effort convergence Pattern 1 already relies on — not a provably-cannot-spin guarantee. Findings are reported in chat only — there are no `audit_logs/{date}.md` artifacts in v2.
 
 **Recommended models:**
 
@@ -53,9 +53,30 @@ See [`reference/model_selection.md`](../../../../reference/model_selection.md) a
 
 ## The audit loop (Pattern 1)
 
-The audit runs Pattern 1's loop verbatim. Each **primary round** runs Steps 1–4: sweep D1, then D2–D11, classify and handle findings, then evaluate the round. Repeat primary rounds until one is **clean** (0 findings, or exactly 1 LOW that was fixed — the primary-round one-LOW allowance). On the first clean round, Step 5 spawns the `audit-checker` adversarial sub-agent; Step 6 exits. Any sub-agent finding (even one LOW — **no** one-LOW allowance for the sub-agent) resets the loop back to Step 1.
+The audit runs on **Pattern 1's exit *shape*** with a clean-round condition adapted for the capture track (see Purpose above). **Step 0** confirms the target is master / self-host (in a child the command halts and redirects — it does not sweep). Each **primary round** then runs Steps 1–4: sweep D1, then D2–D11, classify and handle findings (auto-fix simple, f0-capture intricate), then evaluate the round. Repeat primary rounds until one is **clean** — it needed **no new auto-fix AND no new f0 draft**. A clean round may still *report* intricate findings that already have an addressing draft in `proposals/`; this is the deliberate difference from canonical Pattern 1's "zero issues / one LOW" clean round. On the first clean round, Step 5 spawns the `audit-checker` adversarial sub-agent; Step 6 exits. Any sub-agent finding that is a **new simple finding or a genuinely-uncaptured intricate finding** (even one LOW — **no** one-LOW allowance for the sub-agent) resets the loop back to Step 1; an already-addressed intricate finding the primary captured this run does **not** reset it.
 
-This replaces v2's earlier "2 consecutive clean rounds, no sub-agent" exit — the audit now confirms its clean state the same way every other validated Shamt artifact does.
+This keeps the audit's exit *shape* aligned with Pattern 1 — the way every other validated Shamt artifact confirms its clean state — superseding v2's earlier "2 consecutive clean rounds, no sub-agent" exit. Only the clean-round *condition* is adapted, and that adaptation is stated explicitly throughout this body so the audit's own D2/D9 checks do not flag it as self-contradictory.
+
+### Step 0 — Confirm target context (master / self-host only)
+
+Before sweeping anything, resolve the target context using the **self-host detection rule** D6 uses (the resolved target is the shamt-core self-host iff `{target}/shamt-core/` exists and its canonical sources at `{target}/shamt-core/host/templates/claude/` are the ones that produced this command body, by path identity):
+
+- **Master / self-host target** → proceed to Step 1. The continuous dual-track loop (auto-fix simple findings + f0-capture intricate findings) runs only here, where canonical sources are editable.
+- **Child project target** → **halt immediately.** Do not sweep, auto-fix, capture, or run the sub-agent — not even a D1-only drift check. Print the redirect:
+
+  ```text
+  /f5-audit-framework does not run in a child project. A child's .shamt-core/
+  canonical sources are read-only imported copies of master, so the audit's two
+  clearing actions (auto-fix, f0-capture) are both unavailable here.
+  To contribute a framework change from this project:
+    1. /f0-draft-proposal {slug} [blurb]   — quick-capture the idea
+    2. /f1-propose-update {slug}            — flesh it out
+    3. /sync-submit-proposal {slug}         — send it upstream to master
+  Local drift (canonical -> .claude/) is covered by /sync-import-shamt's regen
+  and by /f4-regen-framework --check.
+  ```
+
+This early check is the **single** child guard; the rest of the body assumes a master / self-host target and carries no per-finding child branch.
 
 ### Step 1 — Run D1 (sync drift)
 
@@ -120,47 +141,51 @@ Missing required sections are HIGH; orphan sections are MEDIUM.
 
 **D11 — Scope-clarity / comprehension risk.** Confirm each command and skill states its scope unambiguously near its heading, and that no leftover migration notes, dead cross-references, or stale "(was X)" / "(formerly Y)" parentheticals survive inline in the agent-instruction path. A reader hitting a stale aside mid-instruction is MEDIUM; an ambiguous or missing scope statement on a command/skill is HIGH.
 
-### Step 3 — Classify and surface all findings; apply the two-track fix policy
+### Step 3 — Classify and handle every finding (dual-track: auto-fix + f0-capture)
 
-Apply Pattern 2 severity per finding. Borderline classifies HIGHER. Then handle each finding per the fix policy below.
+Apply Pattern 2 severity per finding. Borderline classifies HIGHER. The target is master / self-host (Step 0 already halted a child), so both clearing tracks are in scope. Handle each finding per the policy below.
 
-**First, resolve the target context.** Use the **same self-host detection rule D6 uses** (the resolved target is the shamt-core self-host iff `{target}/shamt-core/` exists and its canonical sources at `{target}/shamt-core/host/templates/claude/` are the ones that produced this command body, by path identity):
-
-- **Master / self-host target** → the two-track fix policy applies (auto-fix is in scope).
-- **Child project target** → the audit stays **report-only** (see below). A child's canonical sources under `.shamt-core/` are read-only imported copies of master; auto-editing them would be clobbered on the next `/sync-import-shamt` and silently diverge the child from master.
-
-**Two-track fix policy (master / self-host target only):**
+**Dual-track fix policy:**
 
 - **Simple finding → fix immediately, then verify by re-running its dimension.** A finding is *simple* only when its fix is **mechanical, single-file, AND uniquely determined by the finding** — e.g. a broken link path, a count/number correction (D10), terminology normalization to the one canonical term (D7), removing a stray `TODO`/placeholder (D8). Apply the canonical edit, then re-run that dimension to confirm the finding clears. **If the edited file is under `host/templates/claude/`, follow the fix with `/f4-regen-framework` (or re-run D1) so `.claude/` stays synced** — an unsynced auto-fix is itself a D1 finding.
-- **Intricate finding → draft a `/f1-propose-update` proposal; stop short of editing.** Anything needing design judgment, coordinated multi-file edits (rule↔template↔skill), or protocol-semantic changes. The audit suggests a descriptive proposal slug and routes it through `/f1-propose-update` → `/validate-artifact` → `/f3-implement-update`; it does **not** edit canonical sources for an intricate finding.
-- **Borderline → treated as intricate.** When in doubt whether a fix is uniquely determined or single-file, route it to a proposal. The three criteria above (mechanical + single-file + uniquely-determined) plus this borderline rule are the **normative boundary**; [`reference/audit_dimensions.md`](../../../../reference/audit_dimensions.md) only elaborates them with worked examples — it introduces no new boundary logic.
-- **Both flow contexts.** On a master target, the auto-fix track runs in **both** standalone audits and inside the framework-update flow (Phase 6). When in-flow, apply each simple fix **and log it in chat as an out-of-band correction, explicitly distinct from the in-flight proposal's scope** — so the proposal's validated change-set and its validation footer stay clean and a reader can always tell which edits belong to the proposal versus the audit.
-
-**Report-only policy (child project target):** surface every finding with its severity; for anything upstream-worthy, suggest routing it to master via `/f1-propose-update` → `/sync-submit-proposal`. The only edits permitted are the genuinely-local mechanical re-verifications allowed everywhere — running `/f4-regen-framework` if D1 reported drift from a missed regen, or re-running `--check` to confirm a transient error. The fix-immediately track does **not** edit a child's imported `.shamt-core/` canonical copies.
+- **Intricate finding → capture it as an f0 draft, then continue (do not implement the fix).** Anything needing design judgment, coordinated multi-file edits (rule↔template↔skill), or protocol-semantic changes. Handle it in two sub-steps:
+  1. **Check for an existing addressing draft.** Read `proposals/` in **all** states (active top level + `archive/`, `rejected/`, `deferred/`, `submitted/`, `already-merged/` where present) and **judge** whether a draft already covers this finding — the same judgment Pattern 1 uses for finding identity and severity throughout the loop, **not** a mechanical key match.
+     - **A draft already addresses it** → the finding is **captured**: report it (slug + one-line description), do **not** re-draft, and it does **not** reset the loop.
+     - **No draft addresses it** → **capture it now** via `/f0-draft-proposal {descriptive-slug} {one-line finding blurb}`. This writes a new f0 draft — which counts as a *new draft*, so the round is **not** clean and a re-sweep follows. Report the created slug.
+  2. The audit **never** implements an intricate fix in place — its fix lives in the captured draft, fleshed out later by `/f1-propose-update {slug}` → `/validate-artifact` → `/f3-implement-update`.
+- **Borderline → treated as intricate.** When in doubt whether a fix is uniquely determined or single-file, capture it as an f0 draft rather than auto-fixing. The three criteria above (mechanical + single-file + uniquely-determined) plus this borderline rule are the **normative boundary**; [`reference/audit_dimensions.md`](../../../../reference/audit_dimensions.md) only elaborates them with worked examples — it introduces no new boundary logic.
+- **In-flow out-of-band logging.** When the audit runs as Phase 6 of the framework-update flow, a proposal is already in flight. **Both** clearing actions — each simple auto-fix **and** each f0 draft captured — are logged in chat as out-of-band activity **explicitly distinct from the in-flight proposal's scope**, so the proposal's validated change-set and its validation footer stay clean and a reader can always tell which edits/drafts belong to the proposal versus the audit.
 
 ### Step 4 — Evaluate the primary round
 
-After handling every finding per Step 3, classify the round (Pattern 1 primary-round semantics):
+After handling every finding per Step 3, classify the round using the **adapted clean-round condition**:
 
-- **Clean round** = zero findings, OR exactly **one LOW finding** that was fixed (the primary-round one-LOW allowance).
-- **Not clean** = 2+ findings, or any MEDIUM / HIGH / CRITICAL.
+- **Clean round** = this round needed **no new auto-fix AND no new f0 draft**. It may still *report* intricate findings that already had an addressing draft (those are *captured*, not new) — that is the deliberate difference from canonical Pattern 1's "zero issues / one LOW" clean round.
+- **Not clean** = this round applied at least one auto-fix, OR captured at least one **new** intricate finding as a fresh f0 draft.
 
 Then:
 
-- **Intricate findings routed to a proposal block the loop.** If this round surfaced any intricate finding (routed to `/f1-propose-update`, not auto-fixable), the audit **cannot** reach a clean round on its own — re-sweeping won't clear a finding whose fix lives in an unimplemented proposal. State the routed proposal slug(s) and **halt the loop here**, directing the user to run the framework-update flow for them and re-audit afterward. Do not spin.
-- **Not clean (only auto-fixable findings)** → the simple fixes from Step 3 have been applied; return to Step 1 and re-sweep to confirm they cleared.
+- **Not clean** → return to Step 1 and re-sweep. A re-sweep confirms the simple fixes cleared **and** confirms each freshly-captured intricate finding is now recognized as already-addressed (so it no longer counts as new). The loop **continues** — it does not halt on an intricate finding the way the prior design did. Capture-and-continue is exactly what lets the audit pursue both tracks (simple fixes + proposal candidates) to exhaustion in one run.
 - **Clean** → proceed to Step 5 (the adversarial sub-agent confirmation).
 
-State the round result explicitly, with the per-dimension findings count (e.g., `Round 2: D1 clean, D2 1 HIGH→proposal, D4 2 LOW→fixed, D7 clean, D10 1 LOW→fixed, … rest clean. Not clean — re-sweeping.`).
+The loop converges on agent judgment, exactly as Pattern 1 does — no round cap, no separate dedup machinery, and **no claim that it provably cannot spin**. A re-detected intricate finding is recognized as already-captured (by reading `proposals/`) and so stops resetting the loop; a rare duplicate draft is harmless and user-reviewable.
+
+State the round result explicitly, with the per-dimension findings count and how each was handled (e.g., `Round 2: D1 clean, D2 1 HIGH→f0 draft "audit-rule-skill-mismatch", D4 2 LOW→fixed, D7 clean, D9 1 HIGH→already captured ("audit-loop-spins"), D10 1 LOW→fixed, … rest clean. Not clean (new draft + auto-fixes) — re-sweeping.`).
 
 ### Step 5 — Adversarial sub-agent confirmation
 
-On the first clean primary round, spawn the **`audit-checker`** sub-agent (Cheap / Haiku — see [`agents/audit-checker.md`](../agents/audit-checker.md)) to re-run the D1–D11 sweep across the canonical surface with zero bias. Pass it the target context (master / self-host vs child) and the dimension list. The sub-agent reports ANY finding it independently surfaces — **no one-LOW allowance** — and replies `CONFIRMED: Zero issues found after adversarial review.` only when it finds nothing.
+On the first clean primary round, spawn the **`audit-checker`** sub-agent (Cheap / Haiku — see [`agents/audit-checker.md`](../agents/audit-checker.md)) to re-run the D1–D11 sweep across the canonical surface with zero bias. Pass it:
 
-- **Sub-agent finds any issue (even one LOW)** → the loop resets: fix/route per Step 3, then return to Step 1 for another primary round (which must again reach clean before the sub-agent re-runs).
-- **Sub-agent confirms zero issues** → proceed to Step 6.
+- the **target context** — always master / self-host (a child already halted at Step 0);
+- the **dimension list**; and
+- the **findings captured this run** — each intricate finding the primary captured, as a one-line description + its draft slug — so the sub-agent, like the primary, does **not** reset on an intricate finding that already has an addressing draft.
 
-This is Pattern 1's exit verbatim: 1 primary clean round + 1 adversarial Haiku confirmation. The `audit-checker` persona is framework-sweep-scoped, distinct from the single-artifact-scoped `validation-checker` used by `/validate-artifact`.
+The sub-agent also reads `proposals/` itself for pre-existing addressing drafts. It reports ANY finding it independently surfaces — **no one-LOW allowance** — and replies `CONFIRMED: Zero issues found after adversarial review.` only when it finds nothing resettable.
+
+- **Sub-agent surfaces a new simple finding or a genuinely-uncaptured intricate finding (even one LOW)** → the loop resets: handle it per Step 3 (auto-fix or f0-capture), then return to Step 1 for another primary round (which must again reach clean before the sub-agent re-runs).
+- **Sub-agent reports only already-captured intricate findings, or nothing** → it does not reset the loop; proceed to Step 6.
+
+This is Pattern 1's exit *shape* with the capture-track adaptation: 1 primary clean round + 1 adversarial Haiku confirmation. The `audit-checker` persona is framework-sweep-scoped, distinct from the single-artifact-scoped `validation-checker` used by `/validate-artifact`.
 
 ### Step 6 — Exit
 
@@ -172,9 +197,13 @@ Dimensions swept: D1 sync drift, D2 cross-doc consistency, D3 bidirectional
 coverage, D4 reference validity, D5 template-protocol alignment, D6 project-doc
 currency, D7 terminology consistency, D8 content completeness, D9 duplication/
 contradiction, D10 count/claim accuracy, D11 scope-clarity.
-Target: {master/self-host | child}.
-Findings: {one-line summary of what was auto-fixed / routed to proposals, or "none"}.
+Target: master / self-host.
+Findings: {one-line summary of what was auto-fixed, or "none"}.
+f0 drafts captured this run: {comma-separated slugs, or "none"}.
+Already-captured intricate findings reported: {slugs, or "none"}.
 ```
+
+The **f0 drafts captured this run** line is the audit's hand-off to the framework-update flow: each captured draft is an intricate finding awaiting `/f1-propose-update {slug}` to flesh it out. The audit does not run that flow — it reports the slugs and lets the user prioritize.
 
 **No log artifact is written.** Findings live in chat only; the conversation is the audit record (§3.6 / §3.9).
 
@@ -184,20 +213,23 @@ When standalone, no next-phase suggestion is needed.
 
 ## Exit criteria
 
-- 1 primary clean round (0 findings or 1 LOW fixed) followed by an `audit-checker` sub-agent confirmation that independently finds nothing — Pattern 1's exit.
-- All findings have been surfaced to the user; on a master/self-host target, simple findings auto-fixed (and re-verified) and intricate findings routed to proposals.
+- 1 primary clean round (**no new auto-fix and no new f0 draft** — it may still report already-captured intricate findings) followed by an `audit-checker` sub-agent confirmation that surfaces nothing resettable — Pattern 1's exit *shape* with the capture-track adaptation.
+- All findings surfaced; simple findings auto-fixed (and re-verified), intricate findings captured as f0 drafts (or reported as already-captured). Master / self-host only — a child invocation halts at Step 0 and redirects.
+- Each f0 draft captured this run is reported by slug for later `/f1-propose-update {slug}`.
 
 ## Notes
 
 - **Slugless** — there is no proposal slug. The audit is framework-wide regardless of how it was triggered.
-- **Runnable in both contexts** — inside the framework-update flow (as Phase 6, acting as post-impl verification) and standalone (periodic sweeps, after pulling master updates, before a release). The body is identical; the only difference is the next-phase suggestion at Step 6 and the in-flow out-of-band logging of any auto-fix.
-- **Pattern 1 exit, not consecutive-clean.** The audit confirms its clean state the way every validated Shamt artifact does — one primary clean round plus one adversarial Haiku (`audit-checker`) sub-agent re-sweep that resets the loop on any finding. This supersedes v2's earlier "2 consecutive clean rounds, no sub-agent" rule and keeps the audit's loop semantics word-for-word consistent with the Pattern 1 definition that D2/D7/D9 then check the framework against.
-- **Two-track fix policy, master-target only.** On a master / self-host target the audit auto-fixes *simple* findings (mechanical + single-file + uniquely-determined) and re-verifies each by re-running its dimension; everything else and every borderline case routes to `/f1-propose-update`. Against a child project the audit stays report-only — its `.shamt-core/` canonical copies are imported from master and would be clobbered on the next `/sync-import-shamt`. See Step 3 and [`reference/audit_dimensions.md`](../../../../reference/audit_dimensions.md).
+- **Master / self-host only.** The continuous loop and its two clearing actions (auto-fix, f0-capture) run only where canonical sources are editable. Invoked in a child the command halts at **Step 0** and redirects to `/f0-draft-proposal` → `/f1-propose-update` → `/sync-submit-proposal` — a child's `.shamt-core/` canonical copies are read-only imports of master, so there is nothing local to fix and no local loop to converge. Local drift in a child is covered instead by `/sync-import-shamt`'s regen and `/f4-regen-framework --check`.
+- **Runnable in two flow contexts** (both master / self-host) — inside the framework-update flow (as Phase 6, acting as post-impl verification) and standalone (periodic sweeps, after pulling master updates, before a release). The body is identical; the only differences are the next-phase suggestion at Step 6 and the in-flow out-of-band logging of every auto-fix **and** every f0 draft captured.
+- **Pattern 1 exit *shape*, adapted clean-round.** The audit confirms its clean state with Pattern 1's *shape* — one primary clean round plus one adversarial Haiku (`audit-checker`) sub-agent re-sweep — but with an adapted clean-round *condition*: clean = no new auto-fix and no new f0 draft, which may still *report* already-captured intricate findings. This supersedes v2's earlier "2 consecutive clean rounds, no sub-agent" rule. The adaptation is stated explicitly throughout this body (Purpose, the audit-loop intro, Steps 4–6) so the D2/D7/D9 dimensions the audit runs against its own bodies do not flag it as a self-contradiction.
+- **Dual-track fix policy.** The audit auto-fixes *simple* findings (mechanical + single-file + uniquely-determined) and re-verifies each by re-running its dimension; everything else and every borderline case is **captured as an f0 draft** (`/f0-draft-proposal`) — reported and then continued past, not implemented in place. Before capturing, the audit reads `proposals/` (all states) and skips findings that already have an addressing draft (judgment, not a key match). See Step 3 and [`reference/audit_dimensions.md`](../../../../reference/audit_dimensions.md).
 - **D6 has a not-applicable case** for the in-development `shamt-core/` repo itself — recorded as a single LOW informational finding, not a hard miss. Other projects must have both `.shamt-core/project-specific-files/ARCHITECTURE.md` and `.shamt-core/project-specific-files/CODING_STANDARDS.md` per the templates' seed-at-init contract.
 - **Borderline severity → HIGHER** per Pattern 2. A finding that affects planning is MEDIUM; one that affects approval is HIGH. See [`reference/severity_classification.md`](../../../../reference/severity_classification.md).
 - **The sub-agent is `audit-checker`, not `validation-checker`.** `validation-checker` is single-artifact-scoped ("re-read the entire artifact"); the audit is a framework-wide D1–D11 sweep, so it spawns the sweep-scoped `audit-checker` persona on the clean round.
 
 ---
 Validated 2026-05-28 — 4 rounds, 1 adversarial sub-agent confirmed (Phase 8 implementation loop)
+Touched 2026-06-02 — continuous dual-track loop: intricate findings captured as f0 drafts (capture-and-continue) instead of halting; early Step 0 child halt-and-redirect; child report-only mode removed; Pattern 1 exit *shape* with adapted clean-round. Per proposals/audit-continuous-f0-draft-capture.md.
 
 <!-- Managed by Shamt — do not edit. Regenerate from shamt-core/host/templates/claude/commands/f5-audit-framework.md. -->

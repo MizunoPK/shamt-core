@@ -51,9 +51,9 @@ The audit exists to keep the framework **complete** (it covers what it should, w
 
 ---
 
-## The simple-vs-intricate fix-track boundary (master / self-host target)
+## The simple-vs-intricate fix-track boundary (master / self-host only)
 
-On a **master / self-host** target the audit auto-fixes *simple* findings and routes *intricate* ones to `/f1-propose-update`. Against a **child project** the audit is report-only — see the carve-out below. A finding is **simple** only when **all three** hold:
+The audit runs **only** on a master / self-host target — a child invocation halts and redirects (see "Master / self-host only" below). There it auto-fixes *simple* findings and **captures** *intricate* ones as f0 draft proposals via `/f0-draft-proposal`, continuing the loop instead of halting. A finding is **simple** only when **all three** hold:
 
 1. **Mechanical** — the edit is a text substitution, not a design decision.
 2. **Single-file** — the fix lives entirely in one canonical file.
@@ -72,7 +72,7 @@ On a **master / self-host** target the audit auto-fixes *simple* findings and ro
 
 After any auto-fix, **re-run that finding's dimension** to confirm it clears. If the edited file is under `host/templates/claude/`, follow with `/f4-regen-framework` (or re-run D1) — an unsynced auto-fix is itself a D1 finding.
 
-### Worked examples — intricate (route to `/f1-propose-update`, do not edit)
+### Worked examples — intricate (capture as an f0 draft, do not edit)
 
 | Finding | Why intricate |
 |---------|--------------|
@@ -81,15 +81,27 @@ After any auto-fix, **re-run that finding's dimension** to confirm it clears. If
 | D2: a rule and its skill disagree, and it's unclear whether the rule or the skill is wrong | Resolving it is a coordinated rule↔skill edit — multi-file, design judgment. |
 | D7: a "terminology" fix that is actually load-bearing (the two words name two genuinely different things) | Not mechanical — renaming would erase a real distinction. |
 
-The audit suggests a descriptive proposal slug and stops short of editing. Borderline cases (e.g., "is this one word a synonym or a real distinction?") resolve to **intricate**.
+For an intricate finding the audit **captures** it — `/f0-draft-proposal {descriptive-slug} {one-line blurb}` writes a quick unrefined DRAFT proposal — and continues; it never implements the fix in place. The captured draft is fleshed out later by `/f1-propose-update {slug}`. Borderline cases (e.g., "is this one word a synonym or a real distinction?") resolve to **intricate** → capture.
+
+### Capture-and-continue convergence (master / self-host only)
+
+The audit is a **single continuous loop** that pursues both tracks at once — auto-fixing simple findings and capturing intricate ones — halting only when it can find no more of either. It keeps **Pattern 1's exit *shape*** (primary clean rounds + one adversarial Haiku `audit-checker` sub-agent) but with an **adapted clean-round condition**:
+
+- A round is **clean** when it needed **no new auto-fix AND no new f0 draft**. Unlike canonical Pattern 1's "zero issues / one LOW" clean round, a clean audit round may still *report* captured intricate findings — those that already have an addressing draft. (The f5 command body states this adaptation explicitly so the audit's own D2/D9 checks don't flag it.)
+- An intricate finding that **already has an addressing draft** in `proposals/` is **captured**: reported, but it does **not** reset the loop and is **not** re-drafted. The agent judges "is there already a draft for this?" by reading `proposals/` (all states), exactly as it judges every finding's identity and severity — **not** by a mechanical key match.
+- The `audit-checker` sub-agent is told which findings the primary captured this run (one-line description + slug) and reads `proposals/` itself, so it likewise does not reset on an already-addressed finding.
+
+This is the **same best-effort convergence Pattern 1 already provides** — there is no round cap, no separate dedup machinery, and **no claim of a provably-cannot-spin guarantee** (unachievable for any judgment-based loop). Duplicate-draft mitigation: the audit reads `proposals/` before capturing and skips findings already addressed; `/f0-draft-proposal` never overwrites (it appends a numeric slug suffix on collision). A rare duplicate draft is harmless and user-reviewable.
 
 ### In-flow logging
 
-When the audit runs as Phase 6 of the framework-update flow, a proposal is already in flight. Auto-fixes still run on a master target, but **each is logged in chat as an out-of-band correction, explicitly distinct from the in-flight proposal's scope** — so the proposal's validated change-set and footer stay clean and a reader can always separate proposal edits from audit edits.
+When the audit runs as Phase 6 of the framework-update flow, a proposal is already in flight. **Both** clearing actions — each simple auto-fix **and** each f0 draft captured for an intricate finding — are logged in chat as out-of-band activity, explicitly distinct from the in-flight proposal's scope — so the proposal's validated change-set and footer stay clean and a reader can always separate proposal edits/drafts from audit edits/drafts.
 
-### Child-target carve-out (report-only)
+### Master / self-host only
 
-When `/f5-audit-framework` runs against a **child project**, its canonical sources under `.shamt-core/` are read-only imported copies of master. Auto-fixing them would be clobbered on the next `/sync-import-shamt` and silently diverge the child from master. So in a child context the audit stays **report-only**: every finding surfaces with its severity, anything upstream-worthy carries a suggestion to route it via `/f1-propose-update` → `/sync-submit-proposal`, and the only edits permitted are the genuinely-local mechanical re-verifications allowed everywhere (re-running regen / `--check` for D1). The fix-immediately track never edits a child's imported canonical copies. The master-vs-child decision reuses the **D6 self-host detection rule** — there is no second detection mechanism to keep in sync.
+The audit runs **only** on a master / self-host target. Its two clearing actions — auto-fix and f0-capture — both require **editable** canonical sources, which a child's `.shamt-core/` (read-only imported copies of master) lacks; and there is nothing local to converge against. So invoked in a **child** project, `/f5-audit-framework` **halts immediately at Step 0 and redirects** the user to `/f0-draft-proposal` → `/f1-propose-update` → `/sync-submit-proposal` — it does not sweep, auto-fix, capture, or run the sub-agent. This matches the master/child contract (only proposals flow child → master): a child *authors and submits* proposals; implementation and verification (the audit) happen on master.
+
+The capability a child loses is audit-driven D1 drift detection; that is covered instead by `/sync-import-shamt` (which re-runs regen on every pull) and `/f4-regen-framework --check` for a manual local check. Note that `/f0-draft-proposal` **the command** still works in a child — drafting a new proposal file is not editing an imported canonical copy — it is simply user-driven there, never audit-driven. The master-vs-child decision reuses the **D6 self-host detection rule** — there is no second detection mechanism to keep in sync.
 
 ---
 

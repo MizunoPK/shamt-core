@@ -162,12 +162,13 @@ The status line surfaces PO-flow context by falling back through altitudes — f
 
 | Command | Purpose | Status |
 |---------|---------|--------|
-| `/f1-propose-update {slug}` | Phase 1 — author / edit a proposal | shipped |
+| `/f0-draft-proposal {slug} [blurb]` | Phase 0 (optional) — quick-capture an unrefined DRAFT proposal from a blurb, no open-questions dialog (master **and** child); used by the audit to capture intricate findings | shipped |
+| `/f1-propose-update {slug} [blurb]` | Phase 1 — author / edit a proposal (from scratch, a blurb, or by ingesting an f0 draft) | shipped |
 | `/validate-artifact proposals/{slug}.md` | Phase 2 — Pattern 1 validation | shipped |
 | `/f2-plan-update-implementation {slug}` | Phase 3 (optional, >10 file ops) — architect plan | shipped |
 | `/f3-implement-update {slug}` | Phase 4 — apply canonical edits | shipped |
 | `/f4-regen-framework` | Phase 5 — propagate canonical edits into `.claude/` | shipped |
-| `/f5-audit-framework` | Phase 6 — D1–D11 sweep (also standalone) | shipped |
+| `/f5-audit-framework` | Phase 6 — continuous dual-track D1–D11 sweep: auto-fix simple findings + capture intricate ones as f0 drafts (also standalone). **Master / self-host only** — in a child it halts and redirects to f0 → f1 → `/sync-submit-proposal` | shipped |
 | `/f6-archive-proposal {slug}` | Phase 7 — archive the implemented proposal | shipped |
 
 ### Master / child sync (Part 4)
@@ -309,3 +310,4 @@ Phase 4 (Build) has no dedicated artifact; the cascade shows the last-completed 
 
 ---
 Validated 2026-05-28 — Phase 12 implementation loop. Touched by Phase 12: PO-flow section back-fill (hierarchy diagram, four-command table, folder layout, back-ref handoff, individually-testable rubric, architecture-impact flag, status-line PO modes subsection); priors preserved from Phase 9.
+Touched 2026-06-02 — added `/f0-draft-proposal` (Phase 0 capture) row, gave f1 its `[blurb]`/f0-ingestion form, and reframed the `/f5-audit-framework` row as a continuous dual-track loop that is master/self-host only (child halts → f0 → f1 → sync-submit). Per proposals/audit-continuous-f0-draft-capture.md.

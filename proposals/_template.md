@@ -25,6 +25,31 @@ rejected/ and deferred/ folders are populated manually by the user (or by
 **Proposed by:** [Project name, or blank for master-local proposals]
 **Project context:** [One-line context for child-submitted proposals; blank for master-local]
 
+<!--
+f0-draft capture variant (written by /f0-draft-proposal — a quick, unrefined
+idea/audit capture that has NOT been through the open-questions dialog):
+
+  - Status uses the distinct value `Draft (f0 — audit capture, unrefined)` —
+    visibly different from a normal in-progress `Draft` so f1's re-entry logic
+    (and human readers) never conflate the two.
+  - A banner line sits immediately under the header block:
+
+      > **f0 DRAFT — unrefined capture.** Quick-captured by the framework audit
+      > or a user; not yet through the open-questions dialog. Run
+      > `/f1-propose-update {slug}` to flesh it out — f1 ingests this file as
+      > its intake, normalizes the status to plain `Draft`, and develops the
+      > Scratch Notes below into a full Problem + Proposed Changes + Risks /
+      > Rollback / Validation Considerations.
+
+  - An f0 draft fills only the title and the **Scratch Notes (f0 capture)**
+    section (documented under Problem below); it leaves the formal Proposed
+    Changes table and Risks / Rollback / Validation Considerations as template
+    placeholders for f1.
+
+A normal (non-f0) proposal omits the banner and the Scratch Notes section and
+uses the plain `Draft` status.
+-->
+
 ---
 
 ## Problem
@@ -32,6 +57,22 @@ rejected/ and deferred/ folders are populated manually by the user (or by
 [1–3 paragraphs. State the concrete problem in the framework as it exists today: a pattern that is missing, a rule that is wrong or misleading, a template that fails to capture what the protocol requires, a reference doc whose claims have drifted from the canonical source, a host wiring that breaks in a real scenario.
 
 Cite specific files / sections (`shamt-core/templates/SHAMT_RULES.template.md` §Pattern X, `shamt-core/reference/Y.md`, `shamt-core/host/templates/claude/commands/Z.md`) so a fresh agent can verify the problem without context. If the trigger was a story-level incident, link the story slug.]
+
+<!--
+Optional — f0 capture only. /f0-draft-proposal does NOT fill the formal Problem
+above or the Proposed Changes table; instead it writes the raw idea / audit
+finding into a **Scratch Notes (f0 capture)** section here, e.g.:
+
+  ## Scratch Notes (f0 capture)
+
+  [The raw blurb / audit-finding text, verbatim or lightly tidied. Implicated
+  canonical files may be named informally inline. No formal change list — that
+  is f1's job.]
+
+/f1-propose-update consumes this section as the seed when fleshing out an f0
+draft, then removes it once the formal Problem + Proposed Changes exist. A
+normal proposal omits this section entirely.
+-->
 
 ---
 

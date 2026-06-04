@@ -13,12 +13,23 @@ description: Phase 1 of the framework-update flow — author or edit a proposal 
 ## Usage
 
 ```
-/f1-propose-update {slug}
+/f1-propose-update {slug} [blurb]
 ```
 
 ## Arguments
 
 - `{slug}` (required) — descriptive kebab-case slug for the proposal (e.g., `fix-spec-template-missing-section`, `add-mermaid-recipe`). The slug becomes the filename `.shamt-core/proposals/{slug}.md`. Slugs are descriptive, not numbered — there is no SHAMT-N convention in v2.
+- `[blurb]` (optional) — a free-text idea or problem statement used to seed the Problem section (Input Mode 2 below). Ignored when an f0 draft already exists at the slug (Input Mode 3 supplies the seed from the draft's Scratch Notes instead).
+
+## Input modes
+
+`/f1-propose-update` accepts three starting points; the mode is auto-detected from the slug + optional blurb:
+
+1. **Blank (default)** — `/f1-propose-update {slug}` with no blurb and no existing file. Seed a fresh proposal from the template and draft from scratch.
+2. **Free-text blurb** — `/f1-propose-update {slug} {blurb}`. The blurb is a raw idea / problem statement (like the text a user would type into the dialog). Seed the template, then use the blurb as the starting material for the Problem section before the open-questions dialog refines it.
+3. **Existing f0 draft** — `/f1-propose-update {slug}` where `{slug}.md` already exists and carries the **f0-draft marker** (`Status: Draft (f0 — audit capture, unrefined)` + the f0 banner), as written by `/f0-draft-proposal` (e.g. captured by the audit). Ingest the draft as the intake rather than prompting extend / overwrite: normalize the status to plain `Draft`, drop the banner, and develop the **Scratch Notes (f0 capture)** content into the full Problem + Proposed Changes + Risks / Rollback / Validation Considerations.
+
+Modes 2 and 3 only change the *seed*; the rest of the flow — Proposed Changes, Risks / Rollback / Validation, the open-questions dialog, the exit gate — is identical.
 
 ## Prerequisites
 
@@ -30,21 +41,26 @@ description: Phase 1 of the framework-update flow — author or edit a proposal 
 Proposals are **flat files**, not folders. There is no `_PLAN.md` companion at this phase; that comes in Phase 3.
 
 - Try `.shamt-core/proposals/{slug}.md` (exact match).
-- **File exists, non-empty** — treat as re-entry. Read the file, confirm with the user whether to extend the existing proposal or start over. If extending, skip the template-seed step (Step-by-step Step 1 below) and resume drafting at Step-by-step Step 2; **if a prior Phase 2 validation footer is present, strip it before continuing — extending the proposal invalidates the prior validation, and Phase 2 must re-run on the extended content (the Step 6 exit gate enforces this).** If starting over, move the abandoned draft to `.shamt-core/proposals/archive/{slug}.draft-{timestamp}.md` (using `git mv` when tracked) before overwriting. The archive folder is the documented home for retired proposal files; the `.draft-{timestamp}` infix distinguishes abandoned drafts from implemented archives.
-- **File does not exist** — continue to Step-by-step Step 1 below.
+- **File exists and is an f0 draft** (its `Status:` is `Draft (f0 — audit capture, unrefined)` and/or it carries the f0 banner) — **Input Mode 3: ingest it; do NOT prompt extend / overwrite.** Read the file, normalize `Status:` to plain `Draft`, remove the f0 banner, and lift the **Scratch Notes (f0 capture)** content as the seed for the Problem + Proposed Changes drafting (Step-by-step Step 2 onward); delete the Scratch Notes section once its content has been developed into the formal Problem. An f0 draft never carries a Phase 2 validation footer (f0 does not append one), so there is nothing to strip. Skip the template-seed step (Step 1) — the f0 file already follows the template shape.
+- **File exists, non-empty, and is NOT an f0 draft** — treat as re-entry. Read the file, confirm with the user whether to extend the existing proposal or start over. If extending, skip the template-seed step (Step-by-step Step 1 below) and resume drafting at Step-by-step Step 2; **if a prior Phase 2 validation footer is present, strip it before continuing — extending the proposal invalidates the prior validation, and Phase 2 must re-run on the extended content (the Step 6 exit gate enforces this).** If starting over, move the abandoned draft to `.shamt-core/proposals/archive/{slug}.draft-{timestamp}.md` (using `git mv` when tracked) before overwriting. The archive folder is the documented home for retired proposal files; the `.draft-{timestamp}` infix distinguishes abandoned drafts from implemented archives.
+- **File does not exist** — continue to Step-by-step Step 1 below (Input Mode 1, or Input Mode 2 when a blurb was passed).
 - **`.shamt-core/proposals/archive/{slug}.md` exists** — a proposal with this slug was already implemented. Halt, report the archive location, and ask the user to pick a different slug or explicitly confirm they want a follow-up proposal under the same slug (uncommon).
 
 ## Step-by-step
 
 ### Step 1 — Seed from the template
 
+> **Input Mode 3 (existing f0 draft): skip this step.** The f0 file already follows the template shape — per Slug resolution, just normalize `Status:` to plain `Draft`, drop the f0 banner, and resume at Step 2 using the Scratch Notes as the seed.
+
 1. Read [`.shamt-core/proposals/_template.md`](../../../../proposals/_template.md) top-to-bottom.
 2. Copy it to `.shamt-core/proposals/{slug}.md`.
 3. Fill in the header block: `Created: {today's YYYY-MM-DD}`, `Status: Draft`, `Proposed by:` (blank for master-local; the child's project name for child-authored), `Project context:` (one-line context for child-authored; blank otherwise).
+4. **Input Mode 2 (blurb passed):** drop the blurb verbatim into the Problem section as raw starting material — Step 2 sharpens it against the canonical sources.
 
 ### Step 2 — Draft the Problem section
 
 1. Read enough of the canonical sources to state the concrete problem without hedging. Cite the specific files and sections (e.g., `templates/SHAMT_RULES.template.md` §Pattern X, `reference/severity_classification.md`, `host/templates/claude/commands/Z.md`).
+   - **Seeded from a blurb (Mode 2) or an f0 draft's Scratch Notes (Mode 3):** treat that text as the raw problem statement — verify and sharpen it against the canonical sources, don't just paste it. For **Mode 3**, once the Scratch Notes content is folded into the formal Problem, **remove the `## Scratch Notes (f0 capture)` section** so it does not survive into validation.
 2. Write the Problem section as 1–3 short paragraphs. If the trigger was a story-level incident or a recurring review finding, link the story slug or the [Review Prevention Gates](../../../../reference/pr_review_prevention.md) gate the change is meant to address.
 3. If you cannot yet state the problem precisely — for example, the user has described a symptom but the root canonical-source location is unclear — add the gap to **Open Questions** and surface it via the dialog in Step 5 before proceeding.
 
@@ -122,5 +138,6 @@ Suggest a context-clear and the next command:
 ---
 Validated 2026-05-28 — 4 rounds, 1 adversarial sub-agent confirmed (Phase 8 implementation loop)
 Touched 2026-05-28 — added explicit re-entry footer-stripping clarification under Slug resolution so the agent removes a stale Phase 2 footer up front rather than discovering the issue only at the Step 6 exit gate. Re-validated under the Phase 8 implementation-validation loop (1 primary clean round + 1 adversarial sub-agent confirmed).
+Touched 2026-06-02 — added three input modes (blank / free-text blurb / existing f0 draft) and the optional `[blurb]` argument; new f0-draft ingestion branch under Slug resolution (normalize the f0 marker to `Draft`, develop the Scratch Notes, no extend/overwrite prompt). Per proposals/audit-continuous-f0-draft-capture.md.
 
 <!-- Managed by Shamt — do not edit. Regenerate from shamt-core/host/templates/claude/commands/f1-propose-update.md. -->
