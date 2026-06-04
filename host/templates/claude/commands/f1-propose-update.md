@@ -40,22 +40,27 @@ Modes 2 and 3 only change the *seed*; the rest of the flow — Proposed Changes,
 
 Proposals are **flat files**, not folders. There is no `_PLAN.md` companion at this phase; that comes in Phase 3.
 
-- Try `.shamt-core/proposals/{slug}.md` (exact match).
+- Try `.shamt-core/proposals/{slug}.md` (exact match), then the numbered glob `.shamt-core/proposals/*-{slug}.md` (master-side proposals carry a `{NN}-` filename prefix). A bare numbered stem `{NN}-{slug}` passed as the slug resolves directly. Slugs are unique, so the glob matches **at most one** file; per the established "halt and ask on multiple matches" invariant, halt if it ever matches more than one.
 - **File exists and is an f0 draft** (its `Status:` is `Draft (f0 — audit capture, unrefined)` and/or it carries the f0 banner) — **Input Mode 3: ingest it; do NOT prompt extend / overwrite.** Read the file, normalize `Status:` to plain `Draft`, remove the f0 banner, and lift the **Scratch Notes (f0 capture)** content as the seed for the Problem + Proposed Changes drafting (Step-by-step Step 2 onward); delete the Scratch Notes section once its content has been developed into the formal Problem. An f0 draft never carries a Phase 2 validation footer (f0 does not append one), so there is nothing to strip. Skip the template-seed step (Step 1) — the f0 file already follows the template shape.
 - **File exists, non-empty, and is NOT an f0 draft** — treat as re-entry. Read the file, confirm with the user whether to extend the existing proposal or start over. If extending, skip the template-seed step (Step-by-step Step 1 below) and resume drafting at Step-by-step Step 2; **if a prior Phase 2 validation footer is present, strip it before continuing — extending the proposal invalidates the prior validation, and Phase 2 must re-run on the extended content (the Step 6 exit gate enforces this).** If starting over, move the abandoned draft to `.shamt-core/proposals/archive/{slug}.draft-{timestamp}.md` (using `git mv` when tracked) before overwriting. The archive folder is the documented home for retired proposal files; the `.draft-{timestamp}` infix distinguishes abandoned drafts from implemented archives.
 - **File does not exist** — continue to Step-by-step Step 1 below (Input Mode 1, or Input Mode 2 when a blurb was passed).
-- **`.shamt-core/proposals/archive/{slug}.md` exists** — a proposal with this slug was already implemented. Halt, report the archive location, and ask the user to pick a different slug or explicitly confirm they want a follow-up proposal under the same slug (uncommon).
+- **`.shamt-core/proposals/archive/{slug}.md` or `.shamt-core/proposals/archive/*-{slug}.md` exists** (exact or numbered-prefix match) — a proposal with this slug was already implemented. Halt, report the archive location, and ask the user to pick a different slug or explicitly confirm they want a follow-up proposal under the same slug (uncommon).
 
 ## Step-by-step
 
 ### Step 1 — Seed from the template
 
-> **Input Mode 3 (existing f0 draft): skip this step.** The f0 file already follows the template shape — per Slug resolution, just normalize `Status:` to plain `Draft`, drop the f0 banner, and resume at Step 2 using the Scratch Notes as the seed.
+> **Input Mode 3 (existing f0 draft): skip this step** for the template-seed — the f0 file already follows the template shape — but **still run the master-side number-assignment sub-step (items 5–6 below)**: an f0 draft is unnumbered, so on master it must be numbered + renamed during ingestion. Per Slug resolution, normalize `Status:` to plain `Draft`, drop the f0 banner, and resume at Step 2 using the Scratch Notes as the seed.
 
 1. Read [`.shamt-core/proposals/_template.md`](../../../../proposals/_template.md) top-to-bottom.
 2. Copy it to `.shamt-core/proposals/{slug}.md`.
 3. Fill in the header block: `Created: {today's YYYY-MM-DD}`, `Status: Draft`, `Proposed by:` (blank for master-local; the child's project name for child-authored), `Project context:` (one-line context for child-authored; blank otherwise).
 4. **Input Mode 2 (blurb passed):** drop the blurb verbatim into the Problem section as raw starting material — Step 2 sharpens it against the canonical sources.
+5. **Assign the proposal number — master-side only (guard).** This sub-step runs **only on the master side**, gated behind the same master-vs-child detection the Prerequisites already use (master = the repo with a top-level `proposals/` directory; child = the `.shamt-core/`-synced project root).
+   - **On the child side:** skip number assignment entirely. The proposal stays unnumbered at `.shamt-core/proposals/{slug}.md` — no `**Number:**` header, no filename prefix. Numbering happens only on master; `/sync-triage-proposals` assigns it at promote time.
+   - **On the master side** (top-level `proposals/`): scan every folder a numbered proposal can come to rest in — `proposals/`, `proposals/archive/`, `proposals/deferred/`, `proposals/rejected/` (**not** `proposals/incoming/`, which holds still-unnumbered child submissions). For each filename, parse a leading `^[0-9]+-` digit run; the proposal number is `max(parsed NN) + 1`, or `01` when no numbered file exists (unnumbered/grandfathered files contribute nothing to the max). Format two-digit zero-padded (`01`, `02`, … widening to three digits only past `99`). There is no counter file — re-scan disk each time.
+   - Write the `**Number:** {NN}` header into the proposal and **name the file with the `{NN}-` prefix**: `proposals/{NN}-{slug}.md`. If the Step 1 item 2 copy (or the Mode-3 ingested f0 file) wrote an unnumbered `{slug}.md`, rename it now (`git mv` when tracked).
+6. **Branch creation is NOT f1's job** (either side). Authoring, validation, and planning all happen on the base branch; `/f3-implement-update` creates the `proposal/{NN}-{slug}` branch immediately before the canonical edits. Do not create or switch branches here.
 
 ### Step 2 — Draft the Problem section
 
@@ -120,8 +125,8 @@ If any item fails, return to the relevant step.
 
 Suggest a context-clear and the next command:
 
-- Row count ≤ 10 → `/clear`, then `/validate-artifact .shamt-core/proposals/{slug}.md`.
-- Row count > 10 → `/clear`, then `/validate-artifact .shamt-core/proposals/{slug}.md`, then `/f2-plan-update-implementation {slug}`.
+- Row count ≤ 10 → `/clear`, then `/validate-artifact {path}`, where `{path}` is the proposal's actual on-disk path (`proposals/{NN}-{slug}.md` on master, `.shamt-core/proposals/{slug}.md` on child).
+- Row count > 10 → `/clear`, then `/validate-artifact {path}` (same path), then `/f2-plan-update-implementation {slug}` (resolves the proposal by bare slug or numbered stem).
 
 ## Exit criteria
 

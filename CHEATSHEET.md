@@ -171,6 +171,8 @@ The status line surfaces PO-flow context by falling back through altitudes — f
 | `/f5-audit-framework` | Phase 6 — continuous dual-track D1–D11 sweep: auto-fix simple findings + capture intricate ones as f0 drafts (also standalone). **Master / self-host only** — in a child it halts and redirects to f0 → f1 → `/sync-submit-proposal` | shipped |
 | `/f6-archive-proposal {slug}` | Phase 7 — archive the implemented proposal | shipped |
 
+> **Proposal conventions (master-side).** Master-side proposals carry a lightweight organizational **number**: filenames are `proposals/{NN}-{slug}.md` with a matching `**Number:**` header, assigned at `/f1-propose-update` (master-local) or `/sync-triage-proposals` promote (child-submitted) as `max(existing NN across proposals/, archive/, deferred/, rejected/) + 1` (two-digit zero-padded, no counter file, never reused). **Child-side proposals stay unnumbered** (`.shamt-core/proposals/{slug}.md`). Each proposal lands on its own branch `proposal/{NN}-{slug}` (`proposal/{slug}` when grandfathered/unnumbered), created by `/f3-implement-update` from the base branch immediately before the canonical edits; `/f6-archive-proposal` commits the change as `shamt-core: land #{NN} {slug} (…)`, squash-merges the branch into the base branch, and deletes it. See `CLAUDE.md` §Conventions and the `/f1-propose-update` / `/f6-archive-proposal` command bodies for the authoritative mechanics.
+
 ### Master / child sync (Part 4)
 
 | Command | Side | Purpose | Status |

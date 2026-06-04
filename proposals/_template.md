@@ -1,14 +1,14 @@
 <!--
 proposals/ folder layout (created on first use; folders are not committed empty):
 
-  proposals/
+  proposals/                                    (master-side filenames shown; child-side stay unnumbered {slug}.md)
   ├── _template.md                              (this file — copy when authoring a new proposal)
-  ├── {slug}.md                                 (active proposals — Phase 1 through Phase 4)
-  ├── {slug}_PLAN.md                            (Phase 3 plan, only for proposals >10 file ops)
-  ├── archive/{slug}.md                         (post-implementation, set by /f6-archive-proposal)
-  ├── archive/{slug}.draft-{timestamp}.md       (abandoned drafts, set by /f1-propose-update on start-over re-entry)
-  ├── rejected/{slug}.md                        (explicit rejections with a top-of-file note)
-  └── deferred/{slug}.md                        (on hold)
+  ├── {NN}-{slug}.md                            (active proposals — Phase 1 through Phase 4)
+  ├── {NN}-{slug}_PLAN.md                       (Phase 3 plan, only for proposals >10 file ops)
+  ├── archive/{NN}-{slug}.md                    (post-implementation, set by /f6-archive-proposal)
+  ├── archive/{NN}-{slug}.draft-{timestamp}.md  (abandoned drafts, set by /f1-propose-update on start-over re-entry)
+  ├── rejected/{NN}-{slug}.md                   (explicit rejections with a top-of-file note)
+  └── deferred/{NN}-{slug}.md                   (on hold)
 
 Active proposals live at the top level. /f6-archive-proposal moves implemented
 proposals (and any companion *_PLAN.md / *_PLAN_phase_N.md files) into
@@ -16,12 +16,22 @@ archive/; /f1-propose-update moves abandoned drafts into archive/ with a
 .draft-{timestamp} infix when the user picks "start over" on re-entry. The
 rejected/ and deferred/ folders are populated manually by the user (or by
 /sync-triage-proposals on the master side, when that ships).
+
+Numbering + branch convention (master-side only; see shamt-core/CLAUDE.md
+§Conventions): each master-side proposal carries a filename prefix {NN}- and a
+matching **Number:** header, assigned as max(existing NN across proposals/,
+archive/, deferred/, rejected/) + 1 at /f1-propose-update (master-local) or
+/sync-triage-proposals promote (child-submitted). Child-side proposals under
+.shamt-core/proposals/ stay unnumbered {slug}.md. /f3-implement-update creates
+the proposal/{NN}-{slug} branch; /f6-archive-proposal squash-merges it to the
+base branch and deletes it.
 -->
 
 # Proposal: {slug}
 
 **Created:** [YYYY-MM-DD]
 **Status:** Draft
+**Number:** [NN — master-side only; assigned by /f1-propose-update or /sync-triage-proposals promote. Blank/omitted on the child side and for grandfathered proposals.]
 **Proposed by:** [Project name, or blank for master-local proposals]
 **Project context:** [One-line context for child-submitted proposals; blank for master-local]
 

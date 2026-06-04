@@ -18,12 +18,12 @@ The plan was approved at its gate (Gate 3 for stories; Phase 2 validation for fr
 You operate at one of two altitudes; the orchestrator tells you which by passing the inputs below:
 
 - **Story altitude** (caller is `/e4-execute-plan`) — plan lives under `stories/{slug}/`; the working tree is on a `feature/{slug}/<owner-or-team>` branch baseline.
-- **Framework-update altitude** (caller is `/f3-implement-update`) — plan lives under `proposals/{slug}_PLAN.md`; the working tree is on a `framework-update/{slug}` branch (or whatever the proposal declared); `active_artifacts.md` does not apply (proposals carry their own versioning via `_PLAN_phase_N.md` decomposition rather than active-baseline pointers).
+- **Framework-update altitude** (caller is `/f3-implement-update`) — plan lives under `proposals/{NN}-{slug}_PLAN.md`; the working tree is on a `proposal/{NN}-{slug}` branch (or whatever the proposal declared); `active_artifacts.md` does not apply (proposals carry their own versioning via `_PLAN_phase_N.md` decomposition rather than active-baseline pointers).
 
 ## Inputs (provided by the caller)
 
 - `slug` — the story or proposal slug.
-- `plan_path` — path to the validated plan. Story altitude: `stories/{slug}/implementation_plan.md` or one phase file (e.g., `implementation_plan_phase_1.md`). Framework altitude: `proposals/{slug}_PLAN.md` or one phase file (e.g., `proposals/{slug}_PLAN_phase_1.md`).
+- `plan_path` — path to the validated plan. Story altitude: `stories/{slug}/implementation_plan.md` or one phase file (e.g., `implementation_plan_phase_1.md`). Framework altitude: `proposals/{NN}-{slug}_PLAN.md` or one phase file (e.g., `proposals/{NN}-{slug}_PLAN_phase_1.md`).
 - `active_artifacts_path` — `stories/{slug}/active_artifacts.md` when it exists. **Story altitude only.** Framework altitude callers pass empty.
 
 ## Pre-flight (run once before Step 1)
@@ -31,7 +31,7 @@ You operate at one of two altitudes; the orchestrator tells you which by passing
 1. **Resolve the artifact folder** — at story altitude, glob `stories/{slug}/` (exact) then `stories/{slug}-*/` (halt on multiple or zero matches); read `active_artifacts.md` first when present. At framework altitude, the plan path is absolute and lives under `proposals/`; there is no folder glob and no `active_artifacts.md` to read.
 2. **Read the full plan top-to-bottom.** Note metadata, the pre-execution checklist, the files manifest, the numbered steps, and the verification section. Optional plan sections — **Review Prevention Gate Mapping** and **CODING_STANDARDS Compliance mapping** — appear in story-altitude plans and not in framework-update plans (review-prevention surfaces and project coding standards are story concepts; framework canonical edits do not have these surfaces). Treat absence at the framework altitude as N/A, not a plan defect.
 3. **Confirm the plan footer** is present (`Validated YYYY-MM-DD — N rounds, 1 adversarial sub-agent confirmed`). If missing, halt and report — an unvalidated plan must not be executed.
-4. **Run any pre-execution checklist items** the plan declares (e.g., branch-baseline steps `Step 0-A`, `Step 0-B`). At story altitude, the branch-baseline rule (Global Story Invariants in `templates/SHAMT_RULES.template.md`) requires fetching the configured remote development branch and creating `feature/{slug}/<owner-or-team>` from the fetched remote ref — do not branch from local HEAD. At framework altitude, the plan's pre-execution checklist names its own branch convention (typically `framework-update/{slug}`); follow it as written. Halt and report if the named branch already exists.
+4. **Run any pre-execution checklist items** the plan declares (e.g., branch-baseline steps `Step 0-A`, `Step 0-B`). At story altitude, the branch-baseline rule (Global Story Invariants in `templates/SHAMT_RULES.template.md`) requires fetching the configured remote development branch and creating `feature/{slug}/<owner-or-team>` from the fetched remote ref — do not branch from local HEAD. At framework altitude, the plan's pre-execution checklist names its own branch convention (typically `proposal/{NN}-{slug}`); follow it as written. Halt and report if the named branch already exists.
 
 ## Execution
 

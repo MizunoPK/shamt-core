@@ -31,7 +31,7 @@ Only when the proposal's Proposed Changes table has **more than 10 rows**. Small
 Follow the canonical `/f2-plan-update-implementation` command body verbatim — see [`commands/f2-plan-update-implementation.md`](../../commands/f2-plan-update-implementation.md). Summary:
 
 1. **Read proposal**, confirm validation footer, walk every Proposed Changes row. Note paired-file dependencies (rule ↔ template, command ↔ skill, ref ↔ rule pointer). Halt if any pair is missing from the table — direct the user back to `/f1-propose-update`.
-2. **Author the plan** at `proposals/{slug}_PLAN.md` using the operation contracts (CREATE / EDIT / DELETE / MOVE) from [`templates/implementation_plan.template.md`](../../../../../templates/implementation_plan.template.md). Exact locate strings, exact replacements, concrete paths. No `if / when / consider` branches. Every step has a verification. **Never touch `.claude/`.** Decompose into phase files if the plan would compact a single Phase-4 session.
+2. **Author the plan** at `proposals/{NN}-{slug}_PLAN.md` (same stem as the proposal; `proposals/{slug}_PLAN.md` when grandfathered/unnumbered) using the operation contracts (CREATE / EDIT / DELETE / MOVE) from [`templates/implementation_plan.template.md`](../../../../../templates/implementation_plan.template.md). Exact locate strings, exact replacements, concrete paths. No `if / when / consider` branches. Every step has a verification. **Never touch `.claude/`.** Decompose into phase files if the plan would compact a single Phase-4 session.
 3. **Cross-check** plan steps against Proposed Changes rows. One-to-one coverage; operation match.
 4. **Suggest validation** — single-file plan: `/clear` + `/validate-artifact proposals/{slug}_PLAN.md`. Phase-decomposed plan (index + ≥1 phase file → ≥2 validations): emit a **batch-validation handoff prompt** (recommended) filled with the resolved on-disk paths per [`reference/batch_validation_handoff.md`](../../../../../reference/batch_validation_handoff.md), plus the sequential per-file `/clear` + `/validate-artifact` list naming the index and **every** phase file as the fallback. The plan is not approved for execution until every file carries its own validation footer.
 
@@ -45,7 +45,7 @@ See [`reference/model_selection.md`](../../../../../reference/model_selection.md
 
 ## Exit criteria
 
-`proposals/{slug}_PLAN.md` (or index + phase files) exists with one step per Proposed Changes row, no generated-file edits, and `/validate-artifact` has been suggested. The plan carries no footer yet.
+`proposals/{NN}-{slug}_PLAN.md` (numbered stem; `{slug}_PLAN.md` when grandfathered) (or index + phase files) exists with one step per Proposed Changes row, no generated-file edits, and `/validate-artifact` has been suggested. The plan carries no footer yet.
 
 ---
 Validated 2026-05-28 — 4 rounds, 1 adversarial sub-agent confirmed (Phase 8 implementation loop)

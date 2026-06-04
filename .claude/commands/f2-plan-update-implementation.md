@@ -26,7 +26,7 @@ See [`reference/model_selection.md`](../../../../reference/model_selection.md).
 
 ## Arguments
 
-- `{slug}` (required) — proposal slug. Resolves to `proposals/{slug}.md` (the validated proposal) and writes `proposals/{slug}_PLAN.md` (the implementation plan).
+- `{slug}` (required) — proposal slug, resolvable from the bare descriptive slug or the numbered stem `{NN}-{slug}`. Resolves the validated proposal exact-then-glob — `proposals/{slug}.md`, then `proposals/*-{slug}.md` (master-side proposals carry a `{NN}-` filename prefix; the glob matches at most one, halt on multiple). Writes the plan alongside it with the **same stem**: `proposals/{NN}-{slug}_PLAN.md` (or `proposals/{slug}_PLAN.md` for a grandfathered/unnumbered proposal).
 
 ## Path applicability
 
@@ -81,7 +81,7 @@ Write `proposals/{slug}_PLAN.md`. The plan reuses the **operation contracts** fr
 ## Pre-execution checklist
 - [ ] On a clean working tree (or working in a worktree dedicated to this proposal).
 - [ ] `proposals/{slug}.md` validation footer present.
-- [ ] Branch created: `framework-update/{slug}` from the configured remote development branch.
+- [ ] Branch created by `/f3-implement-update`: `proposal/{NN}-{slug}` (`proposal/{slug}` for a grandfathered/unnumbered proposal) from the base branch, immediately before the canonical edits. (Authoring/validation/planning happen on the base branch; the architect/builder path's executor creates this branch when it runs this pre-execution checklist at Phase 4.)
 
 ## Files manifest
 

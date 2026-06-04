@@ -75,16 +75,21 @@ Carried forward from v1 lessons:
 - **No multi-host support.** Claude Code is the only first-class host. Codex / Cursor / IDE integrations are not regenerated. If a second host ever becomes a real need, propose it through the framework-update flow.
 - **No MCP server, no OTel collector, no SDK CI templates.** v1 had these and the cost outweighed the use.
 - **No rigid stage-gate model.** There is no S1–S11. Stories are the leaf execution unit; epic/feature work is decomposition above them.
-- **No SHAMT-N numbering for framework changes.** Proposal slugs are descriptive.
+- **No SHAMT-N design-doc lifecycle.** Proposals carry a lightweight filename-prefixed organizational **number** (`{NN}-{slug}.md`, master-side only — see the Conventions section below) purely as a stable, `ls`-ordered identifier. Slugs remain the primary descriptive identifier. This is *not* a revival of v1's heavyweight SHAMT-N design-doc lifecycle (per-doc statuses, state machine, numbering ceremony).
 - **No design-doc lifecycle stored in canonical files.** History belongs in git, not in the rules file.
 
 If a request would pull shamt-core back toward any of these, pause and confirm with the user before building.
 
 ---
 
-## Commit conventions (TBD)
+## Conventions
 
-Not pinned yet. Decide before the first feature commit and document here.
+Pinned 2026-06-03 (proposal `proposal-workflow-conventions`). The authoritative mechanics live in the `/f1-propose-update` and `/f6-archive-proposal` command bodies; this section is the concise overview.
+
+- **Commit subject** — one squash commit per proposal: `shamt-core: land #NN {slug} (short description)`. A grandfathered/unnumbered proposal drops the `#NN`: `shamt-core: land {slug} (short description)`.
+- **Proposal number** — a lightweight organizational ID, **master-side only**. Proposals are filename-prefixed `proposals/{NN}-{slug}.md` with a matching `**Number:**` header. The number is two-digit zero-padded (`01`, `02`, … widening to three digits only past `99`), assigned at `/f1-propose-update` (master-local) or `/sync-triage-proposals` promote (child-submitted) as `max(existing NN across proposals/, proposals/archive/, proposals/deferred/, proposals/rejected/) + 1`. There is no counter file — the max is scanned from disk, parsing a leading `^[0-9]+-` run on each filename (so unnumbered/grandfathered files contribute nothing and the first number assigned is `01`), and numbers are never reused. Child-side proposals stay unnumbered (`.shamt-core/proposals/{slug}.md`); numbering happens only on master. This is the lightweight org-ID permitted by the out-of-scope note above — **not** a SHAMT-N design-doc lifecycle.
+- **Branch per proposal** — `proposal/{NN}-{slug}` (`proposal/{slug}` for a grandfathered/unnumbered proposal), created by `/f3-implement-update` from the base branch immediately before the canonical edits. Authoring, validation, and planning happen on the base branch; the proposal branch exists only for the implement→merge window.
+- **Archive commits + merges** — `/f6-archive-proposal` commits the canonical edits + regen output + archive move, squash-merges `proposal/{NN}-{slug}` into the base branch as the single commit above, then deletes the branch.
 
 ---
 

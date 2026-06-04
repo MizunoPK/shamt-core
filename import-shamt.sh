@@ -328,7 +328,22 @@ if [ -d "$CHILD_PROPOSALS" ] && [ -d "$MASTER_ARCHIVE" ]; then
       case "$base" in
         _template.md|.*) continue ;;
       esac
+      # Master archive filenames carry a {NN}- numeric prefix (master-side
+      # numbering; see shamt-core/CLAUDE.md §Conventions) while child-local
+      # proposals stay unnumbered {slug}.md. Match the child basename against
+      # both the exact name (grandfathered/unnumbered archives) and the
+      # numbered-prefix glob {NN}-{slug}.md.
+      matched_archive=""
       if [ -f "$MASTER_ARCHIVE/$base" ]; then
+        matched_archive="$MASTER_ARCHIVE/$base"
+      else
+        for cand in "$MASTER_ARCHIVE"/[0-9]*-"$base"; do
+          [ -e "$cand" ] || continue
+          matched_archive="$cand"
+          break
+        done
+      fi
+      if [ -n "$matched_archive" ]; then
         dest_dir="$CHILD_PROPOSALS/already-merged"
         mkdir -p "$dest_dir"
         mv "$local_proposal" "$dest_dir/$base"

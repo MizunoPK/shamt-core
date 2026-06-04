@@ -4,7 +4,7 @@ description: Master-side. Walk proposals/incoming/ and decide promote / reject /
 
 # /sync-triage-proposals
 
-**Purpose:** Run the master-side triage step of the v2 master/child sync (Part 4). Walk `proposals/incoming/{project}-{slug}.md` files in alphabetical order, present each to the user, and route per their decision: **promote** (move to `proposals/{slug}.md` and hand off to the framework-update flow starting at Phase 2), **reject** (move to `proposals/rejected/{slug}.md` with a top-of-file note), or **defer** (move to `proposals/deferred/{slug}.md`).
+**Purpose:** Run the master-side triage step of the v2 master/child sync (Part 4). Walk `proposals/incoming/{project}-{slug}.md` files in alphabetical order, present each to the user, and route per their decision: **promote** (move to `proposals/{NN}-{slug}.md` and hand off to the framework-update flow starting at Phase 2), **reject** (move to `proposals/rejected/{slug}.md` with a top-of-file note), or **defer** (move to `proposals/deferred/{slug}.md`).
 
 Per phase-per-command resumability (Principle 1), triage does not invoke `/validate-artifact` itself — it places the file at the canonical location and suggests the next command. The rest of the framework-update flow (Phase 8) runs as separate commands.
 
@@ -79,7 +79,7 @@ Surface to the user via `AskUserQuestion`:
 
 Options:
 
-- **Promote** — accept the proposal; it will be moved to `proposals/{slug}.md` and the framework-update flow will resume at Phase 2 (validate-artifact).
+- **Promote** — accept the proposal; it will be moved to `proposals/{NN}-{slug}.md` and the framework-update flow will resume at Phase 2 (validate-artifact).
 - **Reject** — close the proposal with a brief note explaining why. It will be moved to `proposals/rejected/{slug}.md` with the note prepended.
 - **Defer** — hold the proposal without rejecting. It will be moved to `proposals/deferred/{slug}.md`.
 - **Skip** — leave it in `proposals/incoming/` and continue to the next.
@@ -89,10 +89,12 @@ Options:
 **Promote:**
 
 1. Ensure `proposals/` exists at the project root (it should, on master).
-2. Halt if `proposals/{slug}.md` already exists — slug collision, the user must resolve manually (rename one or re-author).
-3. `git mv proposals/incoming/{filename} proposals/{slug}.md` (or plain `mv` if untracked).
-4. Confirm the validation footer (if present) is intact post-move.
-5. Note in chat the next command to run: `/validate-artifact proposals/{slug}.md`. Do not invoke it from this command — phase-per-command resumability (Principle 1) keeps every phase independently runnable by a fresh agent.
+2. **Assign the master-side number.** Scan every folder a numbered proposal can come to rest in — `proposals/`, `proposals/archive/`, `proposals/deferred/`, `proposals/rejected/` (**not** `proposals/incoming/`, which still holds unnumbered child submissions). Parse the leading `^[0-9]+-` digit run on each filename; the number is `max(parsed NN) + 1`, or `01` when none is numbered. Format two-digit zero-padded (widening to three digits past `99`). **Re-read from disk per promote** — never cache `max(NN)` across promotes, or two proposals promoted in the same run would collide. This is the same algorithm `/f1-propose-update` uses for master-local proposals (one shared master namespace).
+3. Halt if `proposals/{slug}.md` or `proposals/*-{slug}.md` already exists — slug collision, the user must resolve manually (rename one or re-author).
+4. `git mv proposals/incoming/{filename} proposals/{NN}-{slug}.md` (or plain `mv` if untracked) — apply the `{NN}-` prefix. Also write the `**Number:** {NN}` header into the promoted proposal.
+5. Confirm the validation footer (if present) is intact post-move.
+6. **No branch.** Branch creation is deferred to `/f3-implement-update` for all proposals (master-local and promoted alike), so triage stays a pure router — it assigns the number and moves the file, nothing more.
+7. Note in chat the next command to run: `/validate-artifact proposals/{NN}-{slug}.md`. Do not invoke it from this command — phase-per-command resumability (Principle 1) keeps every phase independently runnable by a fresh agent.
 
 **Reject:**
 
@@ -140,17 +142,17 @@ Then suggest how to validate the promoted proposals:
   ```text
   Next:
     /clear
-    /validate-artifact proposals/{slug}.md
+    /validate-artifact proposals/{NN}-{slug}.md
   ```
 
-- **Two or more promoted** — this is a batch. Emit a **batch-validation handoff prompt** as the **recommended** path — fill the template in [`reference/batch_validation_handoff.md`](../../../../reference/batch_validation_handoff.md) with the actual promoted `proposals/{slug}.md` paths (each with its governing references), and print it for the user to paste into a fresh session. Also print the **sequential per-slug fallback**:
+- **Two or more promoted** — this is a batch. Emit a **batch-validation handoff prompt** as the **recommended** path — fill the template in [`reference/batch_validation_handoff.md`](../../../../reference/batch_validation_handoff.md) with the actual promoted `proposals/{NN}-{slug}.md` paths (each with its governing references), and print it for the user to paste into a fresh session. Also print the **sequential per-slug fallback**:
 
   ```text
   Next (fallback — drive each step yourself):
     /clear
-    /validate-artifact proposals/{slug-1}.md
+    /validate-artifact proposals/{NN}-{slug-1}.md
     /clear
-    /validate-artifact proposals/{slug-2}.md
+    /validate-artifact proposals/{NN}-{slug-2}.md
     ...
   ```
 
@@ -160,7 +162,7 @@ Both paths run the same Pattern 1 loop per proposal — there is no rigor differ
 
 - Every file in `proposals/incoming/` has been either dispositioned (promoted / rejected / deferred) or explicitly skipped.
 - The triage summary has been printed.
-- For each promoted slug, the next command (`/validate-artifact proposals/{slug}.md`) has been stated.
+- For each promoted slug, the next command (`/validate-artifact proposals/{NN}-{slug}.md`) has been stated.
 
 ## Notes
 

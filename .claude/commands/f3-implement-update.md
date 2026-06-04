@@ -24,14 +24,14 @@ See [`reference/model_selection.md`](../../../../reference/model_selection.md).
 
 ## Arguments
 
-- `{slug}` (required) — proposal slug. Resolves to `proposals/{slug}.md` and (optionally) `proposals/{slug}_PLAN.md` or phase-decomposed plan files.
+- `{slug}` (required) — proposal slug (bare descriptive slug or numbered stem `{NN}-{slug}`). Resolves the proposal exact-then-glob — `proposals/{slug}.md`, then `proposals/*-{slug}.md` (master-side proposals carry a `{NN}-` prefix; matches at most one, halt on multiple) — and the companion `proposals/{NN}-{slug}_PLAN.md` (or phase files) with the same stem.
 
 ## Prerequisites
 
 - `proposals/{slug}.md` exists with a Phase 2 validation footer. If missing or unfootered, halt and direct the user to `/f1-propose-update {slug}` and then `/validate-artifact proposals/{slug}.md`.
 - If the proposal declares a Phase 3 note (`Phase 3 required — file count {N} > 10.`) or `proposals/{slug}_PLAN.md` exists, the plan must also carry a validation footer. If missing or unfootered, halt and direct the user to `/f2-plan-update-implementation {slug}` then `/validate-artifact proposals/{slug}_PLAN.md`.
 - `proposals/archive/{slug}.md` does **not** exist. If it does, halt and report — this slug has already been implemented.
-- Working tree is clean (or the user has confirmed working on a dedicated `framework-update/{slug}` branch). Halt and confirm if the tree has unrelated staged or unstaged changes.
+- Working tree is clean except for the proposal/plan files. Halt and confirm if the tree has unrelated staged or unstaged changes. (Authoring/validation/planning ran on the base branch; this command creates the proposal branch — see Step 1.5.)
 
 ## Path selection
 
@@ -57,6 +57,16 @@ Decide which path to run, state it in one line before any edit:
    - Any path under `shamt-core/` outside the above list **only if** the proposal explicitly justifies it in Validation Considerations or Risks.
 
    If any path falls under generated `.claude/` (or its child-side equivalent), **halt immediately**. Edits to generated files are always wrong — they get overwritten on the next regen and the canonical source still carries the old version. Direct the user back to `/f1-propose-update` to correct the change list.
+
+### Step 1.5 — Create the proposal branch
+
+Branch creation moved to this command — it is **not** done at `/f1-propose-update` or `/sync-triage-proposals`. Create the branch from the base branch immediately before applying canonical edits:
+
+- **Branch name:** `proposal/{NN}-{slug}` using the proposal's resolved numbered stem (`proposal/{slug}` for a grandfathered/unnumbered proposal with no `{NN}-` prefix). Read numbered-ness from the resolved filename's leading `^[0-9]+-` run: present = numbered, absent = grandfathered.
+- **Inline path:** create it directly — `git checkout -b proposal/{NN}-{slug}` from the base branch (the branch framework changes land on). Halt and report if the branch already exists.
+- **Architect/builder path:** do **not** create it here — the validated plan's pre-execution checklist declares the branch, and `plan-executor` creates it when it runs that checklist (pre-flight Step 4). Confirm the plan's pre-execution checklist names `proposal/{NN}-{slug}` before handing off.
+
+Creating a branch is not a commit — the "No commits here" rule (Notes) still holds. The commit + squash-merge happen later at `/f6-archive-proposal` (Phase 7).
 
 ### Step 2 — Apply edits
 
@@ -122,7 +132,7 @@ Suggest a context-clear and the next command:
 
 - **Fresh-agent runnable**: proposal, plan (when present), Proposed Changes table, and on-disk file state are sufficient inputs. No conversation history required.
 - **Hard rule — canonical sources only.** The validator and `/f1-propose-update` already enforce this at draft time; `/f3-implement-update` enforces it at edit time. Editing a generated file is always wrong — it gets overwritten on the next regen and the canonical source still carries the old version. If a step's path looks like `.claude/...`, halt unconditionally.
-- **No commits here.** This command leaves changes in the working tree. The user commits explicitly after Phase 5 (regen) confirms the propagation worked, so the canonical edit and the generated `.claude/` update land in one commit.
+- **No commits here.** This command creates the `proposal/{NN}-{slug}` branch (Step 1.5) and leaves the canonical edits uncommitted in the working tree — creating a branch is not a commit. The commit + squash-merge to the base branch now land at `/f6-archive-proposal` (Phase 7), after `/f4-regen-framework` (Phase 5) has propagated the canonical edits into `.claude/`, so the canonical edit, the regen output, and the archive move land together in one squash commit.
 - **Architect/builder split** — the `plan-executor` persona's contract is identical at the framework altitude. The architect (this orchestrator) re-engages only on builder-reported failure / ambiguity / plan defect.
 - **Re-baseline protocol** — if a Proposed Changes row turns out wrong mid-implementation, the re-baseline protocol applies to `proposals/{slug}.md` (or `{slug}_PLAN.md`). Patch, re-validate, re-run this command. Do not edit silently.
 

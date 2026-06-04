@@ -24,18 +24,17 @@ Mirrors the `/f6-archive-proposal {slug}` slash command. Same canonical body, tw
 
 Follow the canonical `/f6-archive-proposal` command body verbatim — see [`commands/f6-archive-proposal.md`](../../commands/f6-archive-proposal.md). Summary:
 
-1. **Read and confirm** — `proposals/{slug}.md` exists with a validation footer. Check for companions (`{slug}_PLAN.md`, `{slug}_PLAN_phase_N.md`); each must also carry a footer. Update the proposal's `Status:` header to `Implemented`.
-2. **Move to archive** — ensure `proposals/archive/` exists; `git mv` (when tracked) or plain `mv` the proposal and companions into it. Confirm footers intact post-move. Halt if `proposals/archive/{slug}.md` already exists.
-3. **Commit suggestion** — do not commit on the user's behalf. Suggest a `git status` / `git diff` review + a unified commit covering canonical edits + regen output + archive.
-4. **Exit** — state the archive path and that the framework-update flow is complete. No next-phase suggestion.
+1. **Read and confirm** — resolve the proposal exact-then-glob (`proposals/{slug}.md`, then `proposals/*-{slug}.md` for the master-side `{NN}-` prefix); confirm a validation footer. Check for companions (`{NN}-{slug}_PLAN.md`, `{NN}-{slug}_PLAN_phase_N.md`); each must also carry a footer. **Determine numbered-ness** from the resolved filename's leading `^[0-9]+-` run (present = numbered, drives the `#NN` commit subject + `proposal/{NN}-{slug}` branch; absent = grandfathered, drops `#NN`, branch `proposal/{slug}`). Update `Status:` to `Implemented`.
+2. **Move to archive** — ensure `proposals/archive/` exists; `git mv` (tracked) or `mv` the proposal + companions into it, **preserving the `{NN}-` prefix**. Confirm footers intact post-move. Halt if `proposals/archive/{slug}.md` (or `archive/*-{slug}.md`) already exists.
+3. **Commit + squash-merge + delete branch** — behind pre-merge guards (HEAD on the proposal branch; working tree is exactly the canonical edits + archive move + regen output; regen has run; branch is a descendant of base). Commit with subject `shamt-core: land #{NN} {slug} (…)` (drop `#{NN}` when grandfathered), `git merge --squash` the proposal branch into the base branch as that one commit, then `git branch -D` the proposal branch **only after the merge commit succeeds**. Halt on any guard failure or git error.
 
 ## Recommended model
 
-Cheap (Haiku) — archive is mechanical: file move and status update. See [`reference/model_selection.md`](../../../../../reference/model_selection.md).
+Balanced (Sonnet) — archiving now commits, squash-merges the `proposal/{NN}-{slug}` branch into the base branch, and deletes the branch behind pre-merge guards — an irreversible git-state mutation, not just a file move. See [`reference/model_selection.md`](../../../../../reference/model_selection.md).
 
 ## Exit criteria
 
-Proposal (and companions) at `proposals/archive/{slug}.md` with footers intact; commit prompted but not executed.
+Proposal (and companions) at `proposals/archive/{NN}-{slug}.md` with footers intact; the change committed + squash-merged to the base branch and the `proposal/{NN}-{slug}` branch deleted (after all guards held).
 
 ## Reject and defer
 
