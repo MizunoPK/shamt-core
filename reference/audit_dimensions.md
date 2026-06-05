@@ -95,7 +95,7 @@ This is the **same best-effort convergence Pattern 1 already provides** — ther
 
 ### In-flow logging
 
-When the audit runs as Phase 6 of the framework-update flow, a proposal is already in flight. **Both** clearing actions — each simple auto-fix **and** each f0 draft captured for an intricate finding — are logged in chat as out-of-band activity, explicitly distinct from the in-flight proposal's scope — so the proposal's validated change-set and footer stay clean and a reader can always separate proposal edits/drafts from audit edits/drafts.
+When the audit runs as Phase 6 of the framework-update flow, a proposal is already in flight. **Both** clearing actions — each simple auto-fix **and** each f0 draft captured for an intricate finding — are logged in chat so a reader can always separate audit edits/drafts from proposal edits/drafts. They are **not** held separate from the proposal's commit, however: audit auto-fixes (and their regen output) and captured f0 stubs **ride into the in-flight proposal's landing commit and squash-merge** at `/f6-archive-proposal`. The chat log is for attribution, not a hard scope boundary; no commit-body audit marker is added (the git diff of the squash commit is the durable record).
 
 ### Master / self-host only
 

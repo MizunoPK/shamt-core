@@ -23,7 +23,7 @@ description: Phase 7 of the framework-update flow — move proposals/{slug}.md (
 ## Prerequisites
 
 - `proposals/{slug}.md` exists and carries a validation footer (Phase 2 complete).
-- The proposal has been implemented: the working tree contains the canonical edits the proposal described, and `/f4-regen-framework` has propagated them to `.claude/` (or the proposal explicitly did not require regen).
+- The proposal has been implemented: the working tree contains the canonical edits the proposal described (plus any in-flow audit auto-fixes / captured f0 stubs from a Phase 6 `/f5-audit-framework` run, which fold into this landing), and `/f4-regen-framework` has propagated them to `.claude/` (or the proposal explicitly did not require regen).
 - **Recommended (not enforced):** `/f5-audit-framework` has been run and exited cleanly. The archive command does not block on the audit — the user may legitimately archive after a known-clean audit run earlier in the session, or accept lingering findings that are out of scope for the current proposal.
 - `proposals/archive/{slug}.md` (or numbered `proposals/archive/*-{slug}.md`) does **not** already exist. If it does, halt and report — this slug was already archived. A re-archival would either overwrite the prior record or shadow it depending on filesystem semantics; neither is safe.
 
@@ -51,7 +51,7 @@ The archive is the landing point. `/f6-archive-proposal` now commits the change,
 **Pre-merge guards** (all must hold):
 
 - [ ] HEAD is on the proposal branch — `proposal/{NN}-{slug}` for a numbered proposal, `proposal/{slug}` for a grandfathered one (Step 1 determined which). If not, halt and report.
-- [ ] The working tree contains exactly the expected change: the canonical-source edits the proposal described, the archive move (Step 2), and the `.claude/` regen output from Phase 5. No unrelated staged/unstaged changes — run `git status` and confirm.
+- [ ] The working tree contains the proposal's change: the canonical-source edits the proposal described, the archive move (Step 2), the `.claude/` regen output from Phase 5, **and any in-flow audit auto-fixes / captured f0 stubs from a Phase 6 `/f5-audit-framework` run** (these fold into this landing per the audit's in-flow logging rule). Run `git status` for visibility — it is **not** a halt gate; `/f6` commits the whole working tree, so the user is responsible for keeping it free of genuinely-unrelated work while a framework-update flow is in progress.
 - [ ] `/f4-regen-framework` has run (or the proposal explicitly required no regen). If `.claude/` is out of sync with the canonical edits, halt and direct the user to run `/f4-regen-framework` first.
 - [ ] The base branch (`main` for shamt-core) exists and the proposal branch is a descendant of it (a clean squash-merge target).
 
