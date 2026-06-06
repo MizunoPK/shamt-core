@@ -113,6 +113,8 @@ A flat list of canonical files the proposal will touch. **Every file the proposa
 
 If the total row count exceeds **10 canonical file operations**, Phase 3 (`/f2-plan-update-implementation`) is required before Phase 4. The threshold is a framework-altitude expression of the single-session sizing constraint (Principle 1 in [`SHAMT_RULES.template.md`](../templates/SHAMT_RULES.template.md#principle-1-phase-per-command--slug-resumability)).
 
+If a downstream phase later finds this table is *missing* a row (a paired file or reference site surfaced while planning or implementing), add it via an **in-place amendment** — strip the prior `Validated …` footer → append the row → re-run `/validate-artifact` — rather than a full `/f1-propose-update` re-run (see the **In-place amendment** section of `/f1-propose-update`).
+
 ---
 
 ## Risks

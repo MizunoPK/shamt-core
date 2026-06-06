@@ -56,7 +56,7 @@ Decide which path to run, state it in one line before any edit:
    - `shamt-core/CLAUDE.md`, `shamt-core/CHEATSHEET.md`, `shamt-core/shamt-config.example.json` (root-level canonical docs)
    - Any path under `shamt-core/` outside the above list **only if** the proposal explicitly justifies it in Validation Considerations or Risks.
 
-   If any path falls under generated `.claude/` (or its child-side equivalent), **halt immediately**. Edits to generated files are always wrong — they get overwritten on the next regen and the canonical source still carries the old version. Direct the user back to `/f1-propose-update` to correct the change list.
+   If any path falls under generated `.claude/` (or its child-side equivalent), **halt immediately**. Edits to generated files are always wrong — they get overwritten on the next regen and the canonical source still carries the old version. Fix the offending row to point at the canonical source, strip the proposal's prior footer, and re-run `/validate-artifact` — an **[in-place amendment](f1-propose-update.md#in-place-amendment)** path-correction (the row already exists, so this corrects it rather than appending), no full `/f1-propose-update` re-run.
 
 ### Step 1.5 — Create the proposal branch
 
@@ -114,7 +114,7 @@ Walk the Proposed Changes table one final time. For each row, confirm the workin
 - [ ] No file outside the canonical roots is in the diff.
 - [ ] No generated `.claude/` file is in the diff.
 
-If any row is uncovered, treat it as a `Step failed` — diagnose. If the diff contains extra changes not in the table, treat it as scope creep — halt and surface to the user; decide whether to remove the changes or extend the proposal via re-baseline + re-validation.
+If any row is uncovered, treat it as a `Step failed` — diagnose. If the diff contains extra changes not in the table, treat it as scope creep — halt and surface to the user; decide whether to remove the changes or, when a change is genuinely wanted, legitimize it via an **[in-place amendment](f1-propose-update.md#in-place-amendment)** (append the row for it, strip the proposal's prior footer, re-run `/validate-artifact`) rather than a full `/f1-propose-update` re-run.
 
 ### Step 4 — Suggest the next phase
 
@@ -135,6 +135,7 @@ Suggest a context-clear and the next command:
 - **No commits here.** This command creates the `proposal/{NN}-{slug}` branch (Step 1.5) and leaves the canonical edits uncommitted in the working tree — creating a branch is not a commit. The commit + squash-merge to the base branch now land at `/f6-archive-proposal` (Phase 7), after `/f4-regen-framework` (Phase 5) has propagated the canonical edits into `.claude/`, so the canonical edit, the regen output, and the archive move land together in one squash commit.
 - **Architect/builder split** — the `plan-executor` persona's contract is identical at the framework altitude. The architect (this orchestrator) re-engages only on builder-reported failure / ambiguity / plan defect.
 - **Re-baseline protocol** — if a Proposed Changes row turns out wrong mid-implementation, the re-baseline protocol applies to `proposals/{slug}.md` (or `{slug}_PLAN.md`). Patch, re-validate, re-run this command. Do not edit silently.
+- **In-place amendment vs. re-baseline** — re-baseline (above) is for a row that is *wrong*; a *missing* or genuinely *wanted* row is handled by an **[in-place amendment](f1-propose-update.md#in-place-amendment)** instead (append the row, strip the prior footer, re-run `/validate-artifact`) — neither a re-baseline nor a full `/f1-propose-update` re-run.
 
 ---
 Validated 2026-05-28 — 4 rounds, 1 adversarial sub-agent confirmed (Phase 8 implementation loop)

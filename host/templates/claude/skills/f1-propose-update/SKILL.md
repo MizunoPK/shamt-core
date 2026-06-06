@@ -39,6 +39,8 @@ Follow the canonical `/f1-propose-update` command body verbatim — see [`comman
 7. **Exit gate** — proposal non-empty; Problem, Proposed Changes, Risks, Rollback, Validation Considerations filled; Open Questions empty; no validation footer yet.
 8. **Suggest next phase** — `/clear` + `/validate-artifact {resolved path}` (`proposals/{NN}-{slug}.md` on master, `.shamt-core/proposals/{slug}.md` on child), and `/f2-plan-update-implementation {slug}` when row count > 10.
 
+> **In-place amendment** — when a downstream phase (`/f2-plan-update-implementation`, `/f3-implement-update`) finds an already-validated proposal's Proposed Changes table is missing a row, it amends in place (strip footer → append row → re-run `/validate-artifact`) rather than re-running `/f1-propose-update`; see the **In-place amendment** section in the command body.
+
 ## Recommended model
 
 Balanced (Sonnet) — structural analysis. The Phase 2 validation loop escalates to Reasoning (Opus). See [`reference/model_selection.md`](../../../../../reference/model_selection.md).

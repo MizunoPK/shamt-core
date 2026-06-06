@@ -57,7 +57,7 @@ If the user explicitly requests a plan for a smaller proposal, honor the request
 2. Walk the **Proposed Changes** table row by row. For each row:
    - Read the named canonical file (5–10 lines around the target section for EDIT rows; full file for CREATE/DELETE rows).
    - Record the sibling shape if a CREATE is meant to mirror an existing file (e.g., a new skill mirroring `skills/e1-start-story/SKILL.md`).
-   - Note any paired files the row implies (rule ↔ template; command ↔ skill; reference ↔ rule pointer). These pairs must already appear as rows in the table — if they don't, halt and direct the user back to `/f1-propose-update` to expand the change list.
+   - Note any paired files the row implies (rule ↔ template; command ↔ skill; reference ↔ rule pointer). These pairs must already appear as rows in the table — if they don't, perform an **[in-place amendment](f1-propose-update.md#in-place-amendment)**: append the missing row(s), strip the proposal's prior `Validated …` footer, re-run `/validate-artifact`, then resume planning — no full `/f1-propose-update` re-run.
 3. Re-count the rows. Confirm `N > 10`. If not, exit with the message above.
 
 ### Step 2 — Author the plan
@@ -138,7 +138,7 @@ triggers, etc.}
 
 Walk the Proposed Changes table again. Confirm:
 
-- **One-to-one row coverage** — every Proposed Changes row maps to at least one step in the plan; every plan step traces back to a Proposed Changes row. Plan steps that don't trace back are scope creep — halt, surface to the user, decide whether to remove the step or extend the proposal via re-baseline.
+- **One-to-one row coverage** — every Proposed Changes row maps to at least one step in the plan; every plan step traces back to a Proposed Changes row. Plan steps that don't trace back are scope creep — halt, surface to the user, and decide whether to remove the step or, when the step reflects a genuinely needed change, legitimize it via an **[in-place amendment](f1-propose-update.md#in-place-amendment)** (append the missing row, strip the prior footer, re-run `/validate-artifact`) — a *missing* row is amended in place, not re-baselined (re-baseline is for a row that is *wrong*).
 - **Operation match** — a row marked EDIT in the proposal is an EDIT step in the plan (and so on).
 
 ### Step 4 — Suggest validation
@@ -170,7 +170,7 @@ The plan is **not** approved for execution until every plan file carries its own
 
 - **Fresh-agent runnable**: the proposal (with footer) and the canonical files cited in Proposed Changes all live on disk. No conversation history required.
 - **Plan-executor reuse** — Phase 4 hands this plan off to the same `plan-executor` persona used for story-level Build (see [`agents/plan-executor.md`](../agents/plan-executor.md)). The plan body conforms to that persona's expected shape; the executor does not know or care that the plan came from a proposal versus a spec.
-- **Architect/builder split** — author the plan precisely enough that the cheap-tier builder in Phase 4 executes it mechanically. If you find yourself wanting to defer a design decision into a step ("the builder can figure it out"), halt and either resolve the decision now or return to `/f1-propose-update` to expand the proposal.
+- **Architect/builder split** — author the plan precisely enough that the cheap-tier builder in Phase 4 executes it mechanically. If you find yourself wanting to defer a design decision into a step ("the builder can figure it out"), halt and either resolve the decision now or, when the gap is a *missing* Proposed Changes row, perform an **[in-place amendment](f1-propose-update.md#in-place-amendment)** (append the row, strip the prior footer, re-run `/validate-artifact`) instead of a full `/f1-propose-update` re-run.
 - **Re-baseline** — if Phase 4 reports a plan defect, patch the plan, re-run `/validate-artifact proposals/{slug}_PLAN.md`, then re-invoke `/f3-implement-update`. Do not edit the plan in place after Phase 4 has already started executing against it without re-validating.
 
 ---
