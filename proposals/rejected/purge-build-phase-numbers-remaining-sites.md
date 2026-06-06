@@ -1,3 +1,5 @@
+<!-- REJECTED 2026-06-06 — duplicate / absorbed. This f0 capture's sites (the "Phase 9" ×4 and "original Phase 5 path" ×2 dev-build-phase leaks) were folded into the widened **#03 purge-build-phase-numbers-from-host-bodies** proposal (its load-bearing "widen vs. separate" question resolved to *widen*, user choice 2026-06-06). That proposal now covers all 13 sites across 11 files and corrects the false "only Phase 8 / build-plan leaks" completeness claim this stub flagged. Nothing further to act on here. -->
+
 # Proposal: purge-build-phase-numbers-remaining-sites
 
 **Created:** 2026-06-03

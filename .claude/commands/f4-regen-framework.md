@@ -99,7 +99,7 @@ If the user wants to run the audit even on a standalone regen (e.g., as part of 
 - **`--check` after regen is the drift gate.** Some scenarios (a stale `settings.json` patch, a script bug, a race with an external editor) can produce drift even right after regen. Running `--check` is what makes the exit gate trustworthy.
 - **`.claude/settings.json` is partially user-owned.** The script only patches the `statusLine` field via `jq` and leaves the rest. `--check` deliberately does not flag `settings.json` drift; the regen's success is the gate.
 - **Footer contract.** Only files with `<!-- Managed by Shamt -->` (or `# Managed by Shamt` for `.sh`) in their last 5 lines are overwritten or pruned. User-authored host files without the footer are preserved with a warning.
-- **Standalone use** is encouraged. Run `/f4-regen-framework` after pulling master updates (`/sync-import-shamt` in child projects, Phase 9), after rebasing canonical work, or before opening a PR that touches `.shamt-core/host/templates/claude/`.
+- **Standalone use** is encouraged. Run `/f4-regen-framework` after pulling master updates (`/sync-import-shamt` in child projects), after rebasing canonical work, or before opening a PR that touches `.shamt-core/host/templates/claude/`.
 
 ---
 Validated 2026-05-28 — 4 rounds, 1 adversarial sub-agent confirmed (Phase 8 implementation loop)

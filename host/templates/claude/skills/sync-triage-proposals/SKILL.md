@@ -52,7 +52,7 @@ Every file in `proposals/incoming/` has been dispositioned or explicitly skipped
 
 ## Why no auto-validation
 
-Promote moves the file and stops. `/validate-artifact` is a separate phase, runnable by a fresh agent off `proposals/{slug}.md` alone. This matches every other master-side phase in Phase 8 and keeps the slug-resumability contract intact (Principle 1).
+Promote moves the file and stops. `/validate-artifact` is a separate phase, runnable by a fresh agent off `proposals/{slug}.md` alone. This matches every other master-side phase in the framework-update flow and keeps the slug-resumability contract intact (Principle 1).
 
 ---
 Validated 2026-05-28 — 8 rounds (4 primary + 4 adversarial), final adversarial sub-agent confirmed (Phase 9 implementation re-validation). Mirrors the command-side fixes: derived-slug kebab-case check + inline regex-difference note.

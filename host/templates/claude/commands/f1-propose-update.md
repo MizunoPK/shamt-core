@@ -150,7 +150,7 @@ Suggest a context-clear and the next command:
 - **Fresh-agent runnable**: the template, the canonical sources cited in Problem, and the prior draft (when re-entering) all live on disk. No conversation history required.
 - **`Proposed by:` and `Project context:`** are part of the v2 master/child contract — master-local proposals leave them blank; child-authored proposals fill them in so `/sync-triage-proposals` can attribute the change.
 - The proposal **never** edits generated `.claude/` files. That rule is enforced again in Phase 4; surfacing it here keeps Phase 4 honest.
-- This command is reused by child projects when they author proposals locally before `/sync-submit-proposal` ships them up. The body is identical on both sides — Phase 9 wires the child-side submission.
+- This command is reused by child projects when they author proposals locally before `/sync-submit-proposal` ships them up. The body is identical on both sides.
 
 ---
 Validated 2026-05-28 — 4 rounds, 1 adversarial sub-agent confirmed (Phase 8 implementation loop)

@@ -45,7 +45,7 @@ Apply the global slug resolution rule from [`SHAMT_RULES.template.md`](../../../
 3. **Multiple matches** → halt and ask the user which folder to use.
 4. **One match** → that folder is the story folder. **Inspect `ticket.md` to detect the stub case:**
    - **Stub case (PO-flow handoff).** If `ticket.md` carries `**Parent Feature:**` and/or `**Parent Epic:**` back-ref headers directly under the H1, this is a stub written by `/p4-decompose-feature`. Mark the invocation as **stub-aware**: the back-ref headers and the scope one-liner in the body are preserved verbatim throughout the rest of this command. Proceed to Step 4 (the rest of the Intake flow — tracker fetch when the active profile supports Story, else freeform open-questions dialog — merges its output into the existing template sections without rewriting the back-ref headers or the scope one-liner). The Engineer-flow Intake gate (Step 6) still applies. Stub-derived stories are individually testable per `/p4-decompose-feature`'s exit gate — no rubric re-check at Intake.
-   - **Pre-existing freeform case.** If `ticket.md` is populated but carries **no** back-ref headers, this is a pre-existing freeform story (the original Phase 5 path). Confirm with the user whether to refetch / overwrite, append, or exit, the same as before.
+   - **Pre-existing freeform case.** If `ticket.md` is populated but carries **no** back-ref headers, this is a pre-existing freeform story. Confirm with the user whether to refetch / overwrite, append, or exit, the same as before.
 5. **Zero matches** → continue to Step 3 (new story).
 
 ### Step 3 — Derive the brief description and propose the folder name

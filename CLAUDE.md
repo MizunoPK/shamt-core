@@ -38,15 +38,13 @@ Shamt has **canonical sources** (in this folder) and **generated artifacts** (in
 
 ## How changes land
 
-Once Phase 8 is built, the **framework-update flow** is the supported way to change anything in this folder:
+The **framework-update flow** is the supported way to change anything in this folder:
 
 1. Author a proposal at `proposals/{slug}.md`.
 2. Validate the proposal with `/validate-artifact` (Pattern 1).
 3. Implement the change against canonical sources.
-4. Run the regen script in `-Check` mode against a known-clean child project to verify generated output stays sync'd.
+4. Run `scripts/regenerate-framework.sh --check` against a known-clean child project to verify generated output stays sync'd.
 5. Archive the proposal to `proposals/archive/{slug}.md`.
-
-Until Phase 8 lands, treat this list as the **target shape** — propose changes in chat, validate manually using Pattern 1, edit the canonical file, and note what should later become a `proposals/` entry.
 
 ---
 

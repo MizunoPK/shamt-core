@@ -43,7 +43,7 @@ Cheap (Haiku) — script wrapper, output parsing, no design. See [`reference/mod
 
 `import-shamt.sh` exited 0; counts surfaced; regen ran (or its absence was called out); the user knows how to review the diff.
 
-## Footer contract (Phase 9 pragmatic rule)
+## Footer contract
 
 Subtree-level, not per-file. Every path in master's sync set (`CLAUDE.md`, `CHEATSHEET.md`, `shamt-config.example.json`, `init-shamt.sh`, `import-shamt.sh`, `proposals/_template.md`, `scripts/`, `templates/`, `reference/`, `host/`) is master-owned and overwritten on import. Files the child adds under `.shamt-core/{templates,reference,host,scripts}/` outside that set are preserved with a warning. This is the practical interpretation of the subtree-level sync rule, justified in `commands/sync-import-shamt.md` Notes.
 

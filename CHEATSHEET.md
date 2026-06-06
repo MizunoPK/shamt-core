@@ -131,7 +131,7 @@ Linking is plain-markdown header lines under the H1 — no parser, no sidecar fi
 
 - `epic.md` has no back-ref (top of the hierarchy).
 - `feature.md` carries `**Parent Epic:** {epic-slug}` (blank for standalone features created by `/p3-start-feature` from scratch).
-- `ticket.md` (when written by `/p4-decompose-feature`) carries `**Parent Feature:** {feature-slug}` and (when the parent feature has an epic) `**Parent Epic:** {parent-epic-slug}` — the second line is **omitted entirely** for stories under a standalone feature. `/p4-decompose-feature` populates both headers; `/e1-start-story` is **stub-aware** and **preserves them verbatim** when fleshing out the rest of the Intake content (no new command flag — the presence of the back-ref headers is the signal). Pre-existing freeform stories (the original Phase 5 path, no headers) behave unchanged.
+- `ticket.md` (when written by `/p4-decompose-feature`) carries `**Parent Feature:** {feature-slug}` and (when the parent feature has an epic) `**Parent Epic:** {parent-epic-slug}` — the second line is **omitted entirely** for stories under a standalone feature. `/p4-decompose-feature` populates both headers; `/e1-start-story` is **stub-aware** and **preserves them verbatim** when fleshing out the rest of the Intake content (no new command flag — the presence of the back-ref headers is the signal). Pre-existing freeform stories (no headers) behave unchanged.
 
 #### Individually-testable rubric (the hard PO-flow constraint)
 

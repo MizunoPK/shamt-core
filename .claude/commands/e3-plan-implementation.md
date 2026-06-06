@@ -115,7 +115,7 @@ Present the validated plan (and, when applicable, the validated testing plan) fo
 
 Wait for explicit user approval at Gate 3.
 
-On approval, suggest a context-clear breakpoint: `/clear`, then `/e4-execute-plan {slug}` (Phase 4, Build — lands in Phase 6 of the build plan). Builder handoff is **unconditional** after Gate 3 — the architect plans, the cheap-tier builder executes.
+On approval, suggest a context-clear breakpoint: `/clear`, then `/e4-execute-plan {slug}` (Phase 4, Build). Builder handoff is **unconditional** after Gate 3 — the architect plans, the cheap-tier builder executes.
 
 ## Exit criteria
 

@@ -6,7 +6,7 @@ description: Master-side. Walk proposals/incoming/ and decide promote / reject /
 
 **Purpose:** Run the master-side triage step of the v2 master/child sync (Part 4). Walk `proposals/incoming/{project}-{slug}.md` files in alphabetical order, present each to the user, and route per their decision: **promote** (move to `proposals/{NN}-{slug}.md` and hand off to the framework-update flow starting at Phase 2), **reject** (move to `proposals/rejected/{slug}.md` with a top-of-file note), or **defer** (move to `proposals/deferred/{slug}.md`).
 
-Per phase-per-command resumability (Principle 1), triage does not invoke `/validate-artifact` itself — it places the file at the canonical location and suggests the next command. The rest of the framework-update flow (Phase 8) runs as separate commands.
+Per phase-per-command resumability (Principle 1), triage does not invoke `/validate-artifact` itself — it places the file at the canonical location and suggests the next command. The rest of the framework-update flow runs as separate commands.
 
 **Recommended model:** Balanced (Sonnet). Reading each proposal, summarizing for the user, and routing one of three actions is light judgment work. The validation, planning, implementation, and audit phases that follow are separate commands with their own model recommendations. See [`reference/model_selection.md`](../../../../reference/model_selection.md).
 
@@ -167,7 +167,7 @@ Both paths run the same Pattern 1 loop per proposal — there is no rigor differ
 ## Notes
 
 - **No bulk-disposition.** Each proposal gets its own decision via `AskUserQuestion`. Bulk auto-decisions risk silent acceptances of proposals the user would have rejected on a closer read.
-- **No automatic validation invocation.** Promote moves the file and stops. The user runs `/validate-artifact` next — possibly after `/clear` to start fresh. This matches every other master-side phase in the framework-update flow (Phase 8) and keeps each phase independently runnable.
+- **No automatic validation invocation.** Promote moves the file and stops. The user runs `/validate-artifact` next — possibly after `/clear` to start fresh. This matches every other master-side phase in the framework-update flow and keeps each phase independently runnable.
 - **Provenance preserved.** The promoted proposal still carries its `Proposed by:` and `Project context:` headers. The `Proposed by:` header drives the promote-time filename-prefix strip (the `{project}-` prefix is derived from it).
 - **Rejection notes are for the master's record.** Children are informed out-of-band (chat, email, etc.). v2 does not include a notification mechanism — `/sync-submit-proposal` warned the user that rejections require manual cleanup of `proposals/submitted/{slug}.md` on the child side.
 - **Order of files.** Alphabetical order is deterministic and lets a fresh agent resume the loop predictably across sessions if the user skipped some. There is no priority field on incoming proposals; chronological prioritization happens by hand.
