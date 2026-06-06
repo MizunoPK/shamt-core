@@ -35,7 +35,7 @@ Follow the canonical `/p4-decompose-feature` command body verbatim — see [`com
 1. **Resolve `{slug}`** to `features/{slug}/` (exact) or `features/{slug}-*/` (glob). Halt if missing — direct to `/p3-start-feature {slug}`.
 2. **Check the `Validated …` footer** on `feature.md`. Halt with a clear message if absent unless `--allow-unvalidated` was passed (discouraged; one-line notice + continue).
 3. **Re-entry detection.** If a prior `Decomposed YYYY-MM-DD — …` line is present, treat as re-decomposition: warn the user, confirm proceed, then once the new list is approved in step 5, **partition it against the prior list by `{story-slug}`** into Kept (slug appears in both — existing story folder preserved untouched, including any Spec / Plan / Build / Review artifacts inside; collision check exempt), New (slug only in the new list — fresh stub written, collision check applies), and Orphaned (slug only in the prior list — folder left in place, warning surfaced in step 10).
-4. **Read the feature** (`Goal`, `Success Criteria`, `Scope / Non-Scope`, optional `Architecture impact`, `**Parent Epic:**` back-ref, optional `All Remaining Fields`) and **propose the story list** — flat enumeration: title + one-line scope per entry. **Enforce the individually-testable rubric** per §2.1 and the §2.3 decomposition exit-criterion resolution:
+4. **Read the feature** (`Goal`, `Success Criteria`, `Scope / Non-Scope`, optional `Architecture impact`, `**Parent Epic:**` back-ref, optional `All Remaining Fields`) and **propose the story list** — flat enumeration: title + one-line scope per entry. **Enforce the individually-testable rubric** and the decomposition exit-criterion resolution:
    > A story is **individually testable** when it carries a self-contained verification path (automated or manual) that exercises its own contribution without re-verifying any sibling story's success criterion.
    > - Verification path = automated test, manual checklist step, or other observable check.
    > - Self-contained = the check does not require a sibling story's code to be present to *pass* (it may require sibling code to *run* — that's a sequencing fact, recorded in the parallelization analysis below).
@@ -63,7 +63,7 @@ Follow the canonical `/p4-decompose-feature` command body verbatim — see [`com
 - **The individually-testable rubric is the hard constraint** on output. The Engineer flow can refuse a story that violates this; PO-flow enforcement at decomposition time is the contract.
 - **Development-order dependencies between siblings are allowed** — they live in the parallelization analysis, not as a testability violation.
 - **No tracker fetch** at this altitude — `/p4-decompose-feature` operates entirely on the already-written `feature.md`. The active tracker is read only to pick the **ticket template** for the stub bodies (Step 8).
-- **No feature-level review.** The 16-category code-review framework stays story-level per §2.1.
+- **No feature-level review.** The 16-category code-review framework stays story-level per Pattern 4.
 - **No `/e1-start-story` auto-invocation.** Per Principle 1, every command stays independently runnable.
 
 ## Recommended model

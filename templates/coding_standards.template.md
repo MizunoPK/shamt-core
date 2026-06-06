@@ -227,4 +227,4 @@ The full 16-category review framework lives in `reference/review_categories.md`.
 
 ---
 
-*Template for project `.shamt-core/project-specific-files/CODING_STANDARDS.md` in Shamt. Header metadata block above is required — the framework-update audit reads it (§1.12).*
+*Template for project `.shamt-core/project-specific-files/CODING_STANDARDS.md` in Shamt. Header metadata block above is required — the framework-update audit reads it.*

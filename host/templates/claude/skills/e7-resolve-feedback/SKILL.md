@@ -29,7 +29,7 @@ Follow the canonical `/e7-resolve-feedback` command body verbatim — see [`comm
 2. **Open or update `addressed_feedback.md`** — one row per reviewer comment; fields `Source`, `Disposition`, `Action taken`, `Root cause`, `Notes`.
 3. **Resolve one at a time** — descending severity. Understand the finding; choose Fix in-story / Defer (explicit user accept + forward link) / Needs user decision; verify against the active plan's (or spec's) `## Verification`; reflect on root cause. For Standard-path non-trivial fixes, re-hand off to the `plan-executor` builder for the modified step.
 4. **Documentation Impact update** — when the Review flagged `Required`, apply the `Polish action` to `.shamt-core/project-specific-files/ARCHITECTURE.md` / `.shamt-core/project-specific-files/CODING_STANDARDS.md`, update `Last Updated` + `Update History`, re-validate via `/validate-artifact`. Commit.
-5. **Root-cause / upstream proposals** — generalizable patterns → `.shamt-core/proposals/<proposal-slug>.md` (descriptive slug, not the story slug) via the framework-update flow (§1.12 + Part 3 rule). Story-specific patterns stay in-story.
+5. **Root-cause / upstream proposals** — generalizable patterns → `.shamt-core/proposals/<proposal-slug>.md` (descriptive slug, not the story slug) via the framework-update flow. Story-specific patterns stay in-story.
 6. **TODO scan** — Global Story Invariants TODO gate; remove or explicitly justify every remaining marker; honour stricter `.shamt-core/project-specific-files/CODING_STANDARDS.md` rules.
 7. **Exit gate** — every comment `Resolved` / `Deferred — <reason>` / `Needs user decision` with active follow-up; doc updates applied; TODO gate passes; proposals filed. **User explicitly signals complete.**
 

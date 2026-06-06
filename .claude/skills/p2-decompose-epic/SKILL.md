@@ -46,7 +46,7 @@ Follow the canonical `/p2-decompose-epic` command body verbatim — see [`comman
 
 - **Decomposition exit gate ≠ `/validate-artifact`.** The gate is a 2-condition stub-batch check run **before** stubs land on disk. `/validate-artifact` runs the full Pattern 1 loop against `epic.md` (already, before this command) and against each `feature.md` (later, after `/p3-start-feature` completes its dialog). Do not conflate.
 - **No tracker fetch** at this altitude — `/p2-decompose-epic` operates entirely on the already-written `epic.md`.
-- **No epic-level review.** The 16-category code-review framework stays story-level per §2.1.
+- **No epic-level review.** The 16-category code-review framework stays story-level per Pattern 4.
 - **No `/p3-start-feature` auto-invocation.** Per Principle 1, every command stays independently runnable.
 
 ## Recommended model

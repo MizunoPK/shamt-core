@@ -10,7 +10,7 @@ Slug-resumable: if the artifact already exists, re-validate or patch on request 
 
 **Recommended models:**
 
-- Authoring + inline validation-loop primary: Balanced (Sonnet) — both drafting and the 4-dimension validation loop are structural analysis per [`reference/model_selection.md`](../../../../reference/model_selection.md) `## Per-phase guidance` ("Manual-test-plan drafting | Balanced | Drafting + validation loop per `§1.15`").
+- Authoring + inline validation-loop primary: Balanced (Sonnet) — both drafting and the 4-dimension validation loop are structural analysis per [`reference/model_selection.md`](../../../../reference/model_selection.md) `## Per-phase guidance` ("Manual-test-plan drafting | Balanced | Drafting + validation loop per the manual-test-plan rule").
 - Sub-agent: Cheap (Haiku) via `validation-checker`.
 
 See [`reference/model_selection.md`](../../../../reference/model_selection.md).
@@ -100,7 +100,7 @@ Once `consecutive_clean = 1` (one primary clean round), decide whether to spawn 
 
   Sub-agent **has no one-LOW allowance** — any finding (even LOW) resets `consecutive_clean = 0` and the loop continues. Only `CONFIRMED: Zero issues found after adversarial review.` exits.
 
-- **Quick path** (per the active spec's `Path:` header) → no sub-agent required, **unless** the validation loop produced a HIGH or above on any round (per §1.15 — "Sub-agent adversarial confirmation follows the Standard-path rule (applies on Standard path; Quick-path stories use a single primary pass unless a finding is HIGH or above)").
+- **Quick path** (per the active spec's `Path:` header) → no sub-agent required, **unless** the validation loop produced a HIGH or above on any round (per Pattern 1's risk-triggered sub-agent — "Sub-agent adversarial confirmation follows the Standard-path rule (applies on Standard path; Quick-path stories use a single primary pass unless a finding is HIGH or above)").
 
 ### Step 5 — Footer
 
@@ -147,8 +147,8 @@ When the user invokes the command on an existing footered artifact with a specif
 ## Notes
 
 - This command is **fresh-agent runnable**: every input lives on disk (active spec, plan, context, testing plan, active-artifact pointer, governing docs). State is determined by artifact presence + footer presence.
-- **No `.shamt-core/shamt-config.json` no-op gate.** Unlike `/e5-execute-tests` and `/e3b-write-testing-plan`, this command does **not** check `testing` and does **not** print a no-op message. It is always available, on every story, per §1.15.
-- **Recommended model tier: Sonnet** for both authoring and the inline validation-loop primary (per [`reference/model_selection.md`](../../../../reference/model_selection.md) `## Per-phase guidance` — "Manual-test-plan drafting | Balanced | Drafting + validation loop per `§1.15`"). The sub-agent stays at Haiku. This is a deliberate override of the per-phase default "Opus for primary validation loops" — the 4-dimension manual-test-plan loop is balanced/structural rather than multi-piece synthesis.
+- **No `.shamt-core/shamt-config.json` no-op gate.** Unlike `/e5-execute-tests` and `/e3b-write-testing-plan`, this command does **not** check `testing` and does **not** print a no-op message. It is always available, on every story, per the manual-test-plan rule.
+- **Recommended model tier: Sonnet** for both authoring and the inline validation-loop primary (per [`reference/model_selection.md`](../../../../reference/model_selection.md) `## Per-phase guidance` — "Manual-test-plan drafting | Balanced | Drafting + validation loop per the manual-test-plan rule"). The sub-agent stays at Haiku. This is a deliberate override of the per-phase default "Opus for primary validation loops" — the 4-dimension manual-test-plan loop is balanced/structural rather than multi-piece synthesis.
 - The inline validation loop runs **here** (not delegated to `/validate-artifact`) so the Author / Patch / Re-validate modes stay cohesive — but it follows `/validate-artifact`'s standard Pattern 1 exit, which is the source of truth for how validations exit (one primary clean round + Standard-path adversarial). Only the **dimension set** is artifact-specific (the 4 dimensions in this command + the template); the exit rule is not bespoke.
 - **Slug-resumable.** A fresh agent reads the artifact + active pointer + footer status, decides Author / Patch / Re-validate / Author-continue, and proceeds. No conversation history required.
 - **Re-baseline.** If the spec or plan was re-baselined after this artifact was produced, the active-artifact pointer's `Manual Test Plan` row should reference the new `manual_test_plan_vN.md` per `templates/active_artifacts.template.md`. Re-running this command produces the new versioned file rather than overwriting v1.

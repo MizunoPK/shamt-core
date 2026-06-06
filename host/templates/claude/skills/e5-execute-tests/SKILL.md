@@ -34,7 +34,7 @@ Follow the canonical `/e5-execute-tests` command body verbatim — see [`command
    - `Step N failed: Test bug` → patch via `/e3b-write-testing-plan`; re-validate; re-invoke.
    - `Step N failed: Spec gap` → invoke the **Re-baseline Protocol**; do not patch the spec in place.
    - `Plan defect / ambiguous` → patch via `/e3b-write-testing-plan`; re-validate; re-invoke.
-   - `Environment blocked` → resolve externally; re-invoke. **No "document and skip" disposition** — Phase 5 blocks until every step passes (§1.14).
+   - `Environment blocked` → resolve externally; re-invoke. **No "document and skip" disposition** — Phase 5 blocks until every step passes.
 5. **Post-execution** — walk `## Results Log`: every row must read `PASS`. Confirm `## Failure Diagnosis` rows have `Re-run result: PASS`. Run any `## Shared Teardown`.
 6. **Exit** — suggest `/clear` + `/e6-review-changes {slug}` (Phase 6). Suggest `/e5b-write-manual-testing-plan {slug}` for scope automated tests cannot cover.
 

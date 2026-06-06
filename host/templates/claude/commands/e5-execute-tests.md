@@ -46,7 +46,7 @@ Per [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md#wh
 - The active plan exists with a validation footer **and Phase 4 (Build) has completed** — code-under-test is in the working tree. If Build has not run yet, halt and direct the user to `/e4-execute-plan {slug}` first.
 - One of the following is true (per the path):
   - **Standard path:** `stories/{slug}/testing_plan.md` (or `testing_plan_vN.md`) exists with a validation footer.
-  - **Quick path with full artifact:** same as Standard — the artifact was produced via `/e3b-write-testing-plan {slug}` because test scope exceeded the Quick-path inline threshold (>5 steps or any new test file, per §1.14). Quick path itself still skips Phase 3 (Plan); the escalation only adds a `testing_plan.md` without escalating the whole story to Standard.
+  - **Quick path with full artifact:** same as Standard — the artifact was produced via `/e3b-write-testing-plan {slug}` because test scope exceeded the Quick-path inline threshold (>5 steps or any new test file) — the testing-plan escalation threshold (`/e3b`). Quick path itself still skips Phase 3 (Plan); the escalation only adds a `testing_plan.md` without escalating the whole story to Standard.
   - **Quick path with inline checklist:** the active `spec.md` has a populated `### Quick path inline test checklist` under `## Test Strategy`.
 
 If the active testing artifact is not validated, halt and direct the user to `/e3b-write-testing-plan {slug}` (or `/validate-artifact stories/{slug}/spec.md` when the inline checklist was recently edited).

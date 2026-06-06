@@ -36,7 +36,7 @@ Follow the canonical `/e6-review-changes` command body verbatim — see [`comman
 1. **Resolve & gate-check** — apply the active-artifact pointer; confirm spec / plan / testing artifact validation footers.
 2. **Plan Alignment pre-pass** — Quick: `N/A`. Standard: walk Step Coverage, Change Fidelity, Scope Discipline, Verification Passage, Zero Builder Design Decisions. Write `## Plan Alignment` at the top of `review_vN.md`.
 3. **16-category sweep** — apply every category from [`reference/review_categories.md`](../../../../../reference/review_categories.md); apply the Review Prevention Gates overlay from [`reference/pr_review_prevention.md`](../../../../../reference/pr_review_prevention.md); hard checks include per-file-and-function fresh review, removed-check replacement analysis, tenant-A-to-tenant-B bypass consideration, end-to-end DB lineage.
-4. **Documentation Impact Assessment** (§1.12) — does the change require `.shamt-core/project-specific-files/ARCHITECTURE.md` or `.shamt-core/project-specific-files/CODING_STANDARDS.md` updates? Write `## Documentation Impact` with `Required | Not required` + reason + Polish action.
+4. **Documentation Impact Assessment** (the architecture-impact consult / Standards check) — does the change require `.shamt-core/project-specific-files/ARCHITECTURE.md` or `.shamt-core/project-specific-files/CODING_STANDARDS.md` updates? Write `## Documentation Impact` with `Required | Not required` + reason + Polish action.
 5. **Write `review_vN.md`** — Severities BLOCKING / CONCERN / SUGGESTION / NITPICK; required sections per [`templates/code_review.template.md`](../../../../../templates/code_review.template.md). Quick-path no-issue shortcut: append a `## Post-Build Review` block to the spec instead of writing a durable artifact.
 6. **Validate** — `/validate-artifact stories/{slug}/feedback/review_vN.md` (7 dimensions — 6 review + Plan Alignment). Footer.
 7. **Exit** — `/e7-resolve-feedback {slug}` if findings exist.
@@ -45,7 +45,7 @@ Follow the canonical `/e6-review-changes` command body verbatim — see [`comman
 
 1. **Resolve target / base** — `--pr=<id>` resolves via the active tracker profile's `## PR fetch`; `--branch=<name>` is direct.
 2. **Hand off to the `review-executor`** — Opus persona ([`agents/review-executor.md`](../../agents/review-executor.md)). Read-only git; never `git checkout`. Produces `overview.md` (5-dim validated) + `review_vN.md` (6-dim validated).
-3. **Monitor** — surface findings counts to the user. **No tracker postback** — user posts manually if desired (per §1.11 / Pattern 4).
+3. **Monitor** — surface findings counts to the user. **No tracker postback** — user posts manually if desired (per Pattern 4).
 
 ## Recommended models
 

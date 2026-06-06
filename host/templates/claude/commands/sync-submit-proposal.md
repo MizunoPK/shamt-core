@@ -25,7 +25,7 @@ The submission itself is **manual copy-paste**. This command does not push to ma
 ## Prerequisites
 
 - This command runs **on the child side**. Master-side projects do not submit upstream — they author proposals locally and run the framework-update flow directly. Detect master vs. child by checking for `proposals/incoming/` at the cwd: the incoming folder is master's, and child projects never have it. If `proposals/incoming/` exists, halt and direct the user to `/f1-propose-update` + `/validate-artifact` + the rest of the Part 3 framework-update flow instead.
-- `.shamt-core/shamt-config.json` exists at the project root and declares `project_name`. If missing, halt and direct the user to set it: `project_name` namespaces upstream submissions per §4.3 / §4.4.
+- `.shamt-core/shamt-config.json` exists at the project root and declares `project_name`. If missing, halt and direct the user to set it: `project_name` namespaces upstream submissions.
 - `.shamt-core/proposals/{slug}.md` exists, is non-empty, and carries a Phase 2 validation footer (`Validated YYYY-MM-DD — N rounds[, 1 adversarial sub-agent confirmed]`). If the footer is missing, halt and direct the user to `/validate-artifact .shamt-core/proposals/{slug}.md` first — master will not promote an un-validated proposal.
 - `.shamt-core/proposals/submitted/{slug}.md` does **not** already exist. If it does, halt: this slug has already been submitted. Either wait for master's decision, or rename the slug and re-author via `/f1-propose-update`.
 
@@ -41,7 +41,7 @@ The submission itself is **manual copy-paste**. This command does not push to ma
 
 1. Read `.shamt-core/proposals/{slug}.md` top-to-bottom.
 2. Confirm the validation footer is present in the last ~5 lines (`Validated YYYY-MM-DD — …`). Halt if not.
-3. Confirm the proposal's header carries `Proposed by:` and `Project context:` fields with non-empty values. Per §4.13, child-submitted proposals fill these in so master's `/sync-triage-proposals` can attribute the change. If either is empty, surface to the user via `AskUserQuestion` what value to fill in, then update the header in place before submission.
+3. Confirm the proposal's header carries `Proposed by:` and `Project context:` fields with non-empty values. Child-submitted proposals fill these in so master's `/sync-triage-proposals` can attribute the change. If either is empty, surface to the user via `AskUserQuestion` what value to fill in, then update the header in place before submission.
 
 ### Step 3 — Compute target path
 
@@ -105,7 +105,7 @@ No next-phase command on the child side — the next action is manual + master-s
 
 ## Notes
 
-- **Manual copy is the design.** Per §4.3 the user copies the file across repos. No automation that pushes to master — that would re-introduce upstream tooling (PR creation, GitHub auth) that v2 explicitly omitted from the master/child surface.
+- **Manual copy is the design.** The user copies the file across repos. No automation that pushes to master — that would re-introduce upstream tooling (PR creation, GitHub auth) that v2 explicitly omitted from the master/child surface.
 - **`project_name` namespacing** prevents collision when two child projects both author a proposal with the same slug. Master's incoming folder de-duplicates via the `{project}-{slug}.md` prefix.
 - **Pre-validation requirement.** Master will not promote an un-validated proposal. Catching that here (locally) saves a triage round-trip.
 - **Re-submission.** If a submission was rejected and the user wants to revise, move `.shamt-core/proposals/submitted/{slug}.md` back to `.shamt-core/proposals/{slug}.md` by hand, edit, re-validate with `/validate-artifact`, then re-run `/sync-submit-proposal {slug}`.

@@ -57,7 +57,7 @@ The archive is the landing point. `/f6-archive-proposal` now commits the change,
 
 **Commit + merge** (only after every guard holds):
 
-1. Stage and commit the change on the proposal branch. **Commit subject** (per `shamt-core/CLAUDE.md` §Conventions; derive the short description from the proposal title / Problem):
+1. Stage and commit the change on the proposal branch. **Commit subject** (per the Conventions section of `shamt-core/CLAUDE.md`; derive the short description from the proposal title / Problem):
    - Numbered: `shamt-core: land #{NN} {slug} (short description)`
    - Grandfathered/unnumbered: `shamt-core: land {slug} (short description)`
 2. Squash-merge the proposal branch into the base branch as the **single** commit above:
@@ -97,7 +97,7 @@ No next-phase suggestion. The framework-update flow ends at Phase 7.
 
 - **Validation footer preservation** — the move must not strip the footer. `git mv` and plain `mv` preserve content; the risk is only if the proposal is opened and re-saved by tooling mid-move. Read the destination file after the move to confirm.
 - **No re-archive.** The command halts if `proposals/archive/{slug}.md` exists. Re-archival is a hard ambiguity; the user must rename the prior archive or pick a new slug for the follow-up proposal.
-- **Reject and defer paths.** This command implements the archive path only. The `proposals/rejected/` and `proposals/deferred/` folders are documented as expected (see `proposals/_template.md` and §3.4) and used by the `/sync-triage-proposals` command on the master side — `/f6-archive-proposal` itself does not handle rejection or deferral. To reject or defer a proposal, the user moves the file manually with a brief note explaining the disposition.
+- **Reject and defer paths.** This command implements the archive path only. The `proposals/rejected/` and `proposals/deferred/` folders are documented as expected (see `proposals/_template.md`) and used by the `/sync-triage-proposals` command on the master side — `/f6-archive-proposal` itself does not handle rejection or deferral. To reject or defer a proposal, the user moves the file manually with a brief note explaining the disposition.
 - **Fresh-agent runnable** — proposal + companion files + working-tree state are sufficient. No conversation history required.
 
 ---

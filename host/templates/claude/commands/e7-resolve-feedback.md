@@ -89,7 +89,7 @@ For each comment's `Root cause`, ask: **is this a pattern that generalizes beyon
 - **Yes** (recurring across stories, framework-wide gap, missing Review Prevention Gate, model-tier mis-pinning, etc.) → route through the **framework-update flow** per [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md#framework-maintenance). Create a `.shamt-core/proposals/<proposal-slug>.md` rather than patching framework files directly — the **proposal slug is descriptive** (e.g., `add-tenant-bypass-gate`, `pin-haiku-for-formal-git-metadata`), not necessarily the story slug; a single story can surface multiple distinct proposals. Reference the proposal(s) in the comment's `Notes`.
 - **No** (story-specific bug, ad-hoc edge case, one-off naming preference) → no proposal; the fix in-story is enough.
 
-This is the §1.12 + Part 3 lesson — durable framework improvements happen via proposals, not in-story shortcuts.
+Durable framework improvements happen via the framework-update flow (proposals), not in-story shortcuts.
 
 ### Step 6 — TODO scan
 

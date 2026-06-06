@@ -29,7 +29,7 @@ Mirrors the `/sync-submit-proposal {slug}` slash command. Same canonical body, t
 
 Follow the canonical `/sync-submit-proposal` command body verbatim — see [`commands/sync-submit-proposal.md`](../../commands/sync-submit-proposal.md). Summary:
 
-1. **Master-side check** — detect master vs. child by `proposals/incoming/` presence at the cwd (master has it per §4.4 / §4.8; child never does). If master, halt and direct the user to the framework-update flow (`/f1-propose-update` → `/validate-artifact` → … → `/f6-archive-proposal`) instead. Submit is for the child side only.
+1. **Master-side check** — detect master vs. child by `proposals/incoming/` presence at the cwd (master has it; child never does). If master, halt and direct the user to the framework-update flow (`/f1-propose-update` → `/validate-artifact` → … → `/f6-archive-proposal`) instead. Submit is for the child side only.
 2. **Read `.shamt-core/shamt-config.json`** — extract `project_name`. Halt if missing/empty. Validate it matches `^[A-Za-z0-9._-]+$`.
 3. **Read and confirm the proposal** — `.shamt-core/proposals/{slug}.md` exists with a Phase 2 validation footer. The header carries non-empty `Proposed by:` and `Project context:` (ask the user via `AskUserQuestion` if either is blank).
 4. **Compute target path** — `proposals/incoming/{project_name}-{slug}.md` on master. State it in chat.

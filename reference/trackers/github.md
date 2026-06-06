@@ -47,7 +47,7 @@ gh issue view {id} --repo <org>/<repo> \
   --json number,title,body,state,stateReason,labels,milestone,assignees,author,url,createdAt,updatedAt,closedAt,projectItems,reactionGroups
 ```
 
-The consuming command writes the verbatim JSON to `stories/{slug}-*/raw/issue.json`. PO-flow variants (`epics/{slug}-*/raw/issue.json`, `features/{slug}-*/raw/issue.json` — folder layout per §2.1) do not apply here, because `/p1-start-epic` and `/p3-start-feature` against this profile fall through to freeform mode (see [Supported work-item types](#supported-work-item-types) below).
+The consuming command writes the verbatim JSON to `stories/{slug}-*/raw/issue.json`. PO-flow variants (`epics/{slug}-*/raw/issue.json`, `features/{slug}-*/raw/issue.json` — flat folder layout) do not apply here, because `/p1-start-epic` and `/p3-start-feature` against this profile fall through to freeform mode (see [Supported work-item types](#supported-work-item-types) below).
 
 Custom issue types (the repo-level GraphQL `IssueType` field, in repos that have opted into the feature) are not exposed by `gh issue view --json` as of this writing; if a project depends on them, augment with the GraphQL form:
 
@@ -108,13 +108,13 @@ For the diff (used by `/e6-review-changes`):
 gh pr diff {id} --repo <org>/<repo>
 ```
 
-`pr_provider` is read independently of `work_item_tracker` per §1.11. This fetch may run against GitHub even when work items live in ADO.
+`pr_provider` is read independently of `work_item_tracker` per the tracker contract. This fetch may run against GitHub even when work items live in ADO.
 
 ---
 
 ## PR comment posting
 
-**Not invoked by v2.** Documented for future use only — `/e6-review-changes` produces a local artifact at `code_reviews/` and does not post upstream (§1.11 resolved open question).
+**Not invoked by v2.** Documented for future use only — `/e6-review-changes` produces a local artifact at `code_reviews/` and does not post upstream (resolved open question).
 
 For reference, the command shapes are:
 

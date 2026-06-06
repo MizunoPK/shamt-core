@@ -84,7 +84,7 @@ Surface global scoping questions about the list **as a whole** via `AskUserQuest
 
 Iterate with the user until they approve: they may add / remove / reword entries, adjust the derived slugs, or revise the parallelization analysis. Each iteration is a single batch — re-present the updated list + analysis together.
 
-**Per-feature deep dialog is deferred to `/p3-start-feature`.** Do not start drafting per-feature goals, scope, success criteria, or stories here — that is the next altitude's work per §2.1.
+**Per-feature deep dialog is deferred to `/p3-start-feature`.** Do not start drafting per-feature goals, scope, success criteria, or stories here — that is the next altitude's work per the stub-list-then-drill-in decomposition.
 
 ### Step 6 — Decomposition exit gate
 
@@ -169,7 +169,7 @@ Surface, but do **not** auto-invoke:
 /p3-start-feature {feature-slug-2}     # ...and so on
 ```
 
-Each feature stub is **independently resumable**. The PO can drive `/p3-start-feature` on each stub in sequence, or run them in parallel by opening additional terminal tabs (the framework provides no runtime coordination machinery per §2.3). Order is suggested by the `Recommended order` line just written to the epic.
+Each feature stub is **independently resumable**. The PO can drive `/p3-start-feature` on each stub in sequence, or run them in parallel by opening additional terminal tabs (the framework provides no runtime coordination machinery per the decomposition / parallelization step). Order is suggested by the `Recommended order` line just written to the epic.
 
 ## Exit criteria
 
@@ -182,9 +182,9 @@ Each feature stub is **independently resumable**. The PO can drive `/p3-start-fe
 
 - **Fresh-agent runnable.** Every input lives on disk (`epic.md`, `feature.template.md`, the existing `features/` tree). No conversation history required.
 - **Decomposition exit gate ≠ `/validate-artifact`.** The gate in Step 6 is a 2-condition stub-batch check run **before** stubs are written; `/validate-artifact` is the full Pattern 1 loop that runs against `epic.md` (already, before `/p2-decompose-epic`) and against each `feature.md` (later, after `/p3-start-feature` completes its dialog). Do not conflate the two.
-- **No tracker fetch.** This command operates entirely on the already-written `epic.md`. The §1.11 freeform-fallback rule does not apply at this altitude — there is no tracker payload to fall through from.
-- **No per-feature deep dialog here.** That is `/p3-start-feature`'s job per §2.1 stub-list-then-drill-in. Resist the urge to start drafting feature scope or success criteria — it produces low-value batched dialog at this altitude and pre-empts the open-questions iterative dialog at the next altitude.
-- **No epic-level review phase.** Per §2.1, the 16-category code-review framework stays story-level. This command does not invoke `/e6-review-changes`.
+- **No tracker fetch.** This command operates entirely on the already-written `epic.md`. The tracker freeform-fallback rule does not apply at this altitude — there is no tracker payload to fall through from.
+- **No per-feature deep dialog here.** That is `/p3-start-feature`'s job per the stub-list-then-drill-in decomposition. Resist the urge to start drafting feature scope or success criteria — it produces low-value batched dialog at this altitude and pre-empts the open-questions iterative dialog at the next altitude.
+- **No epic-level review phase.** Per Pattern 4, the 16-category code-review framework stays story-level. This command does not invoke `/e6-review-changes`.
 - **No `/p3-start-feature` auto-invocation.** Per Principle 1, every command stays independently runnable. Chaining would force a multi-phase session and would couple resumability across altitudes.
 - **Parallelization is PO-flow output, not runtime coordination.** The `Parallelizable` callout informs the PO; running features concurrently is a "second terminal tab" exercise.
 

@@ -21,7 +21,7 @@
 
 ## Scope / Non-Scope
 
-[Optional `**Architecture impact:** …` inline flag — present only when `/p1-start-epic` consulted `.shamt-core/project-specific-files/ARCHITECTURE.md` (per §1.12) and identified an architectural change implied by this epic. Omit entirely otherwise.]
+[Optional `**Architecture impact:** …` inline flag — present only when `/p1-start-epic` consulted `.shamt-core/project-specific-files/ARCHITECTURE.md` (architecture-impact) and identified an architectural change implied by this epic. Omit entirely otherwise.]
 
 ### In Scope
 

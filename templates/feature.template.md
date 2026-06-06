@@ -23,7 +23,7 @@
 
 ## Scope / Non-Scope
 
-[Optional `**Architecture impact:** …` inline flag — present only when `/p3-start-feature` consulted `.shamt-core/project-specific-files/ARCHITECTURE.md` (per §1.12) and identified an architectural change implied by this feature. Omit entirely otherwise.]
+[Optional `**Architecture impact:** …` inline flag — present only when `/p3-start-feature` consulted `.shamt-core/project-specific-files/ARCHITECTURE.md` (architecture-impact) and identified an architectural change implied by this feature. Omit entirely otherwise.]
 
 ### In Scope
 
@@ -39,7 +39,7 @@
 
 [Populated by `/p4-decompose-feature`. Left empty on `/p3-start-feature` exit. Each line: story slug + one-line scope.]
 
-- `{story-slug}` — [one-line scope; must be individually testable per the §2.3 decomposition exit gate]
+- `{story-slug}` — [one-line scope; must be individually testable per the decomposition exit gate]
 
 ---
 

@@ -71,7 +71,7 @@ Populated by the `test-executor` during Phase 5. Each step records pass/fail, ev
 | 1 | PENDING | — | — | — |
 | 2 | PENDING | — | — | — |
 
-**Status values:** `PENDING`, `PASS`, `FAIL`, `BLOCKED`. Phase 5 blocks until every step is `PASS` (per §1.14 — no exceptions or documented deferrals).
+**Status values:** `PENDING`, `PASS`, `FAIL`, `BLOCKED`. Phase 5 blocks until every step is `PASS` (the Phase-5 blocking rule — no exceptions or documented deferrals).
 
 ---
 

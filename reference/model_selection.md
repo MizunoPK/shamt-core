@@ -51,7 +51,7 @@ Personas declare their tier in the persona body (e.g., a frontmatter `model:` fi
 | 6. Review (formal-mode git metadata) | Cheap | Fetch branch commits, diff stats, file inventory; mechanical |
 | 7. Polish — code edits | Balanced | Apply reviewer feedback; mechanical fixes |
 | 7. Polish — root cause / upstream proposals | Reasoning | Generalize recurring feedback into framework-update proposals; multi-piece synthesis |
-| Manual-test-plan drafting (`/e5b-write-manual-testing-plan`) | Balanced | Drafting + validation loop per `§1.15` |
+| Manual-test-plan drafting (`/e5b-write-manual-testing-plan`) | Balanced | Drafting + validation loop per the manual-test-plan rule |
 | Framework update — Phase 0 (`/f0-draft-proposal`) | Cheap | Quick-capture an unrefined DRAFT proposal from a blurb: resolve a slug, seed a bare file, drop the blurb into Scratch Notes; no design judgment, no open-questions dialog |
 | Framework update — Phase 1 (`/f1-propose-update`) | Balanced | Drafting a proposal: structural reading of canonical sources, naming files precisely, applying the open-questions iterative dialog |
 | Framework update — Phase 2 (proposal validation via `/validate-artifact`) | Reasoning | Primary Pattern 1 loop; sub-agent (Cheap) via `validation-checker` |

@@ -51,8 +51,8 @@ Each profile file should document the `--tracker={name}` form near the top of it
 | Consumer | Reads | When |
 |----------|-------|------|
 | `/e1-start-story {slug}` | `## Slug resolution`, `## Primary fetch`, `## Auxiliary fetches`, `## Field mapping`, `## Auth failure modes`, `## Supported work-item types` (filter on `Story`) | Phase 1 (Intake) |
-| `/p1-start-epic {slug}` | Same as above, filtered on `Epic` | PO flow (§2.2) |
-| `/p3-start-feature {slug}` | Same as above, filtered on `Feature` | PO flow (§2.2) |
+| `/p1-start-epic {slug}` | Same as above, filtered on `Epic` | PO flow |
+| `/p3-start-feature {slug}` | Same as above, filtered on `Feature` | PO flow |
 | `/e6-review-changes {slug}` | `## PR fetch`, `## Auth failure modes`. Driven by `pr_provider` (which may differ from `work_item_tracker`). | Phase 6 (Review) |
 
 `## PR comment posting` is declared but not invoked by any v2 consumer. It is present so the contract is complete for downstream automation that may want to post review summaries upstream.

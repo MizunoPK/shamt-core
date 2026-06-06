@@ -152,4 +152,4 @@ For boundary-crossing flows in active stories, prefer a Mermaid diagram per `ref
 
 ---
 
-*Template for project `.shamt-core/project-specific-files/ARCHITECTURE.md` in Shamt. Header metadata block above is required — the framework-update audit reads it (§1.12).*
+*Template for project `.shamt-core/project-specific-files/ARCHITECTURE.md` in Shamt. Header metadata block above is required — the framework-update audit reads it.*

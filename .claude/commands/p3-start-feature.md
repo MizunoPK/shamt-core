@@ -58,7 +58,7 @@ Apply the global slug-resolution rule from [`SHAMT_RULES.template.md`](../../../
      - **Extend** — preserve existing content and add to it. **If a prior `Validated …` footer is present, strip it before continuing** — extension changes the artifact and invalidates the prior pass; `/validate-artifact` must re-run.
      - **Exit** — leave the file untouched and return. No footer change.
 
-     **Preserve back-ref headers verbatim on re-entry.** `**Parent Epic:** …` and (when present) `**Parent Feature:** …` lines are never rewritten by `/p3-start-feature` regardless of the chosen branch — they are decomposition-owned per §2.1. Only the body sections are touched.
+     **Preserve back-ref headers verbatim on re-entry.** `**Parent Epic:** …` and (when present) `**Parent Feature:** …` lines are never rewritten by `/p3-start-feature` regardless of the chosen branch — they are decomposition-owned per the decomposition step. Only the body sections are touched.
 5. **Zero matches** → continue to Step 3 (Mode B or Mode C, decided in Step 4).
 
 ### Step 3 — Derive the brief description and propose the folder name
@@ -91,7 +91,7 @@ The folder exists; `feature.md` already carries the `**Parent Epic:** {epic-slug
 The folder did not exist before Step 3. There is no parent epic.
 
 1. Write `features/{slug}-{brief}/feature.md` from [`templates/feature.template.md`](../../../../templates/feature.template.md).
-2. **Leave `**Parent Epic:**` blank** — standalone features have no parent epic (per §2.1 — the back-ref is optional and absent for standalone work). Same behavior as `/p1-start-epic`'s create-from-scratch mode.
+2. **Leave `**Parent Epic:**` blank** — standalone features have no parent epic — the back-ref is optional and absent for standalone work. Same behavior as `/p1-start-epic`'s create-from-scratch mode.
 3. Proceed to Step 5 (architecture consult), then Step 6 (open-questions dialog) to populate `Goal`, `Success Criteria`, and `Scope / Non-Scope` from scratch.
 4. Leave `Target Stories` and `Sequencing & Parallelization` empty.
 5. **No `## All Remaining Fields` appendix** — there was no tracker fetch in this mode.
@@ -110,7 +110,7 @@ Apply the profile's `## Slug resolution` rule. If the slug does not parse to a t
    - GitHub currently has **no** Feature type — `/p3-start-feature` against the GitHub profile always falls through here.
    - ADO supports Feature natively (`System.WorkItemType = "Feature"`) — fetch proceeds.
 2. Run the profile's `## Primary fetch` command, substituting `{id}` from sub-step C.1.
-3. **Do not write `raw/issue.json`.** Feature folders contain **only** `feature.md` — no `raw/` subfolder, no `feedback/`. Hold the payload in memory while populating the artifact; the fetched JSON is not persisted to disk. **Same rule as `/p1-start-epic`** — distinct from stories, which *do* have `raw/` per §1.4.
+3. **Do not write `raw/issue.json`.** Feature folders contain **only** `feature.md` — no `raw/` subfolder, no `feedback/`. Hold the payload in memory while populating the artifact; the fetched JSON is not persisted to disk. **Same rule as `/p1-start-epic`** — distinct from stories, which *do* have `raw/`.
 4. Apply the profile's `## Field mapping` to populate the corresponding sections of [`templates/feature.template.md`](../../../../templates/feature.template.md):
    - **Title / Type / State / Assignee / Project / Iteration/Milestone** → used to seed the H1 line and to inform the agent (not their own section in `feature.template.md`; record them in the **All Remaining Fields** appendix described in sub-step C.5).
    - **Description** → narrative input for the `Goal` section; the agent rewrites it as "what this feature exists to accomplish" rather than verbatim paste.
@@ -125,7 +125,7 @@ Apply the profile's `## Slug resolution` rule. If the slug does not parse to a t
 
 Thread architecture / coding-standards consultation at the PO altitude as follows:
 
-1. Read `.shamt-core/project-specific-files/ARCHITECTURE.md` (project root) while drafting. **If the file does not exist**, note its absence in chat (a single line: `.shamt-core/project-specific-files/ARCHITECTURE.md not found — proceeding without architecture consult; bootstrap via init-shamt is the canonical fix per §1.12.`) and continue. Do **not** halt — `.shamt-core/project-specific-files/ARCHITECTURE.md` is governing when present (per the SHAMT_RULES Standards check invariant) but the feature-altitude consult is advisory; missing the file degrades the consult, not the command. Per the SHAMT_RULES Global Story Invariants "Standards check" rule.
+1. Read `.shamt-core/project-specific-files/ARCHITECTURE.md` (project root) while drafting. **If the file does not exist**, note its absence in chat (a single line: `.shamt-core/project-specific-files/ARCHITECTURE.md not found — proceeding without architecture consult; bootstrap via init-shamt is the canonical fix.`) and continue. Do **not** halt — `.shamt-core/project-specific-files/ARCHITECTURE.md` is governing when present (per the SHAMT_RULES Standards check invariant) but the feature-altitude consult is advisory; missing the file degrades the consult, not the command. Per the SHAMT_RULES Global Story Invariants "Standards check" rule.
 2. If the feature implies architectural change — a new service, a new boundary, a new data store, a new external integration, an auth/tenant boundary shift, etc. — flag it **inline** in `Scope / Non-Scope` as a single line at the top of that section: `**Architecture impact:** {one-line description of the architectural change implied}`. Omit the flag entirely when no architectural change is implied (or when `.shamt-core/project-specific-files/ARCHITECTURE.md` is absent and the impact cannot be assessed against a baseline — note the same in chat).
 3. **Do not consult `.shamt-core/project-specific-files/CODING_STANDARDS.md`** — coding style is irrelevant at the feature altitude. The story-altitude Phase 2 / Phase 6 / Phase 7 cycle handles coding-standards alignment for any code changes the feature eventually produces. Same rule as `/p1-start-epic`.
 
@@ -192,8 +192,8 @@ When the fetch succeeds, raw payload data is preserved inline in `feature.md`'s 
 
 - **Fresh-agent runnable.** Every input lives on disk (`.shamt-core/shamt-config.json`, the tracker profile, `.shamt-core/project-specific-files/ARCHITECTURE.md`, the existing stub or prior draft when re-entering). No conversation history required.
 - **Feature-level validation is `/validate-artifact`.** Features have no review phase — Pattern 1 validation only. The decomposition exit gate run inside `/p4-decompose-feature` is a stub-batch check on that command's output and is **distinct from `/validate-artifact`**; do not conflate.
-- **No `Target Stories` work here.** This command writes the feature with the decomposition sections empty; `/p4-decompose-feature` fills them. Two reasons: keeps single-session sizing tight (Principle 1 — single-session sizing constraint), and keeps deep dialog at the right altitude per §2.1 stub-list-then-drill-in.
-- **No `.shamt-core/project-specific-files/CODING_STANDARDS.md` consult.** Coding style is irrelevant at the feature altitude per §1.12 PO-threading row. Same rule as `/p1-start-epic`.
+- **No `Target Stories` work here.** This command writes the feature with the decomposition sections empty; `/p4-decompose-feature` fills them. Two reasons: keeps single-session sizing tight (Principle 1 — single-session sizing constraint), and keeps deep dialog at the right altitude per the stub-list-then-drill-in decomposition.
+- **No `.shamt-core/project-specific-files/CODING_STANDARDS.md` consult.** Coding style is irrelevant at the feature altitude. Same rule as `/p1-start-epic`.
 - **`--tracker=` is one-off, not persisted.** The project default in `.shamt-core/shamt-config.json` is unchanged. The override only affects Mode C; in Mode A and Mode B it is a no-op (a notice is surfaced when the flag is supplied in those modes).
 - **The freeform-fallback rule** means future tracker profiles that don't declare `Feature` natively still work — `/p3-start-feature` degrades gracefully with a one-line notice and continues into Mode A or Mode B based on the filesystem state.
 - **Mode disambiguation is filesystem-first.** Mode A wins when the stub is present; Mode C wins next when the tracker profile and slug shape align; Mode B is the default fallback. No new flags are needed to pick a mode.

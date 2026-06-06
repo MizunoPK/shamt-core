@@ -24,7 +24,7 @@ The slug passed to `/e1-start-story {slug}` resolves to a story folder via glob,
 
 The numeric-prefix convention used by `ado` and `github` profiles is **optional** in `local` mode — any slug is legal as long as exactly one matching story folder exists. The folder must already contain a `ticket.md` file; `/e1-start-story` does not create one in this mode (it treats the local file as the source of truth).
 
-For the PO-flow commands (`/p1-start-epic` / `/p3-start-feature`), folder layout follows §2.1: `epics/{slug}-*/epic.md`, `features/{slug}-*/feature.md` (flat layout, globally unique slugs; the folder name is `{slug}-{brief}` and is matched by glob the same way stories are). Same rule: the file must already exist or be created by the PO-flow command itself.
+For the PO-flow commands (`/p1-start-epic` / `/p3-start-feature`), folder layout follows the flat folder layout: `epics/{slug}-*/epic.md`, `features/{slug}-*/feature.md` (flat layout, globally unique slugs; the folder name is `{slug}-{brief}` and is matched by glob the same way stories are). Same rule: the file must already exist or be created by the PO-flow command itself.
 
 ---
 

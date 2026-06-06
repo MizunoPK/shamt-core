@@ -93,7 +93,7 @@ Hard checks (Pattern 1 code-review dimensions in [`SHAMT_RULES.template.md`](../
 
 At the end of the sweep, answer **explicitly**: does this change require an `.shamt-core/project-specific-files/ARCHITECTURE.md` or `.shamt-core/project-specific-files/CODING_STANDARDS.md` update?
 
-Triggers include: new service / boundary / data store added; deprecated pattern; new convention introduced; or this change actually touches a doc whose `Last Updated` field is stale (older than `.shamt-core/shamt-config.json` → `doc_staleness_threshold_days`). Story-level Doc Impact only fires when this change touches the doc — pure staleness without a touching change is the framework audit's §3.5 D6 dimension, not Phase 6's responsibility.
+Triggers include: new service / boundary / data store added; deprecated pattern; new convention introduced; or this change actually touches a doc whose `Last Updated` field is stale (older than `.shamt-core/shamt-config.json` → `doc_staleness_threshold_days`). Story-level Doc Impact only fires when this change touches the doc — pure staleness without a touching change is the audit's D6 (doc currency) dimension, not Phase 6's responsibility.
 
 Record the assessment as a `## Documentation Impact` block at the bottom of `review_vN.md`. Format:
 
@@ -191,7 +191,7 @@ Surface the artifact paths and the verdict / risk to the user. The user posts ba
 
 - This command is **fresh-agent runnable**: story mode reads on-disk artifacts; formal mode reads the git tree read-only. State is determined by artifact presence.
 - The 16 categories are mandatory **considerations**, not mandatory findings. A category with no finding is still considered — note `N/A` for `Monitoring Checklist` / `Security Checklist` when no applicable surface was touched, but do not skip the category.
-- **No tracker postback.** Even when the tracker profile documents a PR-comment command, this command does not call it. The user posts back manually if desired. This is the §1.11 / Pattern 4 resolution.
+- **No tracker postback.** Even when the tracker profile documents a PR-comment command, this command does not call it. The user posts back manually if desired. This is the Pattern 4 resolution.
 - **Severity ladders are distinct.** Findings use the **BLOCKING / CONCERN / SUGGESTION / NITPICK** ladder (Pattern 4). The internal Pattern 1 / Pattern 2 validation on `review_vN.md` itself uses the CRITICAL / HIGH / MEDIUM / LOW ladder.
 - **Quick-path shortcut** is opt-in only when zero issues are found. The moment one finding exists, write the durable `review_vN.md` artifact even on Quick path.
 - **Single-session sizing constraint** (Principle 1): if a branch is large enough to compact within a session, the review-executor produces phase-decomposed output (`overview.md` + multiple `review_vN_section_<area>.md` files) and reports each piece. The 16 categories still apply across all sections.

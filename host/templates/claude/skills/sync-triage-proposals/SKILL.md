@@ -29,7 +29,7 @@ Mirrors the `/sync-triage-proposals` slash command. Same canonical body, two hos
 
 Follow the canonical `/sync-triage-proposals` command body verbatim — see [`commands/sync-triage-proposals.md`](../../commands/sync-triage-proposals.md). Summary:
 
-1. **Master-side check** — confirm `proposals/incoming/` exists at the cwd. (That folder is master's per §4.4 / §4.8; child projects never have it. Both sides have `shamt-core/`, so its presence is not a master indicator.) Halt and direct to `/sync-submit-proposal` if invoked on a child. (The seven master-side framework-update phases that follow promote are: `/f1-propose-update` ▸ `/validate-artifact` ▸ optional `/f2-plan-update-implementation` ▸ `/f3-implement-update` ▸ `/f4-regen-framework` ▸ `/f5-audit-framework` ▸ `/f6-archive-proposal`.)
+1. **Master-side check** — confirm `proposals/incoming/` exists at the cwd. (That folder is master's; child projects never have it. Both sides have `shamt-core/`, so its presence is not a master indicator.) Halt and direct to `/sync-submit-proposal` if invoked on a child. (The seven master-side framework-update phases that follow promote are: `/f1-propose-update` ▸ `/validate-artifact` ▸ optional `/f2-plan-update-implementation` ▸ `/f3-implement-update` ▸ `/f4-regen-framework` ▸ `/f5-audit-framework` ▸ `/f6-archive-proposal`.)
 2. **Enumerate** — list `proposals/incoming/*.md` in alphabetical order; report count.
 3. **Per file** —
    - **Surface verbatim**: `Proposed by`, `Project context`, `Status`, the full Problem section, the full Proposed Changes table, the first 3 Risks, footer presence.

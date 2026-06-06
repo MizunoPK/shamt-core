@@ -104,7 +104,7 @@ Surface global scoping questions about the list **as a whole** via `AskUserQuest
 
 Iterate with the user until they approve: they may add / remove / reword entries, adjust the derived slugs, fix testability gaps by expanding scope or splitting, or revise the parallelization analysis. Each iteration is a single batch — re-present the updated list + rubric verdicts + analysis together.
 
-**Per-story deep dialog is deferred to `/e1-start-story` (stub-aware).** Do not start drafting per-story acceptance criteria, spec content, or implementation plans here — that is the Engineer flow's work per §2.1.
+**Per-story deep dialog is deferred to `/e1-start-story` (stub-aware).** Do not start drafting per-story acceptance criteria, spec content, or implementation plans here — that is the Engineer flow's work per the stub-list-then-drill-in decomposition.
 
 ### Step 6 — Decomposition exit gate
 
@@ -197,7 +197,7 @@ Surface, but do **not** auto-invoke:
 /e1-start-story {story-slug-2}     # ...and so on
 ```
 
-Each story stub is **independently resumable**. The engineer can drive `/e1-start-story` on each stub in sequence, or run them in parallel by opening additional terminal tabs (the framework provides no runtime coordination machinery per §2.3). Order is suggested by the `Recommended order` line just written to the feature. `/e1-start-story` is **stub-aware** — it detects the back-ref headers in `ticket.md` and preserves them when fleshing out the rest of the Intake content (see `commands/e1-start-story.md`).
+Each story stub is **independently resumable**. The engineer can drive `/e1-start-story` on each stub in sequence, or run them in parallel by opening additional terminal tabs (the framework provides no runtime coordination machinery per the decomposition / parallelization step). Order is suggested by the `Recommended order` line just written to the feature. `/e1-start-story` is **stub-aware** — it detects the back-ref headers in `ticket.md` and preserves them when fleshing out the rest of the Intake content (see `commands/e1-start-story.md`).
 
 ## Exit criteria
 
@@ -213,9 +213,9 @@ Each story stub is **independently resumable**. The engineer can drive `/e1-star
 - **Decomposition exit gate ≠ `/validate-artifact`.** The gate in Step 6 is a 2-condition stub-batch check run **before** stubs are written; `/validate-artifact` is the full Pattern 1 loop that runs against `feature.md` (already, before `/p4-decompose-feature`) and against each story-level artifact (later, after `/e2-define-spec`, `/e3-plan-implementation`, etc. — Engineer-flow validations). Do not conflate the two.
 - **The individually-testable rubric is the hard constraint** on output. The Engineer flow can refuse a story that violates this; PO-flow enforcement at decomposition time is the contract. The rubric is reproduced in full inline in Step 4 sub-step 3 — not just by reference — so a fresh agent reading this command can apply it without external lookup.
 - **Development-order dependencies between siblings are allowed.** They live in the parallelization analysis (`Recommended order`) and are not testability violations. Do not reject candidate stories that have sibling build-order dependencies.
-- **No tracker fetch at this altitude.** This command operates entirely on the already-written `feature.md`. The §1.11 freeform-fallback rule does not apply at this altitude — there is no tracker payload to fall through from. The active tracker is read only to pick the **ticket template** for the stub bodies (Step 8 — `ado` vs. `github` vs. baseline).
-- **No per-story deep dialog here.** That is `/e1-start-story` (stub-aware)'s job per §2.1 stub-list-then-drill-in. Resist the urge to start drafting story acceptance criteria, spec sections, or implementation plans — it produces low-value batched dialog at this altitude and pre-empts the open-questions iterative dialog at the next altitude.
-- **No feature-level review phase.** Per §2.1, the 16-category code-review framework stays story-level. This command does not invoke `/e6-review-changes`.
+- **No tracker fetch at this altitude.** This command operates entirely on the already-written `feature.md`. The tracker freeform-fallback rule does not apply at this altitude — there is no tracker payload to fall through from. The active tracker is read only to pick the **ticket template** for the stub bodies (Step 8 — `ado` vs. `github` vs. baseline).
+- **No per-story deep dialog here.** That is `/e1-start-story` (stub-aware)'s job per the stub-list-then-drill-in decomposition. Resist the urge to start drafting story acceptance criteria, spec sections, or implementation plans — it produces low-value batched dialog at this altitude and pre-empts the open-questions iterative dialog at the next altitude.
+- **No feature-level review phase.** Per Pattern 4, the 16-category code-review framework stays story-level. This command does not invoke `/e6-review-changes`.
 - **No `/e1-start-story` auto-invocation.** Per Principle 1, every command stays independently runnable. Chaining would force a multi-phase session and would couple resumability across altitudes.
 - **Parallelization is PO-flow output, not runtime coordination.** The `Parallelizable` callout informs the engineer; running stories concurrently is a "second terminal tab" exercise.
 - **Parent Epic back-ref propagation.** Step 8 reads the parent feature's `**Parent Epic:** {epic-slug}` header and copies it onto each new story stub. When the parent feature is standalone (no parent epic), the `**Parent Epic:**` line is **omitted** from the stub — not written as blank — so the back-ref headers remain grep-clean.

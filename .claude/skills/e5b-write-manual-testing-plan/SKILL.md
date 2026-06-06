@@ -23,7 +23,7 @@ triggers:
 
 ## Overview
 
-Mirrors the `/e5b-write-manual-testing-plan {slug}` slash command. Same canonical body, two host wirings. **Always available** regardless of `.shamt-core/shamt-config.json` `testing` — no no-op gate (this is the §1.15 rule that distinguishes it from `/e3b-write-testing-plan` and `/e5-execute-tests`).
+Mirrors the `/e5b-write-manual-testing-plan {slug}` slash command. Same canonical body, two host wirings. **Always available** regardless of `.shamt-core/shamt-config.json` `testing` — no no-op gate (this is the manual-test-plan rule that distinguishes it from `/e3b-write-testing-plan` and `/e5-execute-tests`).
 
 ## Protocol
 
@@ -44,7 +44,7 @@ Follow the canonical `/e5b-write-manual-testing-plan` command body verbatim — 
 
 ## Recommended models
 
-- Authoring + inline validation-loop primary: **Balanced (Sonnet)** — both phases are structural analysis per [`reference/model_selection.md`](../../../../../reference/model_selection.md) `## Per-phase guidance` ("Manual-test-plan drafting | Balanced | Drafting + validation loop per `§1.15`"). This deliberately overrides the global default of Opus for primary validation loops.
+- Authoring + inline validation-loop primary: **Balanced (Sonnet)** — both phases are structural analysis per [`reference/model_selection.md`](../../../../../reference/model_selection.md) `## Per-phase guidance` ("Manual-test-plan drafting | Balanced | Drafting + validation loop per the manual-test-plan rule"). This deliberately overrides the global default of Opus for primary validation loops.
 - Sub-agent: Cheap (Haiku) via [`agents/validation-checker.md`](../../agents/validation-checker.md).
 
 ## Exit criteria

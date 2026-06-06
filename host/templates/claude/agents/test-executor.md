@@ -90,7 +90,7 @@ Use one of these messages verbatim:
 - **Never edit `testing_plan.md` to make a step pass.** Updating the `Results Log` row is fine; modifying the `Pass criterion` is a plan change, not an execution action.
 - **Never silently retry.** Each re-run is logged with the reason.
 - **Never edit `active_artifacts.md`.** Re-baseline is the orchestrator's job.
-- **Resolve environmental issues; do not skip them.** This is the §1.14 rule. If `gh` is unauthenticated, authenticate. If the DB is empty, seed it. If the suite needs a new env var, ask the orchestrator — do not paper over.
+- **Resolve environmental issues; do not skip them.** If `gh` is unauthenticated, authenticate. If the DB is empty, seed it. If the suite needs a new env var, ask the orchestrator — do not paper over.
 
 ## Tier
 

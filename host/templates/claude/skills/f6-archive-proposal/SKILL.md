@@ -39,7 +39,7 @@ Proposal (and companions) at `proposals/archive/{NN}-{slug}.md` with footers int
 
 ## Reject and defer
 
-Not handled here. `/f6-archive-proposal` is the success path only. Use a manual `mv` to `proposals/rejected/` (with a top-of-file note) or `proposals/deferred/` for the other dispositions — these folders are documented in [`proposals/_template.md`](../../../../../proposals/_template.md) and `§3.4`.
+Not handled here. `/f6-archive-proposal` is the success path only. Use a manual `mv` to `proposals/rejected/` (with a top-of-file note) or `proposals/deferred/` for the other dispositions — these folders are documented in [`proposals/_template.md`](../../../../../proposals/_template.md).
 
 ---
 Validated 2026-05-28 — 4 rounds, 1 adversarial sub-agent confirmed (Phase 8 implementation loop)

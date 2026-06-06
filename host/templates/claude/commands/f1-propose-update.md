@@ -76,7 +76,7 @@ The discovering command does the mechanical edit and then **halts for re-validat
 
 ### Step 2 — Draft the Problem section
 
-1. Read enough of the canonical sources to state the concrete problem without hedging. Cite the specific files and sections (e.g., `templates/SHAMT_RULES.template.md` §Pattern X, `reference/severity_classification.md`, `host/templates/claude/commands/Z.md`).
+1. Read enough of the canonical sources to state the concrete problem without hedging. Cite the specific files and sections (e.g., `templates/SHAMT_RULES.template.md` Pattern X, `reference/severity_classification.md`, `host/templates/claude/commands/Z.md`).
    - **Seeded from a blurb (Mode 2) or an f0 draft's Scratch Notes (Mode 3):** treat that text as the raw problem statement — verify and sharpen it against the canonical sources, don't just paste it. For **Mode 3**, once the Scratch Notes content is folded into the formal Problem, **remove the `## Scratch Notes (f0 capture)` section** so it does not survive into validation.
 2. Write the Problem section as 1–3 short paragraphs. If the trigger was a story-level incident or a recurring review finding, link the story slug or the [Review Prevention Gates](../../../../reference/pr_review_prevention.md) gate the change is meant to address.
 3. If you cannot yet state the problem precisely — for example, the user has described a symptom but the root canonical-source location is unclear — add the gap to **Open Questions** and surface it via the dialog in Step 5 before proceeding.
