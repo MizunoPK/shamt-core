@@ -31,8 +31,8 @@ See [`reference/model_selection.md`](../../../../reference/model_selection.md) a
 
 ## Prerequisites
 
-- The canonical root (`shamt-core/`) is accessible from the working directory. The audit reads files under `shamt-core/templates/`, `shamt-core/reference/`, `shamt-core/host/templates/claude/`, and `shamt-core/scripts/`.
-- For D1 (sync drift), `shamt-core/scripts/regenerate-framework.sh` exists and is executable.
+- The canonical root is the current working directory (the shamt-core repo root). The audit reads files under `templates/`, `reference/`, `host/templates/claude/`, and `scripts/`.
+- For D1 (sync drift), `scripts/regenerate-framework.sh` exists and is executable.
 - For D6 (project-doc currency), `.shamt-core/shamt-config.json` exists at `.shamt-core/` and either declares `doc_staleness_threshold_days` (integer) or implicitly uses the default of **60 days**. If both `.shamt-core/project-specific-files/ARCHITECTURE.md` and `.shamt-core/project-specific-files/CODING_STANDARDS.md` are missing (legitimate for an in-development shamt-core), D6 reports a structured `not-applicable` finding rather than a HIGH miss — see Step 2 (D6) below.
 
 ## The audit dimensions
@@ -59,7 +59,7 @@ This keeps the audit's exit *shape* aligned with Pattern 1 — the way every oth
 
 ### Step 0 — Confirm target context (master / self-host only)
 
-Before sweeping anything, resolve the target context using the **self-host detection rule** D6 uses (the resolved target is the shamt-core self-host iff `{target}/shamt-core/` exists and its canonical sources at `{target}/shamt-core/host/templates/claude/` are the ones that produced this command body, by path identity):
+Before sweeping anything, resolve the target context using the **self-host detection rule** D6 uses — the same master-vs-child signal `/f1-propose-update` and `/sync-triage-proposals` use: the resolved target is the shamt-core self-host iff a top-level `{target}/proposals/` directory is present (corroborated by canonical sources at the root — `{target}/host/templates/claude/`, `{target}/templates/`, `{target}/scripts/regenerate-framework.sh`); it is a child project iff `{target}/.shamt-core/` carries the imported copy:
 
 - **Master / self-host target** → proceed to Step 1. The continuous dual-track loop (auto-fix simple findings + f0-capture intricate findings) runs only here, where canonical sources are editable.
 - **Child project target** → **halt immediately.** Do not sweep, auto-fix, capture, or run the sub-agent — not even a D1-only drift check. Print the redirect:
@@ -80,7 +80,7 @@ This early check is the **single** child guard; the rest of the body assumes a m
 
 ### Step 1 — Run D1 (sync drift)
 
-1. Invoke `bash shamt-core/scripts/regenerate-framework.sh --check --target {target_dir}`.
+1. Invoke `bash scripts/regenerate-framework.sh --check --target {target_dir}`.
 2. Outcomes:
    - **`no drift`** (exit 0) — record D1 clean.
    - **`DRIFT {path}`** lines — record one finding per path. Severity: HIGH (canonical and generated are out of sync; consumers will see the stale generated content).
@@ -106,7 +106,7 @@ For each dimension, walk the relevant files and identify findings. Apply Pattern
 
 **D4 — Reference validity.** Mechanical walk:
 
-- Markdown links of the form `[text](path)` in every canonical file under `shamt-core/`: confirm the target file exists. Relative paths resolve to disk; halt the audit immediately if any path leaves the canonical root unexpectedly (e.g., `../../../../../etc/passwd`-style traversal — should not occur, surface as CRITICAL if it does).
+- Markdown links of the form `[text](path)` in every canonical file under the repo root: confirm the target file exists. Relative paths resolve to disk; halt the audit immediately if any path leaves the canonical root unexpectedly (e.g., `../../../../../etc/passwd`-style traversal — should not occur, surface as CRITICAL if it does).
 - Template references (e.g., `templates/spec.template.md`): confirm the named file exists.
 - Tracker profile names referenced in command bodies (`ado`, `github`, `local`): confirm the profile file exists at `reference/trackers/{name}.md`.
 - Persona references in command bodies (e.g., `plan-executor`, `validation-checker`, `test-executor`, `review-executor`): confirm `host/templates/claude/agents/{name}.md` exists.
@@ -127,7 +127,7 @@ Missing required sections are HIGH; orphan sections are MEDIUM.
 2. Check for `.shamt-core/project-specific-files/ARCHITECTURE.md` and `.shamt-core/project-specific-files/CODING_STANDARDS.md`.
    - **Both present** — read each file's `Last Updated:` header. If absent, record HIGH (the header contract is defined in [`templates/architecture.template.md`](../../../../templates/architecture.template.md) / [`templates/coding_standards.template.md`](../../../../templates/coding_standards.template.md)). If present, compute `today - Last Updated`; if greater than the threshold, record MEDIUM (`stale doc: {path}, {N} days since Last Updated, threshold {T}`).
    - **One missing** — record HIGH (`required project doc missing: {path}`). Both are required at init per the seed-at-init contract documented in the templates above.
-   - **Both missing** — distinguish via the **self-host detection rule** (same rule used by `/f4-regen-framework`): the resolved target is the shamt-core self-host iff `{target}/shamt-core/` exists and the canonical sources at `{target}/shamt-core/host/templates/claude/` match the canonical sources that produced this audit command's body (resolved by path identity).
+   - **Both missing** — distinguish via the **self-host detection rule** (same rule used by `/f4-regen-framework`): the resolved target is the shamt-core self-host iff a top-level `{target}/proposals/` directory is present (corroborated by canonical sources at the root — `{target}/host/templates/claude/`, `{target}/templates/`, `{target}/scripts/regenerate-framework.sh`); it is a child project iff `{target}/.shamt-core/` carries the imported copy.
      - If self-host (shamt-core developing itself), record a single LOW informational finding (`D6 not applicable: target is shamt-core development repo, no project docs expected`).
      - Otherwise — record CRITICAL (the project is misconfigured; the Engineer flow can't run).
 

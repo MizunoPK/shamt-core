@@ -32,10 +32,10 @@ Regen is global. There is no proposal slug — the script reads every file under
 
 Follow the canonical `/f4-regen-framework` command body verbatim — see [`commands/f4-regen-framework.md`](../../commands/f4-regen-framework.md). Summary:
 
-1. **Resolve script path** at `.shamt-core/scripts/regenerate-framework.sh`. Confirm executable.
+1. **Resolve script path** — `scripts/regenerate-framework.sh` on the shamt-core self-host (master), or `.shamt-core/scripts/regenerate-framework.sh` in a child project. Confirm executable.
 2. **Resolve target** — `--target <dir>` override or current working directory. State the target path in chat in one line.
-3. **Run regen** — `bash .shamt-core/scripts/regenerate-framework.sh --target {dir}`. Surface `wrote` / `removed` / `WARN:` lines. Special-case warnings: unmanaged file collisions, missing `jq`, broken `settings.json`.
-4. **Run drift check** — `bash .shamt-core/scripts/regenerate-framework.sh --check --target {dir}`. Expected: `no drift` (exit 0). Any `DRIFT` or `STALE` lines halt Phase 5.
+3. **Run regen** — `bash {script} --target {dir}` (the path resolved in step 1). Surface `wrote` / `removed` / `WARN:` lines. Special-case warnings: unmanaged file collisions, missing `jq`, broken `settings.json`.
+4. **Run drift check** — `bash {script} --check --target {dir}`. Expected: `no drift` (exit 0). Any `DRIFT` or `STALE` lines halt Phase 5.
 5. **Suggest next phase** — in-flow: `/clear` + `/f5-audit-framework`. Standalone: no suggestion; report `no drift` and exit.
 
 ## Recommended model

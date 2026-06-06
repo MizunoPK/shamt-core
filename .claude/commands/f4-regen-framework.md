@@ -23,10 +23,10 @@ description: Phase 5 of the framework-update flow (slugless) — wrap scripts/re
 
 ## Prerequisites
 
-- `.shamt-core/scripts/regenerate-framework.sh` exists and is executable. If not, halt and report.
+- The regen script exists and is executable — `scripts/regenerate-framework.sh` on the shamt-core self-host (master), or `.shamt-core/scripts/regenerate-framework.sh` in a child project (resolved in Step 1). If not, halt and report.
 - The target project directory exists and is the place you intend to regenerate (i.e., the project's root where `.claude/` should live). When run inside `shamt-core/` development, the target is the project that consumes `shamt-core` — the master self-host or a child project — **not** `shamt-core/` itself, unless `shamt-core/` happens to also be a project that uses its own canonical sources (the self-host pattern).
 
-  **Self-host detection rule of thumb:** the resolved target is the self-host iff `{target}/shamt-core/` exists and the canonical script `{target}/shamt-core/scripts/regenerate-framework.sh` is the same script being invoked (resolved by inode or path identity). Otherwise the target is a consumer project that pulled canonical sources via `import-shamt`. The distinction matters for the audit (D6 not-applicable case below) and for setting user expectations about which `.claude/` is being written.
+  **Self-host detection rule of thumb** (the same master-vs-child signal `/f1-propose-update` and `/sync-triage-proposals` use): the resolved target is the self-host iff it has a top-level `{target}/proposals/` directory — corroborated by canonical sources at the root (`{target}/host/templates/claude/`, `{target}/templates/`, `{target}/scripts/regenerate-framework.sh`). It is a consumer project iff `{target}/.shamt-core/` carries the imported copy. The distinction matters for the audit (D6 not-applicable case below) and for setting user expectations about which `.claude/` is being written.
 - Working tree state: regen will write to `.claude/` and possibly patch `.claude/settings.json` (statusLine wiring). If the target's `.claude/` has uncommitted changes you want to keep, commit them first.
 
 ## Step-by-step
@@ -34,8 +34,9 @@ description: Phase 5 of the framework-update flow (slugless) — wrap scripts/re
 ### Step 1 — Resolve the script path
 
 1. Locate `regenerate-framework.sh`. Preference order:
-   1. `.shamt-core/scripts/regenerate-framework.sh` (relative to repo root when run from a child project's parent context, or directly when run from inside `.shamt-core/`).
-   2. An installed copy at the path documented in the project's `.shamt-core/shamt-config.json` (when available).
+   1. `scripts/regenerate-framework.sh` — the **self-host master** form, when run from the shamt-core repo root (canonical sources live at the root, no `.shamt-core/` wrapper).
+   2. `.shamt-core/scripts/regenerate-framework.sh` — the **child project** form (the imported copy under `.shamt-core/`, relative to the project root).
+   3. An installed copy at the path documented in the project's `.shamt-core/shamt-config.json` (when available).
 2. Confirm the script is executable. If not, run `chmod +x` once and proceed.
 
 ### Step 2 — Resolve the target directory
@@ -49,7 +50,7 @@ description: Phase 5 of the framework-update flow (slugless) — wrap scripts/re
 Invoke the script in default mode:
 
 ```bash
-bash .shamt-core/scripts/regenerate-framework.sh --target {target_dir}
+bash {script} --target {target_dir}    # {script} resolved in Step 1: scripts/… on the self-host master, .shamt-core/scripts/… in a child
 ```
 
 Capture the full output. Surface to the user any `wrote`, `removed`, `unchanged`, or `WARN:` lines.
@@ -65,7 +66,7 @@ Common warnings to surface explicitly:
 Invoke the script in `--check` mode against the same target:
 
 ```bash
-bash .shamt-core/scripts/regenerate-framework.sh --check --target {target_dir}
+bash {script} --check --target {target_dir}
 ```
 
 Expected output: `no drift` (exit 0). Any other output is a Phase 5 failure.
