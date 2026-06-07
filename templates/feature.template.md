@@ -55,5 +55,11 @@
 
 - [Which stories can be worked concurrently and why; or "None — strictly sequential."]
 
+## All Remaining Fields
+
+*(Tracker-seeded features only — omit this entire section when authored freeform or when there is nothing worth preserving.)* Every non-empty tracker payload field not already captured above, preserved inline (features have no `raw/` subfolder at this altitude). Use the durable tracker field name as the heading/key.
+
+- `{field}`: `{value}`
+
 ---
 [Append the validation footer only after Pattern 1 completes, e.g., `Validated YYYY-MM-DD — N rounds, 1 adversarial sub-agent confirmed`.]

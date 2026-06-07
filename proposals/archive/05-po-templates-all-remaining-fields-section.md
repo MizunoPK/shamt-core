@@ -1,7 +1,7 @@
 # Proposal: po-templates-all-remaining-fields-section
 
 **Created:** 2026-05-31
-**Status:** Draft
+**Status:** Implemented
 **Number:** 05
 **Proposed by:**
 **Project context:**
