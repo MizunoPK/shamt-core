@@ -97,7 +97,7 @@ This is the single most load-bearing section. The validator and `/f3-implement-u
      - `shamt-core/host/templates/claude/`
      - `shamt-core/scripts/`
      - `shamt-core/proposals/` (when the proposal updates the proposal template or folder docs)
-     - the root-level canonical docs: `shamt-core/CLAUDE.md`, `shamt-core/CHEATSHEET.md`, `shamt-core/shamt-config.example.json`.
+     - the root-level canonical docs: `shamt-core/CLAUDE.md`, `shamt-core/README.md`, `shamt-core/shamt-config.example.json`.
 
    Any path under `shamt-core/` outside this list is allowed **only if** the proposal explicitly justifies it in **Validation Considerations** or **Risks** (e.g., introducing a new top-level canonical folder). `/f3-implement-update` enforces the same list at edit time.
 3. Cross-check the list. For every rule edit, ask: does the corresponding template need to change? Does the mirrored skill need to change? For every command edit, ask: does the skill need to change? For every reference change, ask: does the rule body that points at it need to change?

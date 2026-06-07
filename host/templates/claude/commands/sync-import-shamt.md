@@ -57,7 +57,7 @@ The script handles:
 
 - Reading `master_url` from `.shamt-core/shamt-config.json` (jq when available; tolerant sed fallback otherwise).
 - Cloning master (`git clone --depth 1`) when `master_url` is a git URL (`https://`, `http://`, `git@`, `ssh://`, `git://`); using `master_url` directly when it is an absolute local filesystem path.
-- Overwriting every file in master's sync set (`CLAUDE.md`, `CHEATSHEET.md`, `shamt-config.example.json`, `init-shamt.sh`, `import-shamt.sh`, `proposals/_template.md`, plus the `scripts/`, `templates/`, `reference/`, `host/` subtrees).
+- Overwriting every file in master's sync set (`CLAUDE.md`, `README.md`, `shamt-config.example.json`, `init-shamt.sh`, `import-shamt.sh`, `proposals/_template.md`, plus the `scripts/`, `templates/`, `reference/`, `host/` subtrees).
 - Preserving (with warnings) any local-only files the child added under the managed subtrees.
 - Auto-moving child-local proposals whose slugs match a file in master's `proposals/archive/` into `.shamt-core/proposals/already-merged/`.
 - Re-running `regenerate-framework.sh --target <target>` after the file sync.

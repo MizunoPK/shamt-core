@@ -21,7 +21,7 @@ The Engineer flow is the load-bearing surface. The PO flow exists for initiative
 Core files:
 
 - `SHAMT_RULES.template.md` — these rules (this file).
-- `.shamt-core/CHEATSHEET.md` — host wiring quick reference (commands, skills, personas).
+- `.shamt-core/README.md` — host wiring quick reference (commands, skills, personas).
 - `reference/` — expanded examples, standards, recipes.
 - `templates/` — artifact skeletons.
 - `stories/{slug}-{brief-description}/` — per-story artifacts.

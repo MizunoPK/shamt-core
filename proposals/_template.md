@@ -107,7 +107,7 @@ A flat list of canonical files the proposal will touch. **Every file the proposa
   - `shamt-core/host/templates/claude/`
   - `shamt-core/scripts/`
   - `shamt-core/proposals/` (when the proposal updates the proposal template or folder docs)
-  - the root-level canonical docs: `shamt-core/CLAUDE.md`, `shamt-core/CHEATSHEET.md`, `shamt-core/shamt-config.example.json`.
+  - the root-level canonical docs: `shamt-core/CLAUDE.md`, `shamt-core/README.md`, `shamt-core/shamt-config.example.json`.
 
   Regen (Phase 5) propagates to `.claude/`. Any path outside this list must be justified in **Validation Considerations** or **Risks**.
 

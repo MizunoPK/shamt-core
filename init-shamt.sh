@@ -21,7 +21,7 @@
 #   5. Copy canonical sources into <target>/.shamt-core/ (skipped on self-host).
 #      The set matches what import-shamt.sh syncs going forward, plus
 #      init-shamt.sh / import-shamt.sh themselves so re-invocation works.
-#      CHEATSHEET.md and proposals/_template.md travel inside this set — they
+#      README.md and proposals/_template.md travel inside this set — they
 #      are NOT separately seeded at the project root.
 #   6. Seed the child's CLAUDE.md (from templates/SHAMT_RULES.template.md) at
 #      <target>/, and the two project-specific docs (ARCHITECTURE.md,
@@ -278,7 +278,7 @@ prompt_value DOC_STALENESS \
 # Matches the import-shamt.sh sync set so the two stay coherent.
 SHAMT_CORE_INSTALL_PATHS=(
   "CLAUDE.md"
-  "CHEATSHEET.md"
+  "README.md"
   "shamt-config.example.json"
   "init-shamt.sh"
   "import-shamt.sh"

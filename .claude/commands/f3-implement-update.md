@@ -53,7 +53,7 @@ Decide which path to run, state it in one line before any edit:
    - `shamt-core/host/templates/claude/`
    - `shamt-core/scripts/`
    - `shamt-core/proposals/` (when the proposal itself is updating the proposal template or related folder docs)
-   - `shamt-core/CLAUDE.md`, `shamt-core/CHEATSHEET.md`, `shamt-core/shamt-config.example.json` (root-level canonical docs)
+   - `shamt-core/CLAUDE.md`, `shamt-core/README.md`, `shamt-core/shamt-config.example.json` (root-level canonical docs)
    - Any path under `shamt-core/` outside the above list **only if** the proposal explicitly justifies it in Validation Considerations or Risks.
 
    If any path falls under generated `.claude/` (or its child-side equivalent), **halt immediately**. Edits to generated files are always wrong — they get overwritten on the next regen and the canonical source still carries the old version. Fix the offending row to point at the canonical source, strip the proposal's prior footer, and re-run `/validate-artifact` — an **[in-place amendment](f1-propose-update.md#in-place-amendment)** path-correction (the row already exists, so this corrects it rather than appending), no full `/f1-propose-update` re-run.

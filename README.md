@@ -21,7 +21,7 @@ A child project that has installed Shamt looks like this:
 │   ├── statusline.sh               # rendered status-line script
 │   └── settings.json               # statusLine entry patched by regen (rest is user-owned)
 ├── .shamt-core/                    # all other Shamt-owned content (managed; do not hand-edit)
-│   ├── CHEATSHEET.md               #   copy of this file
+│   ├── README.md                   #   copy of this file
 │   ├── shamt-config.json           #   initialized from shamt-config.example.json
 │   ├── CLAUDE.md                   #   (master-dev primer)
 │   ├── shamt-config.example.json
@@ -235,7 +235,7 @@ Behavior:
 - Halts if the install config already exists (`<target>/shamt-config.json` on self-host, `<target>/.shamt-core/shamt-config.json` otherwise). Re-init is not supported; use `import-shamt.sh` for updates.
 - Prompts interactively for every `.shamt-core/shamt-config.json` field (no flag-based unattended mode).
 - Copies canonical sources from `<source>/shamt-core/` into `<target>/.shamt-core/` (skipped on self-host).
-- Seeds the child's `CLAUDE.md` at `<target>/` (from `templates/SHAMT_RULES.template.md`), and the two project-specific docs `ARCHITECTURE.md` + `CODING_STANDARDS.md` (with `Last Updated` set to today) under `<target>/.shamt-core/project-specific-files/`. `CHEATSHEET.md` and `proposals/_template.md` travel inside the `.shamt-core/` canonical-source copy — they are not separately seeded. Skipped on self-host.
+- Seeds the child's `CLAUDE.md` at `<target>/` (from `templates/SHAMT_RULES.template.md`), and the two project-specific docs `ARCHITECTURE.md` + `CODING_STANDARDS.md` (with `Last Updated` set to today) under `<target>/.shamt-core/project-specific-files/`. `README.md` and `proposals/_template.md` travel inside the `.shamt-core/` canonical-source copy — they are not separately seeded. Skipped on self-host.
 - Writes the install config (`<target>/shamt-config.json` on self-host, `<target>/.shamt-core/shamt-config.json` otherwise) from the prompted answers. Ends with a copy/pastable completion prompt that drives an agent to fill in and `/validate-artifact` both project-specific docs.
 - Runs `regenerate-framework.sh --target <target>` to produce `<target>/.claude/`.
 

@@ -209,7 +209,7 @@ log "Master shamt-core root: $MASTER_SHAMT_CORE"
 # Top-level files under shamt-core/ that are individually owned.
 MASTER_SYNC_FILES=(
   "CLAUDE.md"
-  "CHEATSHEET.md"
+  "README.md"
   "shamt-config.example.json"
   "init-shamt.sh"
   "import-shamt.sh"

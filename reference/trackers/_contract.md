@@ -64,7 +64,7 @@ Each profile file should document the `--tracker={name}` form near the top of it
 1. Create `reference/trackers/{name}.md`.
 2. Cover every section in the [Required sections](#required-sections) table above, in the given order, with h2 headings.
 3. Declare `## Supported work-item types` honestly — leaving a type out is correct when the tracker has no native concept for it (freeform fallback handles the rest).
-4. Add the new `{name}` as a legal value for `work_item_tracker` and/or `pr_provider` in [`shamt-config.example.json`](../../shamt-config.example.json) and the `.shamt-core/shamt-config.json` schema notes in [`CHEATSHEET.md`](../../CHEATSHEET.md).
+4. Add the new `{name}` as a legal value for `work_item_tracker` and/or `pr_provider` in [`shamt-config.example.json`](../../shamt-config.example.json) and the `.shamt-core/shamt-config.json` schema notes in [`README.md`](../../README.md).
 5. No regen, command, or template change is required.
 
 ---

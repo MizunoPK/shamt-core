@@ -1,6 +1,6 @@
 # shamt-core — Master-Dev Primer
 
-This is the canonical home of the **Shamt** framework: rules, references, templates, and Claude Code host wiring that child projects import. Treat this file as the north star for working **on the framework itself**. For day-to-day project work that *uses* Shamt, see `CHEATSHEET.md` (commands + skills + personas) and `templates/SHAMT_RULES.template.md` (the rules a child project installs).
+This is the canonical home of the **Shamt** framework: rules, references, templates, and Claude Code host wiring that child projects import. Treat this file as the north star for working **on the framework itself**. For day-to-day project work that *uses* Shamt, see `README.md` (commands + skills + personas) and `templates/SHAMT_RULES.template.md` (the rules a child project installs).
 
 This file is for shamt-core contributors. shamt-core is its own standalone git repository.
 
@@ -11,7 +11,7 @@ This file is for shamt-core contributors. shamt-core is its own standalone git r
 ```text
 shamt-core/
 ├── CLAUDE.md                       # this file — master-dev primer
-├── CHEATSHEET.md                   # hand-written quick reference (commands, skills, personas)
+├── README.md                       # hand-written quick reference (commands, skills, personas)
 ├── templates/                      # artifact skeletons + the child-facing rules template
 │   └── SHAMT_RULES.template.md     # canonical rules; rendered into a child's CLAUDE.md
 ├── reference/                      # expanded examples, standards, recipes
@@ -19,7 +19,7 @@ shamt-core/
 └── shamt-config.example.json       # schema-by-example for the per-project config
 ```
 
-A child project that installs Shamt keeps just two Shamt entries at its project root — `CLAUDE.md` (a managed section rendered from `SHAMT_RULES.template.md`) and the generated `.claude/` directory (which Claude Code requires at the root). Everything else lives under a hidden `.shamt-core/` directory: the copied canonical sources, `shamt-config.json` (initialized from the example), `CHEATSHEET.md`, the `proposals/` working area, and `project-specific-files/{ARCHITECTURE,CODING_STANDARDS}.md`.
+A child project that installs Shamt keeps just two Shamt entries at its project root — `CLAUDE.md` (a managed section rendered from `SHAMT_RULES.template.md`) and the generated `.claude/` directory (which Claude Code requires at the root). Everything else lives under a hidden `.shamt-core/` directory: the copied canonical sources, `shamt-config.json` (initialized from the example), `README.md`, the `proposals/` working area, and `project-specific-files/{ARCHITECTURE,CODING_STANDARDS}.md`.
 
 ---
 
@@ -30,7 +30,7 @@ Shamt has **canonical sources** (in this folder) and **generated artifacts** (in
 | Surface | Lives in | Edited by | Notes |
 |---------|----------|-----------|-------|
 | Canonical | `shamt-core/` (this folder) | Framework contributors via the framework-update flow | Single source of truth |
-| Generated | A child project's `.claude/`, its managed-section `CLAUDE.md`, its installed `.shamt-core/CHEATSHEET.md` | Never edited directly | Regenerated from canonical sources |
+| Generated | A child project's `.claude/`, its managed-section `CLAUDE.md`, its installed `.shamt-core/README.md` | Never edited directly | Regenerated from canonical sources |
 
 **Hard rule:** Never edit generated files in a child project. All changes go to canonical sources here, then the child re-runs the import script (or `regenerate-framework`) to pick them up. Editing a generated file is always wrong — it will be overwritten on the next regen, and the canonical source still bears the old version.
 
