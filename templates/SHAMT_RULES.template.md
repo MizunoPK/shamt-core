@@ -158,11 +158,11 @@ Apply across Spec, Plan, Build, Test (when enabled), Review, and Polish:
 
 **Step 2 — Identify issues across dimensions.** First check alignment with `.shamt-core/project-specific-files/ARCHITECTURE.md` and `.shamt-core/project-specific-files/CODING_STANDARDS.md`.
 
-**Specs (8 dimensions):** Completeness; Correctness; Consistency; Helpfulness; Improvements; Missing proposals; Open questions; Standards/architecture alignment. Hard checks: multi-option designs must give each option explicit pros/cons; Open Questions must first be code-researched and cannot contain answerable file/function/column questions; every applicable review-prevention surface has a spec requirement plus evidence or an explicit N/A or deferred reason; when database schema, tables, or columns are modified or added, the spec must explicitly trace the end-to-end cross-service read and write data lineage of both writes (saving) and reads/queries (loading at runtime), ensuring all backend, admin, and backchannel retrieval paths are accounted for.
+**Specs (8 dimensions):** Completeness; Correctness; Consistency; Helpfulness; Improvements; Missing proposals; Open questions; Standards/architecture alignment. Hard checks: per Pattern 3 (Spec Protocol) — multi-option pros/cons (Step 4), Open-Questions-answered-from-code (Step 5), the review-prevention surface inventory and the end-to-end cross-service data-lineage trace for schema changes (Step 5).
 
-**Implementation Plans (8 dimensions):** Step clarity; Mechanical executability; File coverage; Operation specificity; Verification completeness; Dependency ordering; Requirements alignment; Naming clarity. Hard checks: no optional / if / consider executor branches; EDIT steps need exact locate/replace; CREATE steps need concrete paths; imports listed for a file must be used there; every applicable review-prevention gate maps to concrete implementation step(s), verification, or explicit N/A reason.
+**Implementation Plans (8 dimensions):** Step clarity; Mechanical executability; File coverage; Operation specificity; Verification completeness; Dependency ordering; Requirements alignment; Naming clarity. Hard checks: per Pattern 5 (Implementation Planning) — no optional/if/consider branches, exact locate/replace, concrete CREATE paths, and review-prevention-gate mapping; plus imports listed for a file must be used there.
 
-**Code Reviews (6 dimensions):** Correctness; Completeness; Helpfulness; Severity accuracy; Evidence; Standards/architecture alignment. Hard checks: review every changed file/function/branch independently; do not assume parallel files are identical; review removed or weakened security checks and verify equivalent protection still exists; for tenant/path/object/document access changes, explicitly consider a tenant-A-to-tenant-B bypass.
+**Code Reviews (6 dimensions):** Correctness; Completeness; Helpfulness; Severity accuracy; Evidence; Standards/architecture alignment. Hard checks: review every changed file/function/branch independently and do not assume parallel files are identical; for removed/weakened security checks and tenant/path/object/document access changes, per `reference/review_categories.md` (boundary analysis + tenant-A→B bypass tracing).
 
 **General Artifacts (5 dimensions):** Completeness; Clarity; Accuracy; Actionability; Standards/architecture alignment.
 
@@ -196,52 +196,31 @@ Exactly one LOW issue fixed still counts as a clean primary round. Any sub-agent
 
 ## Pattern 3: Spec Protocol
 
-**Purpose:** Targeted research + design dialog + validated user-facing spec and supporting context.
+**Purpose:** Targeted research + design dialog + validated user-facing spec and supporting context. (The exact spec-template section placement — which section follows which — lives in the `/e2-define-spec` command body + `templates/spec.template.md`; this Pattern is the normative contract.)
 
 ### The 7-Step Spec Protocol
 
-**Step 1 — Ingest the ticket.** Apply the active-artifact pointer and global story-folder resolution. Read `ticket.md` or provided ticket content. Extract ask, acceptance criteria, links, due dates, and constraints. Output a 3–5 bullet in-agent summary. Do not write to disk yet. If content is empty or missing, halt and ask.
+**Step 1 — Ingest the ticket.** Apply the active-artifact pointer and global story-folder resolution. Read `ticket.md` (or provided content); extract ask, acceptance criteria, links, due dates, constraints; output a 3–5 bullet in-agent summary; do not write to disk yet. Empty/missing content → halt and ask.
 
-**Step 2 — Targeted research.** Scope research to ticket references, not a broad exploration: grep referenced files / functions / features; read `.shamt-core/project-specific-files/ARCHITECTURE.md` and `.shamt-core/project-specific-files/CODING_STANDARDS.md`; skim related code. Record detailed findings in `context.md` (Standard path) or `spec.md` Evidence (Quick path).
-
-Required research captures:
-
-- **Code shapes:** exact shapes needed for planning.
-- **Pre-existing gaps:** when refactoring, document touched gaps; bring into scope or explicitly defer with reason; if none, say so.
-- **Current flow:** add an ASCII current-state flow once research is sufficient, unless narrowly in-process (record the N/A reason).
-- **Review-prevention risk inventory:** classify whether the story touches regulated/sensitive data, tenant isolation, auth/authorization, route/API contract, DB reads/writes, migrations, new service, monitoring, frontend rendering/auth flow, tests/test data, or removed/weakened checks. Use `reference/pr_review_prevention.md`.
-- **Boundary diagram evidence:** Mermaid is required for boundary-crossing stories. During Spec, collect real component/interface names and flow evidence so a Mermaid diagram can be generated against source-backed components. Diagrams cannot be the only place a component appears.
-- **File placement:** when shared-utility placement matters, record the governing rule under Architecture And Standards Notes.
+**Step 2 — Targeted research.** Scope to ticket references, not broad exploration: grep referenced files/functions/features; read `.shamt-core/project-specific-files/ARCHITECTURE.md` + `CODING_STANDARDS.md`; skim related code. Record findings in `context.md` (Standard) or `spec.md` Evidence (Quick). Required captures: **code shapes** (exact shapes needed for planning); **pre-existing gaps** (when refactoring — bring into scope or defer with reason; if none, say so); **current flow** (ASCII current-state once research suffices, unless narrowly in-process → record the N/A reason); **review-prevention risk inventory** (classify whether the story touches regulated/sensitive data, tenant isolation, auth/authorization, route/API contract, DB reads/writes, migrations, new service, monitoring, frontend rendering/auth flow, tests/test data, or removed/weakened checks — use `reference/pr_review_prevention.md`); **boundary-diagram evidence** (Mermaid is required for boundary-crossing stories — collect real source-backed component/interface names and flow evidence; a diagram cannot be the only place a component appears); **file placement** (record the governing rule under Architecture And Standards Notes when shared-utility placement matters).
 
 **Step 3 — Draft skeletons.**
 
 | Path | Required artifact shape |
 |---|---|
-| Standard | Create `spec.md` from `templates/spec.template.md` and `context.md` from `templates/context.template.md`. `spec.md` is the approval contract; `context.md` is evidence/planning handoff. Approval-relevant persistence design and review-prevention requirements must appear in `spec.md`, not only `context.md`. Key Design Decision IDs appear in both. |
-| Quick | Create `spec.md` only. Populate Evidence, compact Review Prevention Evidence, Code Shapes, Review Prevention Checklist, Build Checklist, and Verification inline. Do not create `context.md` or `implementation_plan.md` unless the story escalates or a risk trigger applies. |
+| Standard | `spec.md` (from `templates/spec.template.md`) + `context.md` (from `templates/context.template.md`). `spec.md` is the approval contract; `context.md` is evidence/planning handoff. Approval-relevant persistence design and review-prevention requirements must appear in `spec.md`, not only `context.md`. Key Design Decision IDs appear in both. |
+| Quick | `spec.md` only — populate Evidence, compact Review Prevention Evidence, Code Shapes, Review Prevention Checklist, Build Checklist, and Verification inline. Do not create `context.md` or `implementation_plan.md` unless the story escalates or a risk trigger applies. |
 
-Optional Standard-path plan skeleton: after `spec.md`/`context.md`, create `implementation_plan.md` with exploratory headers only, mark unresolved decisions as `Blocked:`, and set Planning Status to "Blocked on spec (Gate 2a)". Do not fill locate strings until after Gate 2a.
+Optional Standard-path plan skeleton: after `spec.md`/`context.md`, create `implementation_plan.md` with exploratory headers only, mark unresolved decisions `Blocked:`, set Planning Status to "Blocked on spec (Gate 2a)"; do not fill locate strings until after Gate 2a.
 
-**Step 4 — Architecture/design dialog (Gate 2a).** Present 1–3 design options inline in chat, not in `spec.md` yet. One option is fine when the choice is obvious; 2–3 options are required for non-trivial user-facing forks. Each option needs description, pros, cons, effort (S/M/L), and a recommendation. If an option has no meaningful downside, say so. If open sub-questions exist, use `reference/question_brainstorm_categories.md` and omit empty categories.
+**Step 4 — Architecture/design dialog (Gate 2a).** Present 1–3 design options inline in chat, not in `spec.md` yet: one option is fine when the choice is obvious, 2–3 are required for non-trivial user-facing forks; each needs description, pros, cons, effort (S/M/L), and a recommendation (if an option has no meaningful downside, say so). For open sub-questions, use `reference/question_brainstorm_categories.md` and omit empty categories. Mermaid diagrams are not part of Spec creation — for boundary-crossing stories, record enough approved design-option, workflow, schema, and source-backed component evidence for a later Mermaid generation step; an existing Mermaid block is optional supporting material, do not create or update it during Spec. **Wait for explicit user confirmation before proceeding.**
 
-Mermaid diagrams are not part of Spec creation. For boundary-crossing stories, record enough approved design-option, workflow, schema, and source-backed component evidence for a later Mermaid generation step. If a Mermaid block already exists in the active story artifacts, treat it as optional supporting material; do not create or update Mermaid during Spec.
-
-Wait for explicit user confirmation before proceeding.
-
-**Step 5 — Flesh out spec/context.** Record the agreed approach. For Standard path, keep `spec.md` concise and approval-facing while `context.md` carries detailed rationale, evidence, current flow, standards notes, and code shapes. For Quick path, keep all of that inline in `spec.md`.
-
-Before placing anything in Open Questions, try to answer it from the codebase. Only product, team, or external-system decisions remain open — and even these are surfaced one at a time via the open-questions iterative-dialog principle.
-
-Add `Review Prevention Gates` after Requirements or Interfaces for applicable regulated/sensitive data, tenant, auth/route, DB, infra, frontend, testing, or removed-check surfaces. For each applicable high-risk surface, state the approval-facing prevention requirement: no regulated or sensitive data in logs / responses / metrics / alarms; tenant identity source and enforcement point; route authorizer/integration expectation; DB writer routing for direct and transitive writes; standard monitoring on new services; tests or verification strategy; replacement/preservation for removed or weakened checks. Standard path stores detailed evidence in `context.md`; Quick path stores compact evidence inline in `spec.md`. If a prevention surface is itself a risk trigger, escalate to Standard path.
-
-Add `Database Schema Changes` after `Interfaces and Boundaries` whenever schema is added or modified or candidate persistence designs need approval. For any schema, migration, or table-level change, the spec must explicitly trace the end-to-end cross-service read and write data lineage across service boundaries to ensure data is not written but ignored or dropped at runtime. If a required backchannel API, query route, or configuration endpoint does not exist yet, the spec must either include its creation as in-scope or list it as a Blocker under Open Questions and escalate for pre-approval vetting at Gate 2a/2b. New tables list columns; existing-table changes list deltas only. Candidate schema options must be reviewable when undecided. Explicitly defer schema changes when out of scope.
-
-Standard path does not add a Files Affected inventory to the spec; file-level work belongs in the plan. Quick path uses Review Prevention Checklist and Build Checklist for files, prevention gates, and sequential mechanical steps. If a parallel plan skeleton exists, resolve all `Blocked:` markers after Gate 2a.
+**Step 5 — Flesh out spec/context.** Record the agreed approach: Standard keeps `spec.md` concise and approval-facing while `context.md` carries detailed rationale, evidence, current flow, standards notes, and code shapes; Quick keeps all of that inline in `spec.md`. Before placing anything in Open Questions, answer it from the codebase — only product/team/external-system decisions remain open, surfaced one at a time (Principle 2). For each applicable high-risk surface, state the approval-facing **prevention requirement**: no regulated or sensitive data in logs / responses / metrics / alarms; tenant identity source and enforcement point; route authorizer/integration expectation; DB writer routing for direct and transitive writes; standard monitoring on new services; tests or verification strategy; replacement/preservation for removed or weakened checks — Standard stores detailed evidence in `context.md`, Quick stores compact evidence inline in `spec.md`; if a prevention surface is itself a risk trigger, escalate to Standard path. For any schema, migration, or table-level change, the spec must explicitly trace the end-to-end cross-service read and write data lineage across service boundaries to ensure data is not written but ignored or dropped at runtime; if a required backchannel API, query route, or configuration endpoint does not exist yet, the spec must either include its creation as in-scope or list it as a Blocker under Open Questions and escalate for Gate 2a/2b pre-approval vetting; new tables list columns, existing-table changes list deltas only, candidate schema options must be reviewable when undecided, and explicitly defer schema changes when out of scope. Standard path does not add a Files Affected inventory to the spec (file-level work belongs in the plan); Quick uses Review Prevention Checklist and Build Checklist for files, prevention gates, and sequential mechanical steps. Resolve all parallel-skeleton `Blocked:` markers after Gate 2a.
 
 **Step 6 — Validate.**
 
-- **Standard path:** run Pattern 1 on the `spec.md` + `context.md` pair using spec dimensions plus five pair checks: every factual claim in `spec.md` is supported by `context.md`; every Key Design Decision ID appears in both without contradiction; approval-relevant schema/persistence described in `context.md` appears in `spec.md` unless deferred/out of scope; implementation-relevant prevention evidence in `context.md` appears in `spec.md` when approval-relevant; multi-option comparisons give each option explicit pros/cons. Treat schema-only-in-context, approval-relevant prevention-only-in-context, and missing per-option pros/cons as HIGH by default. If an existing Mermaid diagram is recorded in the active story artifacts, verify it renders, every node/edge is supported by research or an approved decision, it does not contradict spec/context, and it conforms to `reference/mermaid_diagram_standards.md`. Exit: primary clean + 1 adversarial sub-agent; footer both files.
-- **Quick path:** run Pattern 1 on `spec.md` alone. Validate Requirements, Evidence, Review Prevention Gates/Evidence/Checklist, Code Shapes, Build Checklist, and Verification. One primary clean pass is enough unless a risk trigger requires an adversarial sub-agent. Footer `spec.md`.
+- **Standard path:** run Pattern 1 on the `spec.md` + `context.md` pair using spec dimensions plus five pair checks — every factual claim in `spec.md` is supported by `context.md`; every Key Design Decision ID appears in both without contradiction; approval-relevant schema/persistence in `context.md` appears in `spec.md` unless deferred/out of scope; implementation-relevant prevention evidence in `context.md` appears in `spec.md` when approval-relevant; multi-option comparisons give each option explicit pros/cons. Treat schema-only-in-context, approval-relevant prevention-only-in-context, and missing per-option pros/cons as HIGH by default. If a Mermaid diagram is recorded in the active artifacts, verify it renders, every node/edge is research- or decision-backed, it does not contradict spec/context, and it conforms to `reference/mermaid_diagram_standards.md`. Exit: primary clean + 1 adversarial sub-agent; footer both files.
+- **Quick path:** run Pattern 1 on `spec.md` alone (Requirements, Evidence, Review Prevention Gates/Evidence/Checklist, Code Shapes, Build Checklist, Verification); one primary clean pass is enough unless a risk trigger requires an adversarial sub-agent; footer `spec.md`.
 
 Each round ask, "What code should I have read that I haven't?" — and read it.
 
@@ -265,7 +244,7 @@ Each round ask, "What code should I have read that I haven't?" — and read it.
 6. Validate review with Pattern 1 review dimensions; footer it.
 7. On re-review, create the next `review_vN.md` without overwriting. In story mode, write inside `stories/{slug}/feedback/`; in formal mode, keep using `code_reviews/<branch>/`. If `active_artifacts.md` exists, add `Baseline reviewed: vN`. v2 does not post formal-mode reviews back to external trackers — the artifact stays local; the user posts manually if desired.
 
-Every review must consider all 16 categories even when no finding is recorded: Correctness, Security, Performance, Maintainability, Testing, Edge Cases, Naming, Documentation, Error Handling, Concurrency, Dependencies, Architecture, CSS Scope, State Ownership, Response Field Uniformity, Monitoring. Use `reference/review_categories.md` for mechanical checks and finding format.
+Every review must consider all 16 categories even when no finding is recorded; the category list, the mechanical checks, and the finding format all live in `reference/review_categories.md`.
 
 ## Pattern 5: Implementation Planning
 
@@ -297,17 +276,17 @@ The Standard path requires a validated implementation plan after spec approval a
 - **DELETE:** file/section plus justification.
 - **MOVE:** separate create and delete sub-steps, each verified.
 
-**Hard planning checks:**
+**Hard planning checks** (each maps to a concrete step, a verification, or an explicit N/A before validation; expanded per-check detail in `reference/implementation_plan_reference.md`):
 
-- Every applicable review-prevention item from spec/context maps to concrete implementation step(s), verification step(s), or explicit N/A reason before validation.
-- DB write paths: trace direct and transitive writes and plan the writer routing decision before any build step proceeds.
-- New or changed services / routes: require manifest coverage or explicit N/A for handler, application module, route module, monitoring template, packaging, environment, IAM/secrets, log retention, networking, and deployment/stage updates.
-- Tenant / path / object / document changes: plan a tenant-A-to-tenant-B bypass verification when feasible, or state why it cannot be run.
-- Removed/weakened checks: include replacement analysis before the code-edit step.
-- New service handlers: enumerate transitive call graph for imported shared utilities, reachable environment-variable keys, and reachable external resource accesses before drafting environment/IAM steps; add missing symbols/env/IAM steps before proceeding.
-- Byte-for-byte copy files: before adding a function to a shared copy file, verify every called function has identical signature/behavior in every repo maintaining that file. If any dependency differs, place the function repo-specifically and record why.
-- `.shamt-core/project-specific-files/CODING_STANDARDS.md`: map each applicable rule to an existing step, new step, or explicit N/A in `## CODING_STANDARDS Compliance`; merely saying it was read is insufficient.
-- Migration CREATE steps: cover table creation, any required row-level security policy in the same block, and information-schema verification. See `reference/implementation_plan_reference.md` for expanded examples.
+- every applicable review-prevention item from spec/context is covered;
+- DB write paths trace direct **and** transitive writes and decide writer routing before any build step;
+- new/changed services or routes have manifest coverage — handler, application module, route module, monitoring template, packaging, environment, IAM/secrets, log retention, networking, deployment/stage — or explicit N/A;
+- tenant/path/object/document changes plan a tenant-A-to-tenant-B bypass verification (or state why it cannot run);
+- removed/weakened checks get a replacement analysis before the code-edit step;
+- new service handlers enumerate the transitive call graph for imported shared utilities, reachable environment-variable keys, and reachable external-resource accesses, adding missing symbol/env/IAM steps before proceeding;
+- byte-for-byte copy files verify every called function has identical signature/behavior in every repo maintaining that file (else place the function repo-specifically and record why);
+- each applicable `.shamt-core/project-specific-files/CODING_STANDARDS.md` rule maps to a step or explicit N/A in `## CODING_STANDARDS Compliance` (saying it was read is insufficient);
+- migration CREATE steps cover table creation, any required row-level-security policy in the same block, and information-schema verification.
 
 Skeleton-first authoring is recommended for plans with 5+ steps: write all headers, sanity-check structure, then fill locate strings and verification just-in-time.
 
@@ -346,44 +325,13 @@ Sub-agent confirmations **always** use Cheap tier — these are zero-bias re-rea
 
 ## Recommended models per phase (Engineer flow)
 
-| Phase | Model |
-|-------|-------|
-| 1. Intake | Haiku |
-| 2. Spec — research | Sonnet |
-| 2. Spec — design dialog (Gate 2a) | Opus |
-| 2. Spec — validation | Opus |
-| 3. Plan — authoring | Sonnet |
-| 3. Plan — validation | Opus |
-| 4. Build — Quick path | Sonnet |
-| 4. Build — Standard path (mechanical) | Haiku (`plan-executor` persona) |
-| 5. Test (when enabled) | Haiku (`test-executor` persona) |
-| 6. Review — story-mode | Sonnet |
-| 6. Review — formal-mode issue-finding | Opus (`review-executor` persona) |
-| 6. Review — formal-mode git metadata | Haiku |
-| 7. Polish — code edits | Sonnet |
-| 7. Polish — root cause / upstream proposals | Opus |
-
-Personas can override the global table per their definition (see `host/templates/claude/`).
+The per-phase model tiers for the Engineer flow live in `reference/model_selection.md` (the authoritative table). Personas can override per their definition (see `host/templates/claude/`).
 
 ---
 
 # Part 3: Engineer Flow — Phase Narratives
 
-Compact phase reference. For each phase: purpose, minimum viable artifact, key gate, recommended model.
-
-**Phase 1: Intake.** Capture the ticket and establish the story folder. Ask for slug; resolve optional issue-tracker ID per `.shamt-core/shamt-config.json`; derive a 2–4 word brief description; check for slug collision; fetch tracker payload or capture manual content; confirm. Minimum viable: non-empty `ticket.md`. Gate: user confirms slug and content. Model: Haiku.
-
-**Phase 2: Spec.** Run the full 7-step Spec Protocol (Pattern 3). Apply the active-artifact pointer before reading story artifacts. Quick path: compact `spec.md` with Evidence, Code Shapes, Build Checklist, Verification inline. Standard path: `spec.md` (approval) + `context.md` (evidence). Validate per Pattern 1. Gate 2a: design approval. Gate 2b: validated-spec approval. Models: Sonnet (research), Opus (dialog + validation).
-
-**Phase 3: Plan.** Standard path only — Quick path skips this phase. Run the full 5-step Plan contract (Pattern 5). Reconcile `## Review Prevention Gates` from spec/context into `## Review Prevention Gate Mapping`. Every step must be mechanical; no unresolved design decisions remain. Multi-repo plans use `Step 0-A`, `Step 0-B`, etc. with branch-baseline steps. Gate 3: validated-plan approval. Model: Sonnet.
-
-**Phase 4: Build.** Execute the approved Build Checklist (Quick) or implementation plan (Standard). Standard path hands off to the `plan-executor` persona — the architect does not execute the plan itself. Quick path: the primary agent executes the Build Checklist directly. On failed verification or ambiguity, Standard path patches the plan and re-hands off; Quick path investigates and fixes inline. Post-execution: verify changes against spec requirements and review-prevention gates. Gate: verification checklist passes. Model: Haiku (Standard mechanical) or Sonnet (Quick direct-build).
-
-**Phase 5: Test (when `testing: "enabled"`).** Execute the testing plan via the `test-executor` persona. Run the project's test suite, perform e2e scenarios, record results in `testing_plan.md`. Diagnose failures; distinguish story failures from infrastructure flakiness. **Phase 5 blocks until all tests pass** — no exceptions or documented deferrals. Skipped entirely when testing is disabled. Model: Haiku.
-
-**Phase 6: Review.** Pattern 4 in story mode (or formal mode for external branches/PRs). Quick path: chat/spec summary; `feedback/review_v1.md` only on findings, risk, or user request. Standard path: `review_v1.md` is mandatory, even when it only says "No issues found." Story-mode review includes the Plan Alignment pre-pass and a Documentation Impact Assessment (does this change require an `.shamt-core/project-specific-files/ARCHITECTURE.md` or `.shamt-core/project-specific-files/CODING_STANDARDS.md` update? If yes, the update is part of Polish). Models: Opus (issue-finding via `review-executor`), Haiku (git metadata).
-
-**Phase 7: Polish.** Apply reviewer feedback and capture generalizable lessons. Inventory `stories/{slug}/feedback/` at the start of every Polish pass. Track comment handling in `addressed_feedback.md` when feedback exists. Process comments one by one: understand, fix or disposition, verify, reflect on root cause, accumulate. Root-cause proposals that generalize beyond the current story route through the framework-update flow at `.shamt-core/proposals/{slug}.md` rather than direct edits. If Phase 6 flagged a doc-impact change, Polish applies the update and re-validates the doc. Polish cannot complete while any tracked comment remains `Pending` or `Needs user decision` (unless explicitly deferred). Models: Sonnet (fixes), Opus (root cause).
+Each phase's purpose, minimum-viable artifact, gate, recommended model, and per-phase invariants live authoritatively in its **command body** — `/e1-start-story`, `/e2-define-spec`, `/e3-plan-implementation` (+ `/e3b-write-testing-plan`), `/e4-execute-plan`, `/e5-execute-tests`, `/e6-review-changes`, `/e7-resolve-feedback` (under `host/templates/claude/commands/`). Gates are summarized in the Quick / Standard path-map tables above; per-phase model tiers are in `reference/model_selection.md`. Resume any phase with its slug-first command (e.g. `/e4-execute-plan {slug}`).
 
 ---
 
