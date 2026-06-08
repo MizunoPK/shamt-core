@@ -1,8 +1,8 @@
-# Framework Audit Dimensions (D1–D11)
+# Framework Audit Dimensions (D1–D12)
 
 **Extends the `/f5-audit-framework` command body — read [`host/templates/claude/commands/f5-audit-framework.md`](../host/templates/claude/commands/f5-audit-framework.md) first.**
 
-**Purpose:** Full definitions of the eleven audit dimensions grouped under the three C's (Completeness / Correctness / Consistency), worked examples of the simple-vs-intricate fix-track boundary, and the known-exceptions list of intentional patterns the audit must **not** re-flag on every run.
+**Purpose:** Full definitions of the twelve audit dimensions grouped under the three C's (Completeness / Correctness / Consistency), worked examples of the simple-vs-intricate fix-track boundary, and the known-exceptions list of intentional patterns the audit must **not** re-flag on every run.
 
 The command and skill bodies carry the **normative boundary** — the dimension severities and the three simple-fix criteria (mechanical + single-file + uniquely-determined, borderline → intricate). This document only elaborates them with examples; it introduces no new boundary logic an implementing agent has to invent. (Mirrors how Pattern 1 offloads its mechanics to [`validation_exit_criteria.md`](validation_exit_criteria.md).)
 
@@ -20,6 +20,7 @@ The audit exists to keep the framework **complete** (it covers what it should, w
 | D5 | Template-protocol alignment | Each template carries every section its producing/consuming protocol writes or reads — and no orphan sections the protocol abandoned. |
 | D6 | Project-doc currency | The required project docs (`ARCHITECTURE.md`, `CODING_STANDARDS.md`) exist and are within the staleness threshold — the inputs the Engineer flow depends on are present and fresh. |
 | D8 | Content completeness | No half-finished content — no stray `TODO` / `TBD` / `FIXME` / unfilled `[placeholder]` left in a canonical body. |
+| D12 | Rules-file size budget | The canonical rules file (`templates/SHAMT_RULES.template.md`, rendered into every child `CLAUDE.md`) stays within `rules_size_budget_chars` (default 40000 chars) — small enough to load economically into context on every interaction. Over budget is **always intricate** (trimming needs judgment) → f0-capture pointing at `/trim-rules-file`, never auto-fixed. |
 
 ### Correctness
 
@@ -27,7 +28,7 @@ The audit exists to keep the framework **complete** (it covers what it should, w
 |-----|------|---------------------------|
 | D1 | Sync drift | Generated `.claude/` matches canonical sources — regen `--check` exits 0, no `DRIFT` / `STALE`. |
 | D4 | Reference validity | Every markdown link, template reference, tracker-profile name, and persona name resolves on disk. |
-| D10 | Count / claim accuracy | Every explicit count or enumerated claim matches reality — "11 dimensions", "5 patterns", "8 plan dimensions", phase numbers, persona counts. |
+| D10 | Count / claim accuracy | Every explicit count or enumerated claim matches reality — "12 dimensions", "5 patterns", "8 plan dimensions", phase numbers, persona counts. |
 
 ### Consistency
 
@@ -66,7 +67,7 @@ The audit runs **only** on a master / self-host target — a child invocation ha
 | Finding | Why simple |
 |---------|-----------|
 | D4: a markdown link points at `reference/audit_dimension.md` but the file is `audit_dimensions.md` | Mechanical, single-file, the correct target is unambiguous on disk. |
-| D10: a skill `description` says "six dimensions" after the table grew to eleven | Mechanical; the table is the source of truth, so the number is uniquely determined. |
+| D10: a skill `description` says "six dimensions" after the table grew to twelve | Mechanical; the table is the source of truth, so the number is uniquely determined. |
 | D7: one body writes "Small Story Lane" where every other body says "Quick path" | Normalizing to the single canonical term; no judgment. |
 | D8: a stray `TODO: fill in later` left in a reference body | Removal (or completion if the surrounding text determines it) is mechanical and single-file. |
 

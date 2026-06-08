@@ -24,7 +24,7 @@ Adapted from v1's SHAMT-27 (`model_selection.md`); trimmed hard for v2.
 |---------|------|-----------|
 | `plan-executor` | Cheap (Haiku) | Mechanical implementation-plan execution; no synthesis required |
 | `validation-checker` | Cheap (Haiku) | Adversarial sub-agent re-read of a single artifact; fresh eyes, not depth |
-| `audit-checker` | Cheap (Haiku) | Adversarial framework-sweep sub-agent for `/f5-audit-framework`'s clean round; zero-bias D1–D11 re-sweep, not depth |
+| `audit-checker` | Cheap (Haiku) | Adversarial framework-sweep sub-agent for `/f5-audit-framework`'s clean round; zero-bias D1–D12 re-sweep, not depth |
 | `test-executor` | Cheap (Haiku) | Runs the testing plan; interprets test output; diagnoses failures vs. infra flakiness |
 | `review-executor` | Reasoning (Opus) | Formal-mode code review issue-finding using the 16-category framework |
 
@@ -60,8 +60,8 @@ Personas declare their tier in the persona body (e.g., a frontmatter `model:` fi
 | Framework update — Phase 4 (Standard path execution via `plan-executor`) | Cheap | Mechanical execution of the validated plan; identical persona contract to story-altitude builder |
 | Framework update — Phase 5 (`/f4-regen-framework`) | Cheap | Wrap the regen script, surface output, run `--check` for drift; no design judgment |
 | Framework update — Phase 6 (`/f5-audit-framework`) — primary loop | Reasoning | D2 (cross-doc consistency), D3 (bidirectional coverage), D5 (template-protocol alignment), D6 interpretation, D7 (terminology consistency), D9 (duplication/contradiction), D11 (scope-clarity): synthesis across many files |
-| Framework update — Phase 6 mechanical sub-checks (D1, D4, D8, D10) | Cheap | Running regen `--check`; walking links, template paths, profile names, persona names; grepping stray `TODO`/`TBD`/placeholders (D8); cross-checking explicit counts against reality (D10) |
-| Framework update — Phase 6 adversarial confirmation (`audit-checker`) | Cheap | Zero-bias D1–D11 re-sweep on the clean round; fresh eyes, not depth |
+| Framework update — Phase 6 mechanical sub-checks (D1, D4, D8, D10, D12) | Cheap | Running regen `--check`; walking links, template paths, profile names, persona names; grepping stray `TODO`/`TBD`/placeholders (D8); cross-checking explicit counts against reality (D10); measuring the rules file's size against its budget (D12) |
+| Framework update — Phase 6 adversarial confirmation (`audit-checker`) | Cheap | Zero-bias D1–D12 re-sweep on the clean round; fresh eyes, not depth |
 | Framework update — Phase 7 (`/f6-archive-proposal`) | Cheap | File move + status update |
 
 Per-flow overrides live in skill bodies and persona definitions — that is where deviations from this table are declared. The table above is the default; check the individual skill body for the authoritative tier for a given phase.
