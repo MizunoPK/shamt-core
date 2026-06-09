@@ -1,7 +1,7 @@
 {
   "$schema_note": "Example shamt-config.json. Copy to <project-root>/shamt-config.json and edit. All keys are required unless marked optional in shamt-core/README.md.",
   "project_name": "your-project-slug",
-  "work_item_tracker": "github",
+  "work_item_tracker": "local",
   "pr_provider": "github",
   "testing": "disabled",
   "ai_service": "anthropic",

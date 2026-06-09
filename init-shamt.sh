@@ -247,7 +247,7 @@ prompt_value PROJECT_NAME \
 
 prompt_choice WORK_ITEM_TRACKER \
   "Work-item tracker (where /e1-start-story fetches tickets from)" \
-  "github" \
+  "local" \
   "ado" "github" "local" "none"
 
 prompt_choice PR_PROVIDER \
