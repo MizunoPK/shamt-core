@@ -37,6 +37,16 @@
 
 ---
 
+## Decomposition Context
+
+<!-- Cataloged at decomposition (/p2-decompose-epic for features, /p4-decompose-feature for stories) — bounded breadth context discovered by researching the whole sibling set. NOT a depth dump (design/acceptance/implementation detail belongs in the depth sections, filled at start-*). /p3-start-feature and /e1-start-story consume this as a research seed. Leave the placeholder bullets if nothing was cataloged. -->
+
+- **Dependencies on siblings:** [which sibling features/stories this one depends on or blocks — "none" if independent]
+- **Shared context:** [context spanning the set this child needs — shared modules, data, infra, conventions]
+- **Boundary rationale:** [why this child is scoped as drawn rather than merged into a sibling]
+
+---
+
 ## Target Stories
 
 [Populated by `/p4-decompose-feature`. Left empty on `/p3-start-feature` exit. Each line: story slug + one-line scope.]

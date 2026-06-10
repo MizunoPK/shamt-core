@@ -45,8 +45,8 @@ Apply the global slug-resolution rule from [`SHAMT_RULES.template.md`](../../../
 2. If still not found (a slug), glob **both** `features/{slug}-*/feature.md` and `features/*-{slug}-*/feature.md`.
 3. **Multiple matches** → halt and ask the user which folder to use.
 4. **One match** → that folder is the feature folder. **Detect Mode A vs. re-entry** by inspecting `feature.md`:
-   - If `feature.md` has **only** `**Ticket ID:** T{N}` + `**Parent Epic:** T{N} ({epic-slug})` + `## Goal` filled in (every other section empty per the `/p2-decompose-epic` Step 8 contract), this is a **stub** — proceed to **Mode A** under Step 4.
-   - If `feature.md` is populated beyond the stub shape (`Success Criteria`, `Scope`, etc. drafted), this is a **re-entry**. Confirm with the user how to proceed. **Available options depend on whether the active tracker actually has a Feature fetch path** (resolved in Step 1 plus the profile's `## Supported work-item types`):
+   - If `feature.md` has its **decomposition-authored fields** filled — `**Ticket ID:** T{N}` + `**Parent Epic:** T{N} ({epic-slug})` + `## Goal`, plus (on a richer-cataloging stub) `## Scope / Non-Scope` + `## Decomposition Context` — but the **depth sections `## Success Criteria` and `## Open Questions` are still empty** (per the `/p2-decompose-epic` Step 8 contract), this is a **stub** — proceed to **Mode A** under Step 4.
+   - If `feature.md` has its **depth sections drafted** (`## Success Criteria` / `## Open Questions` populated — a prior `/p3-start-feature` deep-dive ran), this is a **re-entry**. Confirm with the user how to proceed. **Available options depend on whether the active tracker actually has a Feature fetch path** (resolved in Step 1 plus the profile's `## Supported work-item types`):
      - **Fetching profile that declares Feature support** (e.g., `ado`): offer all four — **refetch**, **overwrite**, **extend**, **exit**.
      - **Fetching profile that does *not* declare Feature support** (e.g., `github`): same options as `local` / `none` — **overwrite**, **extend**, **exit**. Refetch is suppressed because the profile would just fall through to freeform anyway (per the freeform-fallback rule), making the offered branch pointless.
      - **`local`:** the file is the source of truth. Offer **overwrite**, **extend**, **exit**.
@@ -73,16 +73,16 @@ Applies only when the slug does not yet resolve to a folder (i.e., Mode A is rul
 
 The command supports three input modes. **Mode disambiguation order:**
 
-1. **Mode A — flesh out an existing stub** if Step 2 resolved to a folder whose `feature.md` matches the stub shape (Parent Epic header + Goal one-liner + every other section empty).
+1. **Mode A — flesh out an existing stub** if Step 2 resolved to a folder whose `feature.md` matches the stub shape (decomposition-authored fields filled — Parent Epic header + Goal one-liner, plus `## Scope / Non-Scope` + `## Decomposition Context` on a richer-cataloging stub — but the depth sections `## Success Criteria` / `## Open Questions` still empty).
 2. **Mode C — tracker-seeded** if Mode A did not apply AND the active tracker profile declares Feature work-item type support AND the slug parses to a tracker ID per the profile's `## Slug resolution` rule.
 3. **Mode B — standalone from scratch** otherwise.
 
 #### Mode A — flesh out an existing stub (the common case after `/p2-decompose-epic`)
 
-The folder exists; `feature.md` already carries the `**Parent Epic:** {epic-slug}` back-ref header and a populated `## Goal` from `/p2-decompose-epic` Step 8.
+The folder exists; `feature.md` already carries the `**Parent Epic:** {epic-slug}` back-ref header and a populated `## Goal` from `/p2-decompose-epic` Step 8 — and, for a stub created under richer-cataloging decomposition, a populated `## Scope / Non-Scope` boundary and a `## Decomposition Context` section.
 
 1. **Preserve the back-ref header and `## Goal` verbatim.** Do not rewrite them.
-2. Proceed to Step 5 (architecture consult), then Step 6 (open-questions dialog) to populate `Success Criteria` and `Scope / Non-Scope`.
+2. **Consume the stub's `## Decomposition Context` as a research seed when present** — a stub created before #12 (or via a path that didn't catalog it) lacks the section, so fall back to the existing `## Goal` alone (and `## Scope / Non-Scope` if it was already populated), with no failure. Then proceed to Step 5 (architecture consult) and Step 6 (open-questions dialog) to populate `Success Criteria` + `Open Questions` and the `## Scope / Non-Scope` boundary — **deepening** it when decomposition pre-populated it (a richer-cataloging stub), or **populating it from scratch** when it is empty (an older stub). The existing `/validate-artifact` handoff at the end of the command is unchanged; validation is not folded in here.
 3. Leave `Target Stories` and `Sequencing & Parallelization` empty — those are `/p4-decompose-feature`'s output.
 4. **No `## All Remaining Fields` appendix** — there was no tracker fetch in this mode.
 

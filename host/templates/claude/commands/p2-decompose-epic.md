@@ -92,6 +92,7 @@ Check **before** writing any stubs to disk. The gate is a **2-condition check** 
 
 1. **Every feature stub has a stated goal one-liner.** No blanks, no "TBD", no placeholder text.
 2. **Every feature appears in the parent epic's `Sequencing & Parallelization` analysis** — either in the `Recommended order` enumeration, or in the `Parallelizable` callout, or both.
+3. **Every feature has its breadth content prepared** — a scope boundary (in/out) and the `## Decomposition Context` bullets (dependencies, shared context, boundary rationale) are ready to write from the whole-set research, with no blanks/TBD (use "none" where genuinely empty). This is a presence check on the prepared batch — **still distinct from `\`/validate-artifact\``**, not a Pattern-1 loop.
 
 If either condition fails, surface the gap to the user and return to Step 5. Do not write stubs while the gate is failing.
 
@@ -111,7 +112,9 @@ For each approved feature entry:
   - `**Ticket ID:** T{N}` — the feature's allocated ID; a header line directly under the H1.
   - `**Parent Epic:** T{N} ({epic-slug})` — back-ref to the parent epic (its ID + slug), a header line directly under the H1. Plain markdown; no parser.
   - `## Goal` — the one-liner approved by the user in Step 5.
-  - All other sections (`Open Questions`, `Success Criteria`, `Scope / Non-Scope`, `Target Stories`, `Sequencing & Parallelization`) are **left empty** — `/p3-start-feature {feature-slug}` and `/p4-decompose-feature {feature-slug}` flesh them out later.
+  - `## Scope / Non-Scope` — the feature's breadth **boundary**: what it covers vs. explicitly does not, drawn from the whole-set research (the in/out line, not detailed acceptance criteria). Fill `### In Scope` / `### Out of Scope` with the boundary as understood at decomposition; `/p3-start-feature` refines depth later.
+  - `## Decomposition Context` — the bounded breadth bullets (dependencies on siblings, shared context, boundary rationale) discovered while researching the feature set. Replace the placeholder bullets with real content, or mark "none". **NOT a depth dump** — design / acceptance / implementation detail is `/p3-start-feature`'s job.
+  - All other sections (`Open Questions`, `Success Criteria`, `Target Stories`, `Sequencing & Parallelization`) are **left empty** — `/p3-start-feature {feature-slug}` deepens `Success Criteria` + `Open Questions`; `/p4-decompose-feature {feature-slug}` fills `Target Stories` + `Sequencing & Parallelization` later.
   - No `Validated …` footer — that comes from `/validate-artifact` once `/p3-start-feature` finishes.
 - **Kept partition (re-decomposition only):** **do not touch** the existing `feature.md`. The user may have already done in-progress work inside (open questions, scope decisions, started decomposition). Preserve it untouched — Step 9 only rewrites the parent epic's references, not the feature artifacts themselves. If the user-approved goal one-liner for a Kept feature differs from the current `## Goal` of the existing `feature.md`, surface a notice (`Kept feature {feature-slug}: existing Goal differs from new one-liner — leaving existing feature.md untouched; revise it via /p3-start-feature {feature-slug} if intended.`) and continue without editing.
 
@@ -150,8 +153,8 @@ The left column is the slug as it appeared in the prior `Decomposed …` line; t
 Verify before exiting:
 
 - [ ] N feature-stub folders exist at `features/{ID}-{feature-slug}-{brief}/` with `feature.md` files.
-- [ ] **New stubs** (per Step 3 partition; and every stub on first decomposition) carry `**Parent Epic:** {epic-slug}` and a filled `## Goal`, with every other section empty.
-- [ ] **Kept stubs** (re-decomposition only) are preserved unchanged from before this invocation — any user work inside (Open Questions / Success Criteria / Scope / Target Stories / Sequencing) survives untouched. The "other sections empty" rule does not apply to Kept stubs.
+- [ ] **New stubs** (per Step 3 partition; and every stub on first decomposition) carry `**Parent Epic:** {epic-slug}`, a filled `## Goal`, a `## Scope / Non-Scope` boundary, and a `## Decomposition Context` breadth section, with the depth sections (`## Success Criteria` / `## Open Questions`) empty.
+- [ ] **Kept stubs** (re-decomposition only) are preserved unchanged from before this invocation — any user work inside (Open Questions / Success Criteria / Target Stories / Sequencing) survives untouched. The depth-sections-empty rule does not apply to Kept stubs.
 - [ ] Parent epic's `## Target Features` lists each stub with its one-liner.
 - [ ] Parent epic's `## Sequencing & Parallelization` carries the approved analysis (recommended order + parallelizable callout).
 - [ ] Parent epic has a `Decomposed YYYY-MM-DD — N feature stubs at features/{slug-1}, features/{slug-2}, …` line immediately above the validation footer. **Slug-only format** — the actual folder paths (with their `{brief}` suffixes) are recoverable via `features/{slug}-*/` glob, not embedded in the line. For Kept entries, the cited slug points to the existing preserved folder per Step 4.3 Kept exception.
@@ -174,7 +177,7 @@ Each feature stub is **independently resumable**. The PO can drive `/p3-start-fe
 
 ## Exit criteria
 
-- N feature-stub folders exist at `features/{ID}-{feature-slug}-{brief}/feature.md`. **New** stubs (and every stub on first decomposition) carry `**Parent Epic:** {epic-slug}` + `## Goal` filled with every other section empty. **Kept** stubs (re-decomposition) are preserved unchanged from before this invocation.
+- N feature-stub folders exist at `features/{ID}-{feature-slug}-{brief}/feature.md`. **New** stubs (and every stub on first decomposition) carry `**Parent Epic:** {epic-slug}` + `## Goal` + `## Scope / Non-Scope` + `## Decomposition Context` filled, with the depth sections (`## Success Criteria` / `## Open Questions`) empty. **Kept** stubs (re-decomposition) are preserved unchanged from before this invocation.
 - The parent epic's `Target Features` and `Sequencing & Parallelization` sections carry the approved list and analysis.
 - The parent epic has a slug-only `Decomposed YYYY-MM-DD — N feature stubs at features/{slug-1}, features/{slug-2}, …` line directly above the preserved `Validated …` footer; actual folders are recoverable via `features/{slug}-*/` glob. For Kept entries, the cited slug points to the preserved existing folder.
 - The user has approved the list (gated once) and confirmed any derived-slug overrides.

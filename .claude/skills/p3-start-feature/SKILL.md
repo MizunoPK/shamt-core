@@ -4,7 +4,7 @@ description: >
   Run Phase 3 of the Shamt PO flow at the Feature altitude. Three input modes:
   (A) flesh out an existing feature stub written by /p2-decompose-epic — preserve
   the **Parent Epic:** back-ref + Goal one-liner and drive the open-questions
-  dialog to populate Success Criteria + Scope; (B) create a standalone feature
+  dialog — seeded by the stub's Decomposition Context when present — to populate Success Criteria + deepen Scope; (B) create a standalone feature
   from scratch with **Parent Epic:** left blank; (C) seed from a tracker
   work-item payload when the active profile (read from .shamt-core/shamt-config.json)
   supports the Feature type — ADO does; GitHub does not, falls through to
@@ -35,8 +35,8 @@ Follow the canonical `/p3-start-feature` command body verbatim — see [`command
 
 1. **Read configuration.** `.shamt-core/shamt-config.json` → `work_item_tracker`; honor `--tracker={ado|github|local}` override. Read the corresponding profile in [`reference/trackers/`](../../../../../reference/trackers/). The override only affects Mode C — a no-op in Mode A and Mode B (a one-line notice surfaces if the flag is supplied in those modes).
 2. **Resolve `{id-or-slug}`** — a ticket ID globs `features/{ID}-*/`; a slug tries `features/{slug}/` (exact) then **both** `features/{slug}-*/` and `features/*-{slug}-*/` (glob). Halt on multiple matches. A new feature gets an allocated ticket ID; a Mode A stub preserves its ID. On a one-match resolution, **inspect `feature.md`** to decide Mode A vs. re-entry:
-   - Stub shape (only `**Parent Epic:**` + `## Goal` populated) → Mode A.
-   - Populated beyond stub → re-entry. Confirm refetch / overwrite / extend / exit. **Preserve `**Parent Epic:**` and (when present) `**Parent Feature:**` back-ref headers verbatim** regardless of branch; strip any prior `Validated …` footer when extending.
+   - Stub shape (decomposition-authored fields — `**Parent Epic:**` + `## Goal`, plus `## Scope / Non-Scope` + `## Decomposition Context` on a richer-cataloging stub — filled, but the depth sections `## Success Criteria` / `## Open Questions` empty) → Mode A.
+   - Depth sections drafted (a prior `/p3-start-feature` deep-dive ran) → re-entry. Confirm refetch / overwrite / extend / exit. **Preserve `**Parent Epic:**` and (when present) `**Parent Feature:**` back-ref headers verbatim** regardless of branch; strip any prior `Validated …` footer when extending.
 3. **For new features** (zero matches): ask the user for a 2–4-word brief description; propose and create `features/{ID}-{slug}-{brief}/`. Mode B or Mode C depending on tracker + slug shape.
 4. **Mode disambiguation order** (filesystem-first):
    - **Mode A** — stub exists. Preserve `**Parent Epic:** {epic-slug}` back-ref + `## Goal` one-liner verbatim. Open-questions dialog populates `Success Criteria` + `Scope / Non-Scope`.

@@ -8,7 +8,7 @@ description: >
   concurrent-work callout), checks the decomposition exit gate, then writes
   N story-ticket-stub folders under stories/{ID}-{story-slug}-{brief}/ticket.md
   (each carrying **Parent Feature:** + **Parent Epic:** back-ref headers under
-  H1 plus the scope one-liner in the body intake area; all other template
+  H1 plus the scope one-liner in the body intake area + a Decomposition Context breadth section; all other template
   sections empty) and appends Target Stories + Sequencing & Parallelization
   back onto the parent feature. Per-story deep dialog is deferred to
   /e1-start-story (stub-aware). Invoke when the user wants to decompose a feature,
@@ -72,6 +72,6 @@ Reasoning (Opus) — see [`reference/model_selection.md`](../../../../../referen
 
 ## Exit criteria
 
-N story-stub folders exist: New stubs (and every stub on first decomposition) carry `**Parent Feature:** {feature-slug}` (always) and `**Parent Epic:** {parent-epic-slug}` (when the parent feature has an epic) back-ref headers under H1, plus the scope one-liner in the body, with all other template sections empty; Kept stubs (re-decomposition only) are preserved unchanged from before the invocation, including any in-progress engineer work inside. Every stub's scope one-liner passes the individually-testable rubric. The parent feature's `Target Stories` + `Sequencing & Parallelization` sections carry the approved list and analysis; a slug-only `Decomposed YYYY-MM-DD — N story stubs at stories/{slug-1}, stories/{slug-2}, …` line is present directly above the preserved `Validated …` footer (actual folder paths recovered via `stories/{slug}-*/` glob); orphaned stubs (on re-decomposition) surfaced as a warning, not auto-deleted; the user approved the batch with rubric verdicts surfaced.
+N story-stub folders exist: New stubs (and every stub on first decomposition) carry `**Parent Feature:** {feature-slug}` (always) and `**Parent Epic:** {parent-epic-slug}` (when the parent feature has an epic) back-ref headers under H1, plus the scope one-liner in the body and a `## Decomposition Context` breadth section, with all other template sections empty; Kept stubs (re-decomposition only) are preserved unchanged from before the invocation, including any in-progress engineer work inside. Every stub's scope one-liner passes the individually-testable rubric. The parent feature's `Target Stories` + `Sequencing & Parallelization` sections carry the approved list and analysis; a slug-only `Decomposed YYYY-MM-DD — N story stubs at stories/{slug-1}, stories/{slug-2}, …` line is present directly above the preserved `Validated …` footer (actual folder paths recovered via `stories/{slug}-*/` glob); orphaned stubs (on re-decomposition) surfaced as a warning, not auto-deleted; the user approved the batch with rubric verdicts surfaced.
 
 <!-- Managed by Shamt — do not edit. Regenerate from shamt-core/host/templates/claude/skills/p4-decompose-feature/SKILL.md. -->

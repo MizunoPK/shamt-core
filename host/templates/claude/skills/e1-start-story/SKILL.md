@@ -28,7 +28,7 @@ Follow the canonical `/e1-start-story` command body verbatim — see [`commands/
 
 1. Read `.shamt-core/shamt-config.json`; honor `--tracker={ado|github|local}` override.
 2. Resolve `{id-or-slug}`: a ticket ID globs `stories/{ID}-*/`; a slug tries `stories/{slug}/` (exact) then **both** `stories/{slug}-*/` and `stories/*-{slug}-*/` (glob). Halt on multiple matches.
-3. For new stories: allocate a ticket ID `T{N}` (max across `epics/`, `features/`, `stories/` + 1), ask for a 2–4-word brief description, and create `stories/{ID}-{slug}-{brief}/`; a PO-flow stub already has its ID — preserve it.
+3. For new stories: allocate a ticket ID `T{N}` (max across `epics/`, `features/`, `stories/` + 1), ask for a 2–4-word brief description, and create `stories/{ID}-{slug}-{brief}/`; a PO-flow stub already has its ID — preserve it, and its `## Decomposition Context` (when present) seeds the intake deepening.
 4. Branch on the active tracker:
    - `ado` / `github` — parse slug → ID; check `## Supported work-item types` for `Story` (freeform-fallback notice if not); run `## Primary fetch` and `## Auxiliary fetches`; write `raw/issue.json`, `raw/*.json`; render `ticket.md` from the per-provider template using the profile's `## Field mapping`.
    - `local` — `ticket.md` must already exist; halt otherwise.

@@ -4,7 +4,7 @@ description: Phase 4 of the PO flow — break a validated feature into N story-t
 
 # /p4-decompose-feature
 
-**Purpose:** Run Phase 4 of the PO flow. Read a validated `feature.md`, propose a list of stories (title + one-line scope each), enforce the **individually-testable rubric**, gate the whole list with the user once, derive story slugs, run the decomposition exit gate, then write N story-ticket-stub folders under `stories/` (each carrying `**Parent Feature:**` and `**Parent Epic:**` back-ref headers + scope one-liner) and append `Target Stories` + `Sequencing & Parallelization` back onto the parent feature. Per-story deep dialog is deferred to `/e1-start-story` (stub-aware).
+**Purpose:** Run Phase 4 of the PO flow. Read a validated `feature.md`, propose a list of stories (title + one-line scope each), enforce the **individually-testable rubric**, gate the whole list with the user once, derive story slugs, run the decomposition exit gate, then write N story-ticket-stub folders under `stories/` (each carrying `**Parent Feature:**` and `**Parent Epic:**` back-ref headers + scope one-liner + a `## Decomposition Context` breadth section) and append `Target Stories` + `Sequencing & Parallelization` back onto the parent feature. Per-story deep dialog is deferred to `/e1-start-story` (stub-aware).
 
 **Recommended model:** Reasoning (Opus). Decomposition involves the individually-testable rubric, dependency analysis, parallelization callout, and global-slug discipline — all benefit from Opus's reasoning depth. Same justification as `/p2-decompose-epic`. See [`reference/model_selection.md`](../../../../reference/model_selection.md).
 
@@ -112,6 +112,7 @@ Check **before** writing any stubs to disk. The gate is a **2-condition check** 
 
 1. **Every story stub has an individually-testable scope one-liner** per the rubric in Step 4 sub-step 3. No blanks, no "TBD", no placeholder text, no rubric-failing candidates surviving into the approved list.
 2. **Every story appears in the parent feature's `Sequencing & Parallelization` analysis** — either in the `Recommended order` enumeration, or in the `Parallelizable` callout, or both.
+3. **Every story has its breadth content prepared** — the scope one-liner (its breadth boundary) and the `## Decomposition Context` bullets (dependencies, shared context, boundary rationale) are ready to write from the whole-set research, no blanks/TBD (use "none" where empty). Presence check on the prepared batch — **still distinct from `\`/validate-artifact\``**.
 
 If either condition fails, surface the gap to the user and return to Step 5. Do not write stubs while the gate is failing.
 
@@ -137,6 +138,7 @@ For each approved story entry:
     - `**Parent Feature:** T{N} ({feature-slug})` (the parent feature's ID + slug) — required for every stub written by this command.
     - `**Parent Epic:** T{N} ({parent-epic-slug})` — populated from the parent feature's `**Parent Epic:**` header (read in Step 4 sub-step 1). **Omit the Parent Epic line entirely** when the parent feature is standalone (i.e., the feature's `**Parent Epic:**` header is blank or absent).
   - **Body section** (under the existing template's free-form intake area — the paragraph immediately after the back-ref headers and metadata block, marked by the template as "Paste ticket content here — any format accepted"): write the story's scope one-liner verbatim. The Spec phase extracts structure later.
+  - **`## Decomposition Context` section:** populate the bounded breadth bullets (dependencies on siblings, shared context, boundary rationale) discovered while researching the story set; replace the placeholder bullets or mark "none". **NOT a depth dump** — acceptance / spec detail is the Engineer flow's job. (The scope one-liner written above is this story's breadth boundary — the ticket template has no `## Scope / Non-Scope` section.)
   - Other template sections (Summary, Description, Acceptance Criteria, Related Work, Comments, Update History, All Remaining Fields, Open Questions, etc.) are **left empty / placeholder** as they appear in the template. This matches how a freeform `/e1-start-story` would leave them; `/e1-start-story` (stub-aware) fills them in later.
   - No `Validated …` footer — `/e1-start-story` and the subsequent Engineer-flow phases own validation at the story altitude.
 - **Kept partition (re-decomposition only):** **do not touch** the existing `ticket.md`. The user (or `/e1-start-story`) may have already done in-progress work inside (spec drafting, plan, build artifacts under the same story folder). Preserve it untouched — Step 9 only rewrites the parent feature's references, not the story artifacts themselves. If the user-approved scope one-liner for a Kept story differs meaningfully from the current body of the existing `ticket.md`, surface a notice (`Kept story {story-slug}: existing ticket body differs from new scope one-liner — leaving existing ticket.md untouched; revise it via /e1-start-story {story-slug} if intended.`) and continue without editing.
@@ -176,7 +178,7 @@ The left column is the slug as it appeared in the prior `Decomposed …` line; t
 Verify before exiting:
 
 - [ ] N story-stub folders exist at `stories/{ID}-{story-slug}-{brief}/` with `ticket.md` files.
-- [ ] **New stubs** (per Step 3 partition; and every stub on first decomposition) carry `**Parent Feature:** {feature-slug}` and (when the parent feature has an epic) `**Parent Epic:** {parent-epic-slug}` back-ref headers under H1, plus the scope one-liner in the body. **Parent Epic is omitted** when the parent feature is standalone.
+- [ ] **New stubs** (per Step 3 partition; and every stub on first decomposition) carry `**Parent Feature:** {feature-slug}` and (when the parent feature has an epic) `**Parent Epic:** {parent-epic-slug}` back-ref headers under H1, plus the scope one-liner in the body and a populated `## Decomposition Context` breadth section. **Parent Epic is omitted** when the parent feature is standalone.
 - [ ] **Kept stubs** (re-decomposition only) are preserved unchanged from before this invocation — any user / engineer work inside (Spec / Plan / Build / Review artifacts) survives untouched. The "other sections empty" rule does not apply to Kept stubs.
 - [ ] Every stub's scope one-liner passes the individually-testable rubric (Step 4 sub-step 3) per the gate in Step 6.
 - [ ] Parent feature's `## Target Stories` lists each stub with its one-liner.
@@ -201,7 +203,7 @@ Each story stub is **independently resumable**. The engineer can drive `/e1-star
 
 ## Exit criteria
 
-- N story-stub folders exist at `stories/{ID}-{story-slug}-{brief}/ticket.md`. **New** stubs (and every stub on first decomposition) carry `**Parent Feature:** {feature-slug}` (always) and `**Parent Epic:** {parent-epic-slug}` (when the parent feature has an epic) back-ref headers + scope one-liner in the body with every other template section empty. **Kept** stubs (re-decomposition) are preserved unchanged from before this invocation.
+- N story-stub folders exist at `stories/{ID}-{story-slug}-{brief}/ticket.md`. **New** stubs (and every stub on first decomposition) carry `**Parent Feature:** {feature-slug}` (always) and `**Parent Epic:** {parent-epic-slug}` (when the parent feature has an epic) back-ref headers + scope one-liner in the body + a populated `## Decomposition Context` breadth section, with every other template section empty. **Kept** stubs (re-decomposition) are preserved unchanged from before this invocation.
 - Every stub's scope one-liner passes the individually-testable rubric per Step 4 sub-step 3.
 - The parent feature's `Target Stories` and `Sequencing & Parallelization` sections carry the approved list and analysis.
 - The parent feature has a slug-only `Decomposed YYYY-MM-DD — N story stubs at stories/{slug-1}, stories/{slug-2}, …` line directly above the preserved `Validated …` footer; actual folders are recoverable via `stories/{slug}-*/` glob. For Kept entries, the cited slug points to the preserved existing folder.

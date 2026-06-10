@@ -25,6 +25,14 @@ The sections below populate automatically when `/e1-start-story {slug}` resolves
 - **Preserve encoding artifacts as-is.** Some fetched HTML contains `�` (U+FFFD REPLACEMENT CHARACTER) where the upstream content had smart quotes or em-dashes that did not round-trip cleanly. Keep these characters in the rendered Markdown rather than guessing the intended character. If any field contains `�`, add a one-line note under the affected section: `> Note: this field contains U+FFFD replacement characters where the upstream HTML had encoding artifacts. Preserved as-is; the raw HTML is in raw/issue.json.`
 - **Long custom HTML fields (>2 KB).** For custom HTML fields above 2 KB (for example, long design-notes fields), render the converted Markdown in full inside the "All Remaining Fields" section if the content is part of the spec input. Always link to the raw JSON section for fidelity. Do not silently truncate.
 
+## Decomposition Context
+
+<!-- Cataloged at decomposition (/p2-decompose-epic for features, /p4-decompose-feature for stories) — bounded breadth context discovered by researching the whole sibling set. NOT a depth dump (design/acceptance/implementation detail belongs in the depth sections, filled at start-*). /p3-start-feature and /e1-start-story consume this as a research seed. Leave the placeholder bullets if nothing was cataloged. -->
+
+- **Dependencies on siblings:** [which sibling features/stories this one depends on or blocks — "none" if independent]
+- **Shared context:** [context spanning the set this child needs — shared modules, data, infra, conventions]
+- **Boundary rationale:** [why this child is scoped as drawn rather than merged into a sibling]
+
 ## Summary
 
 - **Title:** {`System.Title`}

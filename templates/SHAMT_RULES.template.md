@@ -16,7 +16,7 @@ Shamt is a quality framework for AI-assisted development under Claude Code. It d
 - **The story** as the handoff artifact between the two roles.
 - **A path system inside the Engineer flow** — every story runs the **Quick path** (default, low-ceremony) unless a risk trigger escalates it to the **Standard path**.
 
-The Engineer flow is the load-bearing surface. The PO flow exists for initiatives large enough to warrant top-down decomposition; standalone stories with no parent epic/feature are first-class and run the Engineer flow directly.
+The Engineer flow is the load-bearing surface. The PO flow exists for initiatives large enough to warrant top-down decomposition; standalone stories with no parent epic/feature are first-class and run the Engineer flow directly. Within the PO flow, **decomposition catalogs breadth-context** — a bounded `## Decomposition Context` section plus each child's breadth boundary (`## Scope / Non-Scope` for a feature, the scope one-liner for a story) — and **start-\* deepens depth** from that seed before its existing terminal gate (`/p3-start-feature` → `/validate-artifact` handoff; `/e1-start-story` → Intake confirmation).
 
 Core files:
 
