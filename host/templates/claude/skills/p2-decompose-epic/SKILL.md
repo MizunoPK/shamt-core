@@ -6,7 +6,7 @@ description: >
   whole list with the user once, produces a parallelization analysis
   (recommended development order + concurrent-work callout), checks the
   decomposition exit gate, then writes N feature-stub folders under
-  features/{feature-slug}-{brief}/feature.md (each carrying Parent Epic
+  features/{ID}-{feature-slug}-{brief}/feature.md (each carrying Parent Epic
   back-ref + Goal one-liner; all other sections empty) and appends Target
   Features + Sequencing & Parallelization back onto the parent epic. Per-
   feature deep dialog is deferred to /p3-start-feature. Invoke when the user
@@ -30,7 +30,7 @@ Mirrors the `/p2-decompose-epic {slug}` slash command. Same canonical body, two 
 
 Follow the canonical `/p2-decompose-epic` command body verbatim — see [`commands/p2-decompose-epic.md`](../../commands/p2-decompose-epic.md). Summary:
 
-1. **Resolve `{slug}`** to `epics/{slug}/` (exact) or `epics/{slug}-*/` (glob). Halt if missing — direct to `/p1-start-epic {slug}`.
+1. **Resolve `{id-or-slug}`** — a ticket ID globs `epics/{ID}-*/`; a slug tries `epics/{slug}/` (exact) then **both** `epics/{slug}-*/` and `epics/*-{slug}-*/` (glob). Halt if missing — direct to `/p1-start-epic {slug}`. Each New feature gets an allocated ticket ID (`T{N}`) + a `**Parent Epic:** T{N} (slug)` back-ref.
 2. **Check the `Validated …` footer** on `epic.md`. Halt with a clear message if absent unless `--allow-unvalidated` was passed (discouraged; one-line notice + continue).
 3. **Re-entry detection.** If a prior `Decomposed YYYY-MM-DD — …` line is present, treat as re-decomposition: warn the user, confirm proceed, then once the new list is approved in step 5, **partition it against the prior list by `{feature-slug}`** into Kept (slug appears in both — existing `feature.md` preserved untouched; collision check exempt), New (slug only in the new list — fresh stub written, collision check applies), and Orphaned (slug only in the prior list — folder left in place, warning surfaced in step 10).
 4. **Read the epic** (`Goal`, `Success Criteria`, `Scope / Non-Scope`, optional `Architecture impact`, optional `All Remaining Fields`) and **propose the feature list** — flat enumeration: title + one-line goal per entry. Derive `{feature-slug}` (kebab-case from title) and `{brief}` (kebab-case from goal one-liner) per entry. Draft the **parallelization analysis**: `Recommended order` (sequenced by dependency) and `Parallelizable` (concurrent-work callout, or `None — strictly sequential.`).

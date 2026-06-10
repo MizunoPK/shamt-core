@@ -4,7 +4,7 @@ description: Phase 1 of the PO flow — resolve a slug, fetch the tracker payloa
 
 # /p1-start-epic
 
-**Purpose:** Run Phase 1 of the PO flow at the **Epic** altitude. Resolve a slug, fetch the work-item payload from the active tracker profile when the profile declares Epic support (or fall through to freeform capture), drive an open-questions iterative dialog over `Goal`, `Success Criteria`, and `Scope / Non-Scope`, and produce `epics/{slug}-{brief}/epic.md`.
+**Purpose:** Run Phase 1 of the PO flow at the **Epic** altitude. Resolve a slug, fetch the work-item payload from the active tracker profile when the profile declares Epic support (or fall through to freeform capture), drive an open-questions iterative dialog over `Goal`, `Success Criteria`, and `Scope / Non-Scope`, and produce `epics/{ID}-{slug}-{brief}/epic.md`.
 
 **Recommended model:** Reasoning (Opus). Epic drafting is a design / multi-dimensional scoping task — defining the outcome, the success criteria, and the in/out scope warrants the deeper reasoning tier. See [`reference/model_selection.md`](../../../../reference/model_selection.md).
 
@@ -40,8 +40,8 @@ description: Phase 1 of the PO flow — resolve a slug, fetch the tracker payloa
 
 Apply the global slug-resolution rule from [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md) (Principle 1):
 
-1. Try `epics/{slug}/epic.md` (exact match).
-2. If not found, glob `epics/{slug}-*/epic.md`.
+1. If `{id-or-slug}` is a ticket ID (`^T[0-9]+$`), glob `epics/{ID}-*/epic.md`; otherwise try `epics/{slug}/epic.md` (exact match).
+2. If still not found (a slug), glob **both** `epics/{slug}-*/epic.md` and `epics/*-{slug}-*/epic.md`.
 3. **Multiple matches** → halt and ask the user which folder to use.
 4. **One match** → that folder is the epic folder. If `epic.md` is already populated and non-empty, treat this as a re-entry and confirm with the user how to proceed. **Available options depend on the active tracker mode** (resolved in Step 1):
    - **Fetching profiles (`ado` / `github` / any future fetching profile):** offer all four — **refetch**, **overwrite**, **extend**, **exit**.
@@ -60,7 +60,7 @@ Apply the global slug-resolution rule from [`SHAMT_RULES.template.md`](../../../
 When the slug does not yet resolve to a folder:
 
 1. Ask the user for a 2–4-word **brief description** of the epic, or derive it from the tracker payload's title once fetched (re-propose after Step 4).
-2. Propose `epics/{slug}-{brief-description-kebab}/` and ask the user to confirm before creating the directory. Lowercase, hyphen-separated.
+2. Allocate a ticket ID `T{N}` (= `max` of the `^T([0-9]+)-` prefixes across `epics/`, `features/`, and `stories/`, + 1 — per **# Ticket IDs**); propose `epics/{ID}-{slug}-{brief-description-kebab}/` and ask the user to confirm before creating the directory; populate the epic's `**Ticket ID:** T{N}` header. Lowercase, hyphen-separated.
 3. On confirmation, create the folder.
 
 ### Step 4 — Fetch (or fall through to freeform)
@@ -92,7 +92,7 @@ Apply the profile's `## Slug resolution` rule. If the slug does not parse to a t
 
 #### C. Freeform capture
 
-When the fetch path is skipped (or fell through), capture the epic manually. Write to `epics/{slug}-{brief}/epic.md` (the folder created in Step 3) from [`templates/epic.template.md`](../../../../templates/epic.template.md). The `## All Remaining Fields` appendix described in sub-step B.5 is **omitted in freeform mode** — there is no fetched payload to preserve.
+When the fetch path is skipped (or fell through), capture the epic manually. Write to `epics/{ID}-{slug}-{brief}/epic.md` (the folder created in Step 3) from [`templates/epic.template.md`](../../../../templates/epic.template.md). The `## All Remaining Fields` appendix described in sub-step B.5 is **omitted in freeform mode** — there is no fetched payload to preserve.
 
 The freeform path is **not** field-by-field paste; it is the open-questions iterative dialog (Step 6) drafting `Goal`, `Success Criteria`, and `Scope / Non-Scope` from scratch.
 
@@ -118,14 +118,14 @@ Apply [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md)
 
 After writing the folder and epic:
 
-1. Glob `epics/{slug}-*/` (and the exact `epics/{slug}/`) and confirm only one folder exists for this slug.
+1. Glob `epics/{ID}-*/` (for a ticket ID) or, for a slug, **both** `epics/{slug}-*/` and `epics/*-{slug}-*/` (and the exact `epics/{slug}/`), and confirm only one folder exists for this ticket.
 2. If multiple folders exist (typically because a different brief was used previously), halt and ask the user to either reuse the existing folder or rename one.
 
 ### Step 8 — Exit gate
 
 Verify before exiting:
 
-- [ ] `epics/{slug}-{brief}/epic.md` exists and is non-empty.
+- [ ] `epics/{ID}-{slug}-{brief}/epic.md` exists and is non-empty.
 - [ ] `## Open Questions` is empty (every question resolved, with answers folded into the artifact).
 - [ ] `Goal`, `Success Criteria`, and `Scope / Non-Scope` are drafted.
 - [ ] `Target Features` and `Sequencing & Parallelization` are **left empty** (owned by `/p2-decompose-epic`).
@@ -140,7 +140,7 @@ Surface — but do **not** auto-invoke — the next command:
 
 ```
 /clear
-/validate-artifact epics/{slug}-{brief}/epic.md
+/validate-artifact epics/{ID}-{slug}-{brief}/epic.md
 ```
 
 After validation appends the footer, `/p2-decompose-epic {slug}` can run. This command stays independently runnable by a fresh agent off on-disk state per Principle 1 — chaining validation here would couple the two phases.
@@ -153,7 +153,7 @@ When the fetch succeeds, raw payload data is preserved inline in `epic.md`'s **A
 
 ## Exit criteria
 
-- `epics/{slug}-{brief}/epic.md` exists, is non-empty, and has `Goal`, `Success Criteria`, `Scope / Non-Scope` drafted.
+- `epics/{ID}-{slug}-{brief}/epic.md` exists, is non-empty, and has `Goal`, `Success Criteria`, `Scope / Non-Scope` drafted.
 - `Target Features` and `Sequencing & Parallelization` remain empty (decomposition output).
 - `## Open Questions` is empty.
 - No validation footer yet — `/validate-artifact` adds it.

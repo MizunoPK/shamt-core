@@ -24,7 +24,7 @@ See [`reference/model_selection.md`](../../../../reference/model_selection.md).
 
 ## Arguments
 
-- `{slug}` (required) — story slug. Resolved via the global story-folder rules (exact `stories/{slug}/`, then `stories/{slug}-*/` glob; halt on multiple or zero matches per the Global Story Invariants in [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md#global-story-invariants)).
+- `{id-or-slug}` (required) — story ticket ID (`T{N}`) or slug. Resolved via the global story-folder rules (ID glob `stories/{ID}-*/`, else the both-positions slug glob; halt on multiple or zero matches per the Global Story Invariants in [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md#global-story-invariants)).
 
 ## Prerequisites
 

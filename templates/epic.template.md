@@ -1,5 +1,7 @@
-<!-- Epic artifact. Lives at epics/{slug}-{brief}/epic.md (flat layout; globally unique slug). -->
+<!-- Epic artifact. Lives at epics/{ID}-{slug}-{brief}/epic.md ({ID}- prefix is the ticket ID; globally unique slug). -->
 # Epic {slug}
+
+**Ticket ID:** {ID}
 
 ## Open Questions
 

@@ -6,7 +6,7 @@ description: >
   enforces the individually-testable rubric, gates the whole list with the user
   once, produces a parallelization analysis (recommended development order +
   concurrent-work callout), checks the decomposition exit gate, then writes
-  N story-ticket-stub folders under stories/{story-slug}-{brief}/ticket.md
+  N story-ticket-stub folders under stories/{ID}-{story-slug}-{brief}/ticket.md
   (each carrying **Parent Feature:** + **Parent Epic:** back-ref headers under
   H1 plus the scope one-liner in the body intake area; all other template
   sections empty) and appends Target Stories + Sequencing & Parallelization
@@ -32,7 +32,7 @@ Mirrors the `/p4-decompose-feature {slug}` slash command. Same canonical body, t
 
 Follow the canonical `/p4-decompose-feature` command body verbatim — see [`commands/p4-decompose-feature.md`](../../commands/p4-decompose-feature.md). Summary:
 
-1. **Resolve `{slug}`** to `features/{slug}/` (exact) or `features/{slug}-*/` (glob). Halt if missing — direct to `/p3-start-feature {slug}`.
+1. **Resolve `{id-or-slug}`** — a ticket ID globs `features/{ID}-*/`; a slug tries `features/{slug}/` (exact) then **both** `features/{slug}-*/` and `features/*-{slug}-*/` (glob). Halt if missing — direct to `/p3-start-feature {slug}`. Each New story gets an allocated ticket ID (`T{N}`) + `**Parent Feature:** T{N} (slug)` (+ `**Parent Epic:** T{N} (slug)` when present) back-refs.
 2. **Check the `Validated …` footer** on `feature.md`. Halt with a clear message if absent unless `--allow-unvalidated` was passed (discouraged; one-line notice + continue).
 3. **Re-entry detection.** If a prior `Decomposed YYYY-MM-DD — …` line is present, treat as re-decomposition: warn the user, confirm proceed, then once the new list is approved in step 5, **partition it against the prior list by `{story-slug}`** into Kept (slug appears in both — existing story folder preserved untouched, including any Spec / Plan / Build / Review artifacts inside; collision check exempt), New (slug only in the new list — fresh stub written, collision check applies), and Orphaned (slug only in the prior list — folder left in place, warning surfaced in step 10).
 4. **Read the feature** (`Goal`, `Success Criteria`, `Scope / Non-Scope`, optional `Architecture impact`, `**Parent Epic:**` back-ref, optional `All Remaining Fields`) and **propose the story list** — flat enumeration: title + one-line scope per entry. **Enforce the individually-testable rubric** and the decomposition exit-criterion resolution:

@@ -25,7 +25,7 @@ See [`reference/model_selection.md`](../../../../reference/model_selection.md).
 
 ## Arguments
 
-- `{slug}` (required) — story slug. Resolved via the global story-folder rules (exact `stories/{slug}/`, then `stories/{slug}-*/` glob; halt on multiple or zero matches).
+- `{id-or-slug}` (required) — story ticket ID (`T{N}`) or slug. Resolved via the global story-folder rules (ID glob `stories/{ID}-*/`, else the both-positions slug glob; halt on multiple or zero matches).
 
 ## No-op gate
 

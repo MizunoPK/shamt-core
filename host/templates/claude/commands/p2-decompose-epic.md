@@ -32,8 +32,8 @@ description: Phase 2 of the PO flow — break a validated epic into N feature st
 
 Apply the global slug-resolution rule from [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md) (Principle 1):
 
-1. Try `epics/{slug}/epic.md` (exact match).
-2. If not found, glob `epics/{slug}-*/epic.md`.
+1. If `{id-or-slug}` is a ticket ID (`^T[0-9]+$`), glob `epics/{ID}-*/epic.md`; otherwise try `epics/{slug}/epic.md` (exact match).
+2. If still not found (a slug), glob **both** `epics/{slug}-*/epic.md` and `epics/*-{slug}-*/epic.md`.
 3. **Multiple matches** → halt; ask the user which folder to use.
 4. **One match** → that folder is the epic folder.
 5. **Zero matches** → halt; direct the user to `/p1-start-epic {slug}`.
@@ -42,7 +42,7 @@ Apply the global slug-resolution rule from [`SHAMT_RULES.template.md`](../../../
 
 1. Read the last non-blank line of `epic.md`.
 2. If it matches `Validated YYYY-MM-DD — …`, proceed to Step 3.
-3. Otherwise, **halt** with: `epic.md is not validated — run /validate-artifact epics/{slug}-{brief}/epic.md first, or re-invoke with --allow-unvalidated to proceed against the draft.`
+3. Otherwise, **halt** with: `epic.md is not validated — run /validate-artifact epics/{ID}-{slug}-{brief}/epic.md first, or re-invoke with --allow-unvalidated to proceed against the draft.`
 4. If `--allow-unvalidated` was passed, surface a one-line notice (`proceeding against an unvalidated epic — re-run /validate-artifact after decomposition`) and continue.
 
 ### Step 3 — Re-entry detection
@@ -66,7 +66,7 @@ On first decomposition (no prior `Decomposed …` line), every approved feature 
 3. For each entry, derive:
    - `{feature-slug}` — kebab-case from the title (e.g., "Billing integration" → `billing-integration`).
    - `{brief}` suffix — kebab-case from the goal one-liner (e.g., goal "wire Stripe webhooks into the ledger service" → `stripe-webhook-ledger`). Keep `{brief}` short — 2–4 words.
-   - **Re-decomposition Kept exception:** if a prior `Decomposed …` line is present (Step 3) and the derived `{feature-slug}` matches one of its entries, **do not** re-derive `{brief}`. Resolve the existing folder via `features/{feature-slug}-*/` glob (slugs are globally unique; the prior line records slugs only, so the actual `{brief}` is read off the existing folder name) and reuse that folder verbatim. Step 5 user iteration may move entries in or out of this set; the final Kept partition is the slug match against the prior list at the moment Step 5 approval lands (per Step 3.4). Downstream: Step 7 exempts Kept slugs from the collision halt; Step 8 preserves the existing `feature.md`; Step 9 cites the slug in the new `Decomposed …` line (the folder is recoverable via the same glob).
+   - **Re-decomposition Kept exception:** if a prior `Decomposed …` line is present (Step 3) and the derived `{feature-slug}` matches one of its entries, **do not** re-derive `{brief}`. Resolve the existing folder via the both-positions slug glob `features/{feature-slug}-*/` ∪ `features/*-{feature-slug}-*/` (the latter finds an ID-prefixed Kept folder) (slugs are globally unique; the prior line records slugs only, so the actual `{brief}` is read off the existing folder name) and reuse that folder verbatim. Step 5 user iteration may move entries in or out of this set; the final Kept partition is the slug match against the prior list at the moment Step 5 approval lands (per Step 3.4). Downstream: Step 7 exempts Kept slugs from the collision halt; Step 8 preserves the existing `feature.md`; Step 9 cites the slug in the new `Decomposed …` line (the folder is recoverable via the same glob).
 4. Draft the **parallelization analysis**:
    - **Recommended order** — sequenced enumeration of features by dependency; for each, a one-line "why this comes first; dependencies" note.
    - **Parallelizable** — which features can be worked concurrently and why, or `None — strictly sequential.`
@@ -99,7 +99,7 @@ If either condition fails, surface the gap to the user and return to Step 5. Do 
 
 Feature slug uniqueness is **global** (flat layout). Before writing:
 
-1. **For features in the New partition** (per Step 3 — and for all features on first decomposition): glob `features/{feature-slug}-*/` and `features/{feature-slug}/`. If **any** candidate slug collides with an existing feature folder, halt with: `feature slug "{slug}" collides with existing feature at features/{existing-folder}/. Choose a different title, or rename the existing feature.` Surface the conflict and let the user adjust the title (return to Step 5).
+1. **For features in the New partition** (per Step 3 — and for all features on first decomposition): glob `features/{feature-slug}-*/`, `features/*-{feature-slug}-*/` (ID-prefixed folders), and `features/{feature-slug}/`. If **any** candidate slug collides with an existing feature folder, halt with: `feature slug "{slug}" collides with existing feature at features/{existing-folder}/. Choose a different title, or rename the existing feature.` Surface the conflict and let the user adjust the title (return to Step 5).
 2. **Exemption — re-decomposition Kept partition.** A Kept slug (per Step 3) is expected to collide with its own prior stub folder under the current epic. That is not a collision in the gate sense — proceed without halting and reuse the existing folder in Step 8. Apply the exemption only when the colliding folder appears in the prior `Decomposed …` line of *this* epic; collisions against features outside that prior list (e.g., a stub created by a different epic that happens to share the slug) are real and still halt.
 3. Repeat until every New candidate is unique (modulo the Kept exemption above).
 
@@ -107,8 +107,9 @@ Feature slug uniqueness is **global** (flat layout). Before writing:
 
 For each approved feature entry:
 
-- **New partition (per Step 3) — and every feature on first decomposition:** create `features/{feature-slug}-{brief}/feature.md` from [`templates/feature.template.md`](../../../../templates/feature.template.md). Populate **only** these fields:
-  - `**Parent Epic:** {epic-slug}` — back-ref header line directly under the H1. Plain markdown; no parser.
+- **New partition (per Step 3) — and every feature on first decomposition:** allocate a ticket ID `T{N}` for the feature (= `max` of the `^T([0-9]+)-` prefixes across `epics/`, `features/`, `stories/`, + 1 — per **# Ticket IDs**) and create `features/{ID}-{feature-slug}-{brief}/feature.md` from [`templates/feature.template.md`](../../../../templates/feature.template.md). Populate **only** these fields:
+  - `**Ticket ID:** T{N}` — the feature's allocated ID; a header line directly under the H1.
+  - `**Parent Epic:** T{N} ({epic-slug})` — back-ref to the parent epic (its ID + slug), a header line directly under the H1. Plain markdown; no parser.
   - `## Goal` — the one-liner approved by the user in Step 5.
   - All other sections (`Open Questions`, `Success Criteria`, `Scope / Non-Scope`, `Target Stories`, `Sequencing & Parallelization`) are **left empty** — `/p3-start-feature {feature-slug}` and `/p4-decompose-feature {feature-slug}` flesh them out later.
   - No `Validated …` footer — that comes from `/validate-artifact` once `/p3-start-feature` finishes.
@@ -148,7 +149,7 @@ The left column is the slug as it appeared in the prior `Decomposed …` line; t
 
 Verify before exiting:
 
-- [ ] N feature-stub folders exist at `features/{feature-slug}-{brief}/` with `feature.md` files.
+- [ ] N feature-stub folders exist at `features/{ID}-{feature-slug}-{brief}/` with `feature.md` files.
 - [ ] **New stubs** (per Step 3 partition; and every stub on first decomposition) carry `**Parent Epic:** {epic-slug}` and a filled `## Goal`, with every other section empty.
 - [ ] **Kept stubs** (re-decomposition only) are preserved unchanged from before this invocation — any user work inside (Open Questions / Success Criteria / Scope / Target Stories / Sequencing) survives untouched. The "other sections empty" rule does not apply to Kept stubs.
 - [ ] Parent epic's `## Target Features` lists each stub with its one-liner.
@@ -173,7 +174,7 @@ Each feature stub is **independently resumable**. The PO can drive `/p3-start-fe
 
 ## Exit criteria
 
-- N feature-stub folders exist at `features/{feature-slug}-{brief}/feature.md`. **New** stubs (and every stub on first decomposition) carry `**Parent Epic:** {epic-slug}` + `## Goal` filled with every other section empty. **Kept** stubs (re-decomposition) are preserved unchanged from before this invocation.
+- N feature-stub folders exist at `features/{ID}-{feature-slug}-{brief}/feature.md`. **New** stubs (and every stub on first decomposition) carry `**Parent Epic:** {epic-slug}` + `## Goal` filled with every other section empty. **Kept** stubs (re-decomposition) are preserved unchanged from before this invocation.
 - The parent epic's `Target Features` and `Sequencing & Parallelization` sections carry the approved list and analysis.
 - The parent epic has a slug-only `Decomposed YYYY-MM-DD — N feature stubs at features/{slug-1}, features/{slug-2}, …` line directly above the preserved `Validated …` footer; actual folders are recoverable via `features/{slug}-*/` glob. For Kept entries, the cited slug points to the preserved existing folder.
 - The user has approved the list (gated once) and confirmed any derived-slug overrides.

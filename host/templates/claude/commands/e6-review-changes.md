@@ -32,7 +32,7 @@ Exactly one of `{slug}`, `--branch=<name>`, or `--pr=<id>` is required. If none 
 
 ## Arguments
 
-- `{slug}` (story mode) — story slug. Resolved via the global story-folder rules (exact `stories/{slug}/`, then `stories/{slug}-*/` glob; halt on multiple or zero matches).
+- `{id-or-slug}` (story mode) — story ticket ID (`T{N}`) or slug. Resolved via the global story-folder rules (ID glob `stories/{ID}-*/`, else the both-positions slug glob; halt on multiple or zero matches).
 - `--branch=<name>` (formal mode) — a local or remote feature branch name. Slashes are sanitized for the output folder (e.g., `feature/123-foo` → `feature-123-foo`).
 - `--pr=<id>` (formal mode) — tracker PR or MR ID. Resolved to a head branch and base branch via the active tracker profile (`reference/trackers/<profile>.md` `## PR fetch` command).
 

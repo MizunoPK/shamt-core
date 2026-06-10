@@ -24,8 +24,8 @@ Core files:
 - `.shamt-core/README.md` — host wiring quick reference (commands, skills, personas).
 - `reference/` — expanded examples, standards, recipes.
 - `templates/` — artifact skeletons.
-- `stories/{slug}-{brief-description}/` — per-story artifacts.
-- `epics/{slug}-{brief}/`, `features/{slug}-{brief}/` — PO-flow artifacts.
+- `stories/{ID}-{slug}-{brief-description}/` — per-story artifacts (the `{ID}-` prefix is added to new tickets — see **# Ticket IDs**).
+- `epics/{ID}-{slug}-{brief}/`, `features/{ID}-{slug}-{brief}/` — PO-flow artifacts.
 - `.shamt-core/proposals/` — framework-update proposals.
 - `.shamt-core/shamt-config.json` — per-project configuration (tracker, testing opt-in, etc.).
 
@@ -40,7 +40,7 @@ These two principles apply to **every** multi-phase flow and every artifact-gene
 Every multi-phase flow follows this pattern:
 
 1. **One slash command per phase.** No single mega-orchestrator. Each phase is invoked explicitly: `/e1-start-story`, `/e2-define-spec`, `/e3-plan-implementation` are separate commands, not steps inside one `/run-story`.
-2. **Every command takes a slug.** `/command {slug}` resolves to a folder via the standard rules (try exact match `{root}/{slug}/`, then glob `{root}/{slug}-*/`, halt if ambiguous, halt if none).
+2. **Every command takes a ticket ID or slug.** `/command {id-or-slug}` resolves to a folder: if the key is a ticket ID (matches `^T[0-9]+$`), glob `{root}/{ID}-*/`. Otherwise treat the key as a slug — try exact `{root}/{slug}/`, then glob **both** `{root}/{slug}-*/` (slug at the folder start — pre-ID folders) **and** `{root}/*-{slug}-*/` (slug after an ID prefix — `{ID}-{slug}-{brief}/` folders), unioning the matches. Halt if ambiguous (more than one folder); halt if none. See **# Ticket IDs**.
 3. **Fresh-agent runnable.** A new agent with no conversation history reads the on-disk artifacts under the resolved folder, determines current state from artifact presence (and from `active_artifacts.md` when re-baselined), and executes the requested phase.
 4. **No state file, no orchestrator memory.** State lives in the filesystem. If the prior phase's artifact exists and passes its exit gate, the next phase can run.
 5. **Skills mirror slash commands.** Each slash command has a corresponding auto-triggered skill (natural-language phrases like "spec this ticket") that runs the same flow. Both surfaces, same canonical body.
@@ -91,7 +91,7 @@ When uncertain, default to Standard.
 
 | Phase | Artifact | Gate |
 |---|---|---|
-| 1. Intake | `stories/{slug}-{brief-description}/ticket.md` | User confirms slug + content |
+| 1. Intake | `stories/{ID}-{slug}-{brief-description}/ticket.md` | User confirms slug + content |
 | 2. Compact Spec | `stories/{slug}/spec.md` (Evidence, Code Shapes, Build Checklist, Verification inline) | Gate 2b: user approves spec/checklist |
 | 3. Build | code changes | Verification checklist in spec |
 | 4. Review | chat/spec summary; `feedback/review_v1.md` only on findings, risk, or user request | Review completed |
@@ -101,7 +101,7 @@ When uncertain, default to Standard.
 
 | Phase | Artifact | Gate |
 |---|---|---|
-| 1. Intake | `stories/{slug}-{brief-description}/ticket.md` | User confirms slug + content |
+| 1. Intake | `stories/{ID}-{slug}-{brief-description}/ticket.md` | User confirms slug + content |
 | 2. Spec | `stories/{slug}/spec.md` + `stories/{slug}/context.md` | Gate 2a design approval; Gate 2b validated-spec approval |
 | 3. Plan | `stories/{slug}/implementation_plan.md` | Gate 3 approved |
 | 4. Build | code changes | Verification checklist in plan |
@@ -130,7 +130,7 @@ Resume any phase with the slug-first command: `/e4-execute-plan {slug}`, `/e7-re
 
 Apply across Spec, Plan, Build, Test (when enabled), Review, and Polish:
 
-- **Story folder resolution.** For `{slug}`, resolve the folder using file-based anchors. Try `stories/{slug}/ticket.md` first; if not found, glob `stories/{slug}-*/ticket.md` and derive the folder from the matched path. Multiple matches → halt and ask. No matches → halt and report.
+- **Story folder resolution.** For `{id-or-slug}`, resolve the folder using file-based anchors. If the key is a ticket ID (`^T[0-9]+$`), glob `stories/{ID}-*/ticket.md`. Otherwise (a slug) try `stories/{slug}/ticket.md`, then glob **both** `stories/{slug}-*/ticket.md` and `stories/*-{slug}-*/ticket.md`, deriving the folder from the matched path. Multiple matches → halt and ask. No matches → halt and report.
 - **Active artifact pointer.** When `stories/{slug}/active_artifacts.md` exists, read it first and use files listed under "Active Files" instead of assuming unversioned names.
 - **TODO gate.** TODO comments are allowed only for team-discussion placeholders or temporary debug logging that must be removed before merge. Polish cannot complete while any TODO remains in the implementation plan or code. If `.shamt-core/project-specific-files/CODING_STANDARDS.md` is stricter, follow it.
 - **Re-baseline rule.** When a post-approval requirement change makes the active spec or plan misleading, stop and create a new baseline instead of patching the old one in place. See the Re-baseline Protocol below.
@@ -361,6 +361,18 @@ Use a re-baseline when a large requirement change arrives after Gate 2b, Gate 3,
 10. Resume at Gate 2b, then Gate 3, then continue the workflow.
 
 Unversioned names remain baseline v1. Do not rename or overwrite them.
+
+---
+
+# Ticket IDs
+
+Every epic, feature, and story is a **ticket** with a short, globally-unique **ticket ID** of the form `T{N}` (`T1`, `T2`, …) used alongside its slug. The ID prefixes the folder — `epics/{ID}-{slug}-{brief}/`, `features/{ID}-{slug}-{brief}/`, `stories/{ID}-{slug}-{brief}/` — mirroring the `proposals/{NN}-{slug}.md` convention.
+
+- **Allocation.** A new ticket's ID is `max(existing T-number across epics/, features/, AND stories/) + 1` — **scanned from disk** (parse a leading `^T([0-9]+)-` run on each folder name across all three roots), **no counter file**, never reused. The sequence is **global** (one space across all ticket types — an epic might be `T1`, its feature `T2`, a story `T3`) and **flat** (an ID does not encode its parent). A project with only slug-only folders allocates `T1` first.
+- **Addressing.** Commands accept either the ID or the slug — see Principle 1.2's resolver (ID glob `{root}/{ID}-*/`; otherwise the both-positions slug glob `{root}/{slug}-*/` ∪ `{root}/*-{slug}-*/`).
+- **New-tickets-only.** Existing slug-only folders are **not** renamed; they keep resolving via the slug glob. IDs accrue as new tickets are created.
+- **Stub IDs are preserved.** `/p2-decompose-epic` and `/p4-decompose-feature` allocate each child's ID at stub time; `/p3-start-feature` (fleshing a feature stub) and `/e1-start-story` (fleshing a story stub) **preserve** that ID — they do not re-allocate.
+- **Parent back-refs** use `T{N} (slug)` — the stable parent ID plus the slug for readability (e.g. `**Parent Epic:** T1 (auth-overhaul)`).
 
 ---
 

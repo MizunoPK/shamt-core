@@ -6,7 +6,7 @@ description: >
   when the profile declares Epic support (ADO does; GitHub does not — falls
   through to freeform), consults .shamt-core/project-specific-files/ARCHITECTURE.md for architectural impact, and
   drives an open-questions iterative dialog over Goal, Success Criteria, and
-  Scope / Non-Scope to produce epics/{slug}-{brief}/epic.md. Leaves Target
+  Scope / Non-Scope to produce epics/{ID}-{slug}-{brief}/epic.md. Leaves Target
   Features and Sequencing & Parallelization empty for /p2-decompose-epic. Invoke
   when the user wants to start, create, or open a new epic; capture an ADO
   Epic; or scope an epic for an upcoming initiative.
@@ -30,8 +30,8 @@ Mirrors the `/p1-start-epic {slug}` slash command. Same canonical body, two host
 Follow the canonical `/p1-start-epic` command body verbatim — see [`commands/p1-start-epic.md`](../../commands/p1-start-epic.md). Summary:
 
 1. **Read configuration.** `.shamt-core/shamt-config.json` → `work_item_tracker`; honor `--tracker={ado|github|local}` override. Read the corresponding profile in [`reference/trackers/`](../../../../../reference/trackers/).
-2. **Resolve `{slug}`** to `epics/{slug}/` (exact) or `epics/{slug}-*/` (glob). Halt on multiple matches. On re-entry to a populated `epic.md`, confirm extend / overwrite / exit; **strip any prior `Validated …` footer if extending**.
-3. **For new epics:** ask the user for a 2–4-word brief description; propose and create `epics/{slug}-{brief}/`.
+2. **Resolve `{id-or-slug}`** — a ticket ID globs `epics/{ID}-*/`; a slug tries `epics/{slug}/` (exact) then **both** `epics/{slug}-*/` and `epics/*-{slug}-*/` (glob). Halt on multiple matches. On re-entry to a populated `epic.md`, confirm extend / overwrite / exit; **strip any prior `Validated …` footer if extending**.
+3. **For new epics:** allocate a ticket ID `T{N}` (max across `epics/`, `features/`, `stories/` + 1), ask for a 2–4-word brief description, and create `epics/{ID}-{slug}-{brief}/` with the `**Ticket ID:** T{N}` header.
 4. **Branch on the active tracker:**
    - **`ado`** — parse slug → ID; check `## Supported work-item types` for `Epic` (freeform-fallback notice if not); run `## Primary fetch`; map `Title / Type / State / Description / Acceptance Criteria` into `epic.md`'s sections per the profile's `## Field mapping`. **No `raw/` subfolder** — preserve fidelity data inline in an `## All Remaining Fields` appendix at the bottom of `epic.md` (above the eventual validation footer).
    - **`github`** — surface `tracker profile github has no Epic work-item type — proceeding freeform` and fall through to freeform capture.
@@ -39,7 +39,7 @@ Follow the canonical `/p1-start-epic` command body verbatim — see [`commands/p
 5. **Consult `.shamt-core/project-specific-files/ARCHITECTURE.md`** (advisory). Flag architectural impact inline in `Scope / Non-Scope` as `**Architecture impact:** {…}` when the epic implies a new service / boundary / data store / external integration. **Do NOT consult `.shamt-core/project-specific-files/CODING_STANDARDS.md`** — coding style is irrelevant at the epic altitude.
 6. **Open-questions iterative dialog** ([Principle 2](../../../../../templates/SHAMT_RULES.template.md#principle-2-open-questions-iterative-dialog)) — surface each question one at a time via `AskUserQuestion`, update the epic with each answer, drain the section before exit. Drafts `Goal`, `Success Criteria`, `Scope / Non-Scope`. **Leaves `Target Features` and `Sequencing & Parallelization` empty** — owned by `/p2-decompose-epic`.
 7. **Detect slug collisions; confirm the intake summary with the user.**
-8. **Suggest** `/clear` + `/validate-artifact epics/{slug}-{brief}/epic.md` as the next command. Do **not** auto-invoke — per [Principle 1](../../../../../templates/SHAMT_RULES.template.md#principle-1-phase-per-command--slug-resumability), every command stays independently runnable.
+8. **Suggest** `/clear` + `/validate-artifact epics/{ID}-{slug}-{brief}/epic.md` as the next command. Do **not** auto-invoke — per [Principle 1](../../../../../templates/SHAMT_RULES.template.md#principle-1-phase-per-command--slug-resumability), every command stays independently runnable.
 
 ## Tracker fallback
 
@@ -51,6 +51,6 @@ Reasoning (Opus) — see [`reference/model_selection.md`](../../../../../referen
 
 ## Exit criteria
 
-Non-empty `epics/{slug}-{brief}/epic.md` exists with `Goal`, `Success Criteria`, `Scope / Non-Scope` drafted; `Target Features` and `Sequencing & Parallelization` empty; `## Open Questions` empty; no validation footer yet; user has confirmed slug + content.
+Non-empty `epics/{ID}-{slug}-{brief}/epic.md` exists with `Goal`, `Success Criteria`, `Scope / Non-Scope` drafted; `Target Features` and `Sequencing & Parallelization` empty; `## Open Questions` empty; no validation footer yet; user has confirmed slug + content.
 
 <!-- Managed by Shamt — do not edit. Regenerate from shamt-core/host/templates/claude/skills/p1-start-epic/SKILL.md. -->

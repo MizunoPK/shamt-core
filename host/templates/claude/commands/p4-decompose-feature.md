@@ -32,8 +32,8 @@ description: Phase 4 of the PO flow — break a validated feature into N story-t
 
 Apply the global slug-resolution rule from [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md) (Principle 1):
 
-1. Try `features/{slug}/feature.md` (exact match).
-2. If not found, glob `features/{slug}-*/feature.md`.
+1. If `{id-or-slug}` is a ticket ID (`^T[0-9]+$`), glob `features/{ID}-*/feature.md`; otherwise try `features/{slug}/feature.md` (exact match).
+2. If still not found (a slug), glob **both** `features/{slug}-*/feature.md` and `features/*-{slug}-*/feature.md`.
 3. **Multiple matches** → halt; ask the user which folder to use.
 4. **One match** → that folder is the feature folder.
 5. **Zero matches** → halt; direct the user to `/p3-start-feature {slug}`.
@@ -42,7 +42,7 @@ Apply the global slug-resolution rule from [`SHAMT_RULES.template.md`](../../../
 
 1. Read the last non-blank line of `feature.md`.
 2. If it matches `Validated YYYY-MM-DD — …`, proceed to Step 3.
-3. Otherwise, **halt** with: `feature.md is not validated — run /validate-artifact features/{slug}-{brief}/feature.md first, or re-invoke with --allow-unvalidated to proceed against the draft.`
+3. Otherwise, **halt** with: `feature.md is not validated — run /validate-artifact features/{ID}-{slug}-{brief}/feature.md first, or re-invoke with --allow-unvalidated to proceed against the draft.`
 4. If `--allow-unvalidated` was passed, surface a one-line notice (`proceeding against an unvalidated feature — re-run /validate-artifact after decomposition`) and continue.
 
 ### Step 3 — Re-entry detection
@@ -84,7 +84,7 @@ On first decomposition (no prior `Decomposed …` line), every approved story is
      - **ado / github** — descriptive kebab-case is allowed at the stub stage (the engineer can rename to the tracker-native form during `/e1-start-story` if a ticket is later filed). The PO flow does not create tracker work items.
      - **local / none** — any descriptive kebab-case slug.
    - `{brief}` suffix — kebab-case from the scope one-liner. Keep `{brief}` short — 2–4 words.
-   - **Re-decomposition Kept exception:** if a prior `Decomposed …` line is present (Step 3) and the derived `{story-slug}` matches one of its entries, **do not** re-derive `{brief}`. Resolve the existing folder via `stories/{story-slug}-*/` glob (slugs are globally unique; the prior line records slugs only, so the actual `{brief}` is read off the existing folder name) and reuse that folder verbatim. Same Kept-exception rule as `/p2-decompose-epic`.
+   - **Re-decomposition Kept exception:** if a prior `Decomposed …` line is present (Step 3) and the derived `{story-slug}` matches one of its entries, **do not** re-derive `{brief}`. Resolve the existing folder via the both-positions slug glob `stories/{story-slug}-*/` ∪ `stories/*-{story-slug}-*/` (the latter finds an ID-prefixed Kept folder) (slugs are globally unique; the prior line records slugs only, so the actual `{brief}` is read off the existing folder name) and reuse that folder verbatim. Same Kept-exception rule as `/p2-decompose-epic`.
 
 5. Draft the **parallelization analysis**:
    - **Recommended order** — sequenced enumeration of stories by dependency; for each, a one-line "why this comes first; dependencies" note. Development-order dependencies between siblings (rubric exception above) live here.
@@ -119,7 +119,7 @@ If either condition fails, surface the gap to the user and return to Step 5. Do 
 
 Story slug uniqueness is **global** (flat layout). Before writing:
 
-1. **For stories in the New partition** (per Step 3 — and for all stories on first decomposition): glob `stories/{story-slug}-*/` and `stories/{story-slug}/`. If **any** candidate slug collides with an existing story folder, halt with: `story slug "{slug}" collides with existing story at stories/{existing-folder}/. Choose a different title, or rename the existing story.` Surface the conflict and let the user adjust the title (return to Step 5).
+1. **For stories in the New partition** (per Step 3 — and for all stories on first decomposition): glob `stories/{story-slug}-*/`, `stories/*-{story-slug}-*/` (ID-prefixed folders), and `stories/{story-slug}/`. If **any** candidate slug collides with an existing story folder, halt with: `story slug "{slug}" collides with existing story at stories/{existing-folder}/. Choose a different title, or rename the existing story.` Surface the conflict and let the user adjust the title (return to Step 5).
 2. **Exemption — re-decomposition Kept partition.** A Kept slug (per Step 3) is expected to collide with its own prior stub folder under the current feature. That is not a collision in the gate sense — proceed without halting and reuse the existing folder in Step 8. Apply the exemption only when the colliding folder appears in the prior `Decomposed …` line of *this* feature; collisions against stories outside that prior list (e.g., a stub created by a different feature that happens to share the slug) are real and still halt.
 3. Repeat until every New candidate is unique (modulo the Kept exemption above).
 
@@ -127,15 +127,15 @@ Story slug uniqueness is **global** (flat layout). Before writing:
 
 For each approved story entry:
 
-- **New partition (per Step 3) — and every story on first decomposition:** create `stories/{story-slug}-{brief}/ticket.md` from the active tracker's per-provider ticket template. **Template selection rule:** read `work_item_tracker` from `.shamt-core/shamt-config.json`:
+- **New partition (per Step 3) — and every story on first decomposition:** allocate a ticket ID `T{N}` for the story (= `max` of the `^T([0-9]+)-` prefixes across `epics/`, `features/`, `stories/`, + 1 — per **# Ticket IDs**) and create `stories/{ID}-{story-slug}-{brief}/ticket.md` from the active tracker's per-provider ticket template. **Template selection rule:** read `work_item_tracker` from `.shamt-core/shamt-config.json`:
   - `ado` → [`templates/ticket.ado.template.md`](../../../../templates/ticket.ado.template.md)
   - `github` → [`templates/ticket.github.template.md`](../../../../templates/ticket.github.template.md)
   - `local` or `none` → [`templates/ticket.github.template.md`](../../../../templates/ticket.github.template.md) as the **generic baseline** (GitHub-flavored sections are closer to the generic structural shape). **Replace the template's `**Tracker profile:** GitHub (see …)` metadata line with `**Tracker profile:** {local|none}` to match the active config** — leaving the static GitHub text would mislead a fresh agent reading the stub. The rest of the template body (Summary, Description, etc.) is generic-enough to carry over unchanged.
 
   Populate **only** these fields:
   - **Back-ref headers** under H1, in order:
-    - `**Parent Feature:** {feature-slug}` — required for every stub written by this command.
-    - `**Parent Epic:** {parent-epic-slug}` — populated from the parent feature's `**Parent Epic:**` header (read in Step 4 sub-step 1). **Omit the Parent Epic line entirely** when the parent feature is standalone (i.e., the feature's `**Parent Epic:**` header is blank or absent).
+    - `**Parent Feature:** T{N} ({feature-slug})` (the parent feature's ID + slug) — required for every stub written by this command.
+    - `**Parent Epic:** T{N} ({parent-epic-slug})` — populated from the parent feature's `**Parent Epic:**` header (read in Step 4 sub-step 1). **Omit the Parent Epic line entirely** when the parent feature is standalone (i.e., the feature's `**Parent Epic:**` header is blank or absent).
   - **Body section** (under the existing template's free-form intake area — the paragraph immediately after the back-ref headers and metadata block, marked by the template as "Paste ticket content here — any format accepted"): write the story's scope one-liner verbatim. The Spec phase extracts structure later.
   - Other template sections (Summary, Description, Acceptance Criteria, Related Work, Comments, Update History, All Remaining Fields, Open Questions, etc.) are **left empty / placeholder** as they appear in the template. This matches how a freeform `/e1-start-story` would leave them; `/e1-start-story` (stub-aware) fills them in later.
   - No `Validated …` footer — `/e1-start-story` and the subsequent Engineer-flow phases own validation at the story altitude.
@@ -175,7 +175,7 @@ The left column is the slug as it appeared in the prior `Decomposed …` line; t
 
 Verify before exiting:
 
-- [ ] N story-stub folders exist at `stories/{story-slug}-{brief}/` with `ticket.md` files.
+- [ ] N story-stub folders exist at `stories/{ID}-{story-slug}-{brief}/` with `ticket.md` files.
 - [ ] **New stubs** (per Step 3 partition; and every stub on first decomposition) carry `**Parent Feature:** {feature-slug}` and (when the parent feature has an epic) `**Parent Epic:** {parent-epic-slug}` back-ref headers under H1, plus the scope one-liner in the body. **Parent Epic is omitted** when the parent feature is standalone.
 - [ ] **Kept stubs** (re-decomposition only) are preserved unchanged from before this invocation — any user / engineer work inside (Spec / Plan / Build / Review artifacts) survives untouched. The "other sections empty" rule does not apply to Kept stubs.
 - [ ] Every stub's scope one-liner passes the individually-testable rubric (Step 4 sub-step 3) per the gate in Step 6.
@@ -201,7 +201,7 @@ Each story stub is **independently resumable**. The engineer can drive `/e1-star
 
 ## Exit criteria
 
-- N story-stub folders exist at `stories/{story-slug}-{brief}/ticket.md`. **New** stubs (and every stub on first decomposition) carry `**Parent Feature:** {feature-slug}` (always) and `**Parent Epic:** {parent-epic-slug}` (when the parent feature has an epic) back-ref headers + scope one-liner in the body with every other template section empty. **Kept** stubs (re-decomposition) are preserved unchanged from before this invocation.
+- N story-stub folders exist at `stories/{ID}-{story-slug}-{brief}/ticket.md`. **New** stubs (and every stub on first decomposition) carry `**Parent Feature:** {feature-slug}` (always) and `**Parent Epic:** {parent-epic-slug}` (when the parent feature has an epic) back-ref headers + scope one-liner in the body with every other template section empty. **Kept** stubs (re-decomposition) are preserved unchanged from before this invocation.
 - Every stub's scope one-liner passes the individually-testable rubric per Step 4 sub-step 3.
 - The parent feature's `Target Stories` and `Sequencing & Parallelization` sections carry the approved list and analysis.
 - The parent feature has a slug-only `Decomposed YYYY-MM-DD — N story stubs at stories/{slug-1}, stories/{slug-2}, …` line directly above the preserved `Validated …` footer; actual folders are recoverable via `stories/{slug}-*/` glob. For Kept entries, the cited slug points to the preserved existing folder.
