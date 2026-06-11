@@ -34,13 +34,13 @@ cd "$PROJECT_DIR" 2>/dev/null || { printf 'Shamt | idle'; exit 0; }
 
 idle() { printf 'Shamt | idle'; exit 0; }
 
-# ---- Numbering scheme (testing enabled = 7 phases, disabled = 6 phases) -----
+# ---- Numbering scheme (testing enabled = 8 phases, disabled = 7 phases) -----
 #
 # Engineer flow expands when `testing: "enabled"`:
-#   enabled : Intake(1) Spec(2) Plan(3) Build(4) Test(5)  Review(6) Polish(7)
-#   disabled: Intake(1) Spec(2) Plan(3) Build(4)          Review(5) Polish(6)
+#   enabled : Intake(1) Spec(2) Plan(3) Build(4) Test(5)  Review(6) Polish(7) Finalize(8)
+#   disabled: Intake(1) Spec(2) Plan(3) Build(4)          Review(5) Polish(6) Finalize(7)
 #
-# Default to the 6-phase scheme so projects without .shamt-core/shamt-config.json (or with
+# Default to the 7-phase scheme so projects without .shamt-core/shamt-config.json (or with
 # testing absent / disabled) get the correct numbering shown by default.
 
 TESTING_ENABLED=0
@@ -73,12 +73,14 @@ resolve_active_dir() {
   if [ -f "$parent/.active" ]; then
     local pinned
     pinned="$(head -n 1 "$parent/.active" 2>/dev/null | tr -d '[:space:]')"
-    if [ -n "$pinned" ] && [ -d "$parent/$pinned" ]; then
+    # `archive` is the finalized-epic store (/p5-finalize-epic), never an active item.
+    if [ -n "$pinned" ] && [ "$pinned" != "archive" ] && [ -d "$parent/$pinned" ]; then
       active="$parent/$pinned"
     fi
   fi
   if [ -z "$active" ]; then
-    active="$(ls -1td "$parent"/*/ 2>/dev/null | head -1 | sed 's:/$::')"
+    # Exclude the archive/ subdir (finalized epics) from most-recently-modified resolution.
+    active="$(ls -1td "$parent"/*/ 2>/dev/null | grep -v '/archive/$' | head -1 | sed 's:/$::')"
   fi
   [ -n "$active" ] && [ -d "$active" ] && printf '%s' "$active"
 }
@@ -121,7 +123,13 @@ if [ -n "$ACTIVE_STORY_DIR" ]; then
   PHASE_NUM=""
   PHASE_NAME=""
 
-  if [ -f "$ACTIVE_STORY_DIR/feedback/addressed_feedback.md" ]; then
+  if [ -f "$ACTIVE_STORY_DIR/ticket.md" ] && grep -qE '\*\*Status:.*Done' "$ACTIVE_STORY_DIR/ticket.md" 2>/dev/null; then
+    # Finalize is terminal: /e8-finalize-story writes **Status: Done** into
+    # ticket.md (profile-independent signal). Checked first — it outranks every
+    # earlier-phase artifact a finalized story still carries on disk.
+    PHASE_NAME=Finalize
+    PHASE_NUM=$([ "$TESTING_ENABLED" -eq 1 ] && echo 8 || echo 7)
+  elif [ -f "$ACTIVE_STORY_DIR/feedback/addressed_feedback.md" ]; then
     PHASE_NAME=Polish
     PHASE_NUM=$([ "$TESTING_ENABLED" -eq 1 ] && echo 7 || echo 6)
   elif compgen -G "$ACTIVE_STORY_DIR/feedback/review_v*.md" >/dev/null 2>&1; then

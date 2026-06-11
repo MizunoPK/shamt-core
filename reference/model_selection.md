@@ -51,6 +51,8 @@ Personas declare their tier in the persona body (e.g., a frontmatter `model:` fi
 | 6. Review (formal-mode git metadata) | Cheap | Fetch branch commits, diff stats, file inventory; mechanical |
 | 7. Polish — code edits | Balanced | Apply reviewer feedback; mechanical fixes |
 | 7. Polish — root cause / upstream proposals | Reasoning | Generalize recurring feedback into framework-update proposals; multi-piece synthesis |
+| 8. Finalize (`/e8-finalize-story`) | Cheap | Mechanical: evaluate three guards, scoped commit, one tracker-close command, status flip — mirrors `/f6-archive-proposal` |
+| PO — Epic finalize (`/p5-finalize-epic`) | Cheap | Mechanical: children-done guard, tracker close, `epic.md` status flip, folder move into `epics/archive/`, commit |
 | Manual-test-plan drafting (`/e5b-write-manual-testing-plan`) | Balanced | Drafting + validation loop per the manual-test-plan rule |
 | Framework update — Phase 0 (`/f0-draft-proposal`) | Cheap | Quick-capture an unrefined DRAFT proposal from a blurb: resolve a slug, seed a bare file, drop the blurb into Scratch Notes; no design judgment, no open-questions dialog |
 | Framework update — Phase 1 (`/f1-propose-update`) | Balanced | Drafting a proposal: structural reading of canonical sources, naming files precisely, applying the open-questions iterative dialog |

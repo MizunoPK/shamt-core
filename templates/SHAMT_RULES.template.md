@@ -12,7 +12,7 @@
 Shamt is a quality framework for AI-assisted development under Claude Code. It defines:
 
 - **5 core patterns** — validation loops, severity classification, spec protocol, code review, implementation planning.
-- **Two role flows** — an **Engineer flow** (six-phase story workflow; seven phases when automated testing is enabled) and a **Product Owner flow** (Epic → Feature → Story decomposition).
+- **Two role flows** — an **Engineer flow** (seven-phase story workflow; eight phases when automated testing is enabled) and a **Product Owner flow** (Epic → Feature → Story decomposition).
 - **The story** as the handoff artifact between the two roles.
 - **A path system inside the Engineer flow** — every story runs the **Quick path** (default, low-ceremony) unless a risk trigger escalates it to the **Standard path**.
 
@@ -96,6 +96,7 @@ When uncertain, default to Standard.
 | 3. Build | code changes | Verification checklist in spec |
 | 4. Review | chat/spec summary; `feedback/review_v1.md` only on findings, risk, or user request | Review completed |
 | 5. Polish | no-op unless feedback exists | TODO scan passes; feedback handled if present |
+| 6. Finalize | scoped commit + work item marked done (`ticket.md` `**Status: Done**`) | `/e8-finalize-story`: prior phases complete, scoped clean-tree commit, explicit confirmation |
 
 ### Standard path map (no automated testing)
 
@@ -107,6 +108,7 @@ When uncertain, default to Standard.
 | 4. Build | code changes | Verification checklist in plan |
 | 5. Review | `stories/{slug}/feedback/review_v1.md` | Review artifact exists after Build |
 | 6. Polish | `feedback/addressed_feedback.md` + commits | User signals complete |
+| 7. Finalize | scoped commit + work item marked done (`ticket.md` `**Status: Done**`) | `/e8-finalize-story`: prior phases complete, scoped clean-tree commit, explicit confirmation |
 
 ### When automated testing is enabled
 
@@ -121,6 +123,13 @@ After Phase 4 (or Phase 5 when testing is enabled), `/e5b-write-manual-testing-p
 - **Standard path:** strong breakpoints after Gate 2b and after Gate 3.
 - **Quick path:** strong breakpoint after Gate 2b.
 - **Advisory** anywhere: before spec validation, after Gate 2b, before plan validation, after Build, after Review.
+
+### Finalize phase (terminal)
+
+Both role flows end with a **Finalize** command modelled on `/f6-archive-proposal`, each behind explicit user confirmation:
+
+- **`/e8-finalize-story {slug}`** — the Engineer flow's terminal phase. Commits the story's work as a scoped unit (clean-tree guard: commit only the story's own files, halt-and-ask on unrelated changes) after confirming prior phases are complete (Review ran + feedback resolved; Test PASSes when testing is enabled), then marks the work item done via the active tracker (ADO sets State, GitHub closes the issue, local flips status) and writes `**Status: Done**` into `ticket.md` — the profile-independent signal the status line reads to render the Finalize phase.
+- **`/p5-finalize-epic {slug}`** — the PO flow's terminal command at the Epic altitude. After confirming every child feature/story is finalized, marks the epic done and **moves the epic folder into `epics/archive/`** (analogous to `proposals/archive/`). On the current flat layout this is **move-epic-only** — the epic's child features/stories stay in their sibling top-level dirs, their `**Parent Epic:**` back-refs still resolving. There is no per-feature finalize command (features close implicitly when their stories are done). `epics/archive/` is excluded from active-epic status-line resolution.
 
 Resume any phase with the slug-first command: `/e4-execute-plan {slug}`, `/e7-resolve-feedback {slug}`, etc.
 

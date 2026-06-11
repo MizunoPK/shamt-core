@@ -77,6 +77,7 @@ No bidirectional guide-editing sync. No `export.sh`. The child's project work (s
 | `/e5-execute-tests {slug}` | 5. Test (testing enabled) | shipped |
 | `/e6-review-changes [{slug}\|--branch=<name>\|--pr=<id>]` | 6. Review | shipped |
 | `/e7-resolve-feedback {slug}` | 7. Polish | shipped |
+| `/e8-finalize-story {slug}` | 8. Finalize | shipped |
 | `/e5b-write-manual-testing-plan {slug}` | Post-Build (optional) | shipped |
 | `/validate-artifact <path>` | any | shipped |
 
@@ -84,7 +85,7 @@ No bidirectional guide-editing sync. No `export.sh`. The child's project work (s
 
 ### Product Owner flow (Part 2)
 
-Four commands at two altitudes — Epic (top) and Feature (one level down). Each `start-*` command defines an artifact; each `decompose-*` command breaks it into stubs at the next altitude. The story is the handoff into the Engineer flow.
+Five commands across two altitudes — Epic (top) and Feature (one level down). Each `start-*` command defines an artifact; each `decompose-*` command breaks it into stubs at the next altitude; `/p5-finalize-epic` is the terminal Epic-altitude command. The story is the handoff into the Engineer flow.
 
 ```text
             Epic                       <-- /p1-start-epic, /p2-decompose-epic
@@ -102,6 +103,7 @@ Four commands at two altitudes — Epic (top) and Feature (one level down). Each
 | `/p2-decompose-epic {slug}` | Epic → feature stubs | shipped |
 | `/p3-start-feature {slug}` | Feature intake/define | shipped |
 | `/p4-decompose-feature {slug}` | Feature → story stubs | shipped |
+| `/p5-finalize-epic {slug}` | Epic finalize → `epics/archive/` | shipped |
 
 Every command above is **slug-first** and **fresh-agent runnable** per Principle 1: pass a slug, the command resolves the folder, reads on-disk state, executes its phase. Each one mirrors `/e1-start-story`'s tracker plumbing: when the active profile (read from `.shamt-core/shamt-config.json`) declares the matching work-item type (e.g., ADO supports Epic + Feature + Story; GitHub supports Issue only), the slug-to-ID parse and payload fetch happen — otherwise the command falls through to freeform mode with a one-line notice (`tracker profile {name} has no {Type} work-item type — proceeding freeform`).
 
@@ -110,8 +112,9 @@ Every command above is **slug-first** and **fresh-agent runnable** per Principle
 ```text
 <child-project>/
 ├── epics/                                # flat, globally unique slugs
-│   └── {epic-slug}-{brief}/
-│       └── epic.md                       # no raw/ subfolder; All Remaining Fields appendix holds fetched fidelity
+│   ├── {epic-slug}-{brief}/
+│   │   └── epic.md                       # no raw/ subfolder; All Remaining Fields appendix holds fetched fidelity
+│   └── archive/{epic-slug}-{brief}/      # finalized epics, moved here by /p5-finalize-epic (excluded from active-epic status-line resolution)
 ├── features/                             # flat, globally unique slugs
 │   └── {feature-slug}-{brief}/
 │       └── feature.md                    # **Parent Epic:** back-ref header under H1 (blank for standalone)
@@ -301,8 +304,9 @@ The `.active` override file works the same way at every altitude: a single line 
 
 Phase detection (story altitude only) cascades from latest-stage artifact. Numbers depend on `.shamt-core/shamt-config.json` `testing`:
 
-| Artifact present | `testing: "enabled"` (7 phases) | `testing: "disabled"` (6 phases) |
+| Artifact present | `testing: "enabled"` (8 phases) | `testing: "disabled"` (7 phases) |
 |---|---|---|
+| `ticket.md` carries `**Status: Done**` | P8 Finalize | P7 Finalize |
 | `feedback/addressed_feedback.md` | P7 Polish | P6 Polish |
 | `feedback/review_v*.md` | P6 Review | P5 Review |
 | `testing_plan.md` | P5 Test | *(ignored — no Test phase)* |

@@ -114,7 +114,7 @@ These are intentional patterns. The expanded audit must recognize them and recor
 - **D8 template fill-in placeholders.** Intentional fill-in tokens inside `templates/*.template.md` and the host template bodies — `{slug}`, `{date}`, `[one-line description]`, `{N}`, and similar — are the templates doing their job, **not** stray markers. D8 flags `TODO` / `TBD` / `FIXME` / unfilled brackets only in non-template canonical prose (or in a template's *instructional* prose, where they would be a real omission).
 - **"finding" vs "issue".** The audit says "finding"; Pattern 1 says "issue". They are interchangeable by design (stated in the command body) — **not** a D7 terminology violation.
 - **`local` tracker profile has no ticket template.** D5 records no finding for the absence of a `ticket.local.template.md` — the `local` ticket is hand-authored or PO-flow-produced.
-- **Phase count varies with the testing flag.** 6 phases when `testing: "disabled"`, 7 when `"enabled"`. D10 treats both as correct — a body must match the count *for the configuration it describes*, not a single fixed number.
+- **Phase count varies with the testing flag.** 7 phases when `testing: "disabled"`, 8 when `"enabled"` (the terminal phase is Finalize, `/e8-finalize-story`). D10 treats both as correct — a body must match the count *for the configuration it describes*, not a single fixed number.
 
 When a genuinely-new intentional pattern emerges that the audit keeps re-flagging, add it here through `/f1-propose-update` rather than weakening a dimension.
 
