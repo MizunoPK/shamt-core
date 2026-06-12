@@ -16,7 +16,7 @@ Shamt is a quality framework for AI-assisted development under Claude Code. It d
 - **The story** as the handoff artifact between the two roles.
 - **A path system inside the Engineer flow** — every story runs the **Quick path** (default, low-ceremony) unless a risk trigger escalates it to the **Standard path**.
 
-The Engineer flow is the load-bearing surface. The PO flow exists for initiatives large enough to warrant top-down decomposition. There are no top-level orphans: every feature nests under an epic and every story under a feature (see §PO-tree resolution). One-off / standalone work (bugs, quick wins, tech stories) lives under the standing **Tech Stories** epic and runs the Engineer flow from there. Within the PO flow, **decomposition catalogs breadth-context** — a bounded `## Decomposition Context` section plus each child's breadth boundary (`## Scope / Non-Scope` for a feature, the scope one-liner for a story) — and **start-\* deepens depth** from that seed before its existing terminal gate (`/p3-start-feature` → `/validate-artifact` handoff; `/e1-start-story` → Intake confirmation).
+The Engineer flow is the load-bearing surface. The PO flow exists for initiatives large enough to warrant top-down decomposition. There are no top-level orphans: every feature nests under an epic and every story under a feature (see §PO-tree resolution). One-off / standalone work (bugs, quick wins, tech stories) lives under the standing **Tech Stories** epic and runs the Engineer flow from there. Within the PO flow, **decomposition catalogs breadth-context** (a bounded `## Decomposition Context` plus each child's breadth boundary — `## Scope / Non-Scope` for a feature, a scope one-liner for a story) and **start-\* deepens depth** from that seed before its terminal gate — see the `/p2`/`/p4` decompose and `/p3`/`/e1` start command bodies for per-altitude detail.
 
 Core files:
 
@@ -126,14 +126,14 @@ After Phase 4 (or Phase 5 when testing is enabled), `/e5b-write-manual-testing-p
 
 ### Finalize phase (terminal)
 
-Both role flows end with a **Finalize** command modelled on `/f6-archive-proposal`, each behind explicit user confirmation:
+Both role flows end with a **Finalize** command modelled on `/f6-archive-proposal`, each behind explicit user confirmation (per-tracker and clean-tree mechanics in the command bodies):
 
-- **`/e8-finalize-story {slug}`** — the Engineer flow's terminal phase. Commits the story's work as a scoped unit (clean-tree guard: commit only the story's own files, halt-and-ask on unrelated changes) after confirming prior phases are complete (Review ran + feedback resolved; Test PASSes when testing is enabled), then marks the work item done via the active tracker (ADO sets State, GitHub closes the issue, local flips status) and writes `**Status: Done**` into `ticket.md` — the profile-independent signal the status line reads to render the Finalize phase.
-- **`/p5-finalize-epic {slug}`** — the PO flow's terminal command at the Epic altitude. After confirming every child feature/story is finalized (found by walking the nested tree inside the epic folder), marks the epic done and **moves the epic folder into `epics/archive/`** (analogous to `proposals/archive/`). Under the nested layout this is a **whole-subtree move** — the epic's features/stories live inside the epic folder, so they ride along in one operation (parentage is the path, nothing dangles). There is no per-feature finalize command (features close implicitly when their stories are done). `epics/archive/` is excluded from active-epic status-line resolution.
+- **`/e8-finalize-story {slug}`** — the Engineer flow's terminal phase: commits the story's work as a scoped unit (clean-tree guard), confirms prior phases complete (Review + feedback resolved; Test PASSes when testing is enabled), marks the work item done via the active tracker, and writes `**Status: Done**` into `ticket.md` — the profile-independent signal the status line reads.
+- **`/p5-finalize-epic {slug}`** — the PO flow's terminal command at the Epic altitude: after confirming every child feature/story is finalized, marks the epic done and **moves the epic folder into `epics/archive/`** as a **whole-subtree move** (features/stories ride along — parentage is the path, nothing dangles). There is no per-feature finalize command (features close implicitly when their stories are done); `epics/archive/` is excluded from active-epic status-line resolution.
 
 ### §PO-tree resolution
 
-The PO hierarchy nests: features under their epic, stories under their feature.
+The PO hierarchy nests — features under their epic, stories under their feature:
 
 ```
 epics/{ID}-{epic-slug}-{brief}/
@@ -150,20 +150,17 @@ Slug-first commands resolve a folder by a **tree-wide glob with a legacy-flat fa
 - **Feature**: `epics/*/features/{ID}-*/` · `epics/*/features/{slug}-*/` · `epics/*/features/*-{slug}-*/`; legacy fallback `features/{slug}-*/`.
 - **Story**: `epics/*/features/*/stories/{ID}-*/` · `…/stories/{slug}-*/` · `…/stories/*-{slug}-*/`; legacy fallback `stories/{slug}-*/`.
 
-New work is **written nested**; pre-existing flat folders stay and resolve via the fallback (no migration). Parentage is encoded by the path — there are **no `**Parent Epic:**` / `**Parent Feature:**` back-ref headers**. Throughout command / skill / template / reference bodies, `epics/{slug}/`, `features/{slug}/`, and `stories/{slug}/` denote **the resolved folder** (located via the globs above; leaf still `…-{brief}/`) — path-relative shorthands, not literal top-level paths.
+New work is **written nested**; pre-existing flat folders stay and resolve via the fallback (no migration). Parentage is encoded by the path — there are **no `**Parent Epic:**` / `**Parent Feature:**` back-ref headers**. Throughout command / skill / template / reference bodies, `epics/{slug}/`, `features/{slug}/`, `stories/{slug}/` denote **the resolved folder** (per the globs above; leaf still `…-{brief}/`), not literal top-level paths.
 
-**Active-item pointers.** The status line resolves the active epic / feature / story from root-level pointer files in the project work tree — `.shamt-state/active-epic`, `.shamt-state/active-feature`, `.shamt-state/active-story` — each holding the active item's full resolved nested path (parentage derived by walking up that path). The `p*` start/decompose commands and `/e1-start-story` write/refresh the matching pointer when they create or advance an item. Pointers live outside `.shamt-core/` so `import-shamt` never clobbers them.
+**Active-item pointers.** The status line resolves the active epic / feature / story from root-level pointer files — `.shamt-state/active-{epic,feature,story}` — each holding the active item's full resolved nested path (parentage derived by walking it up). The `p*` start/decompose commands and `/e1-start-story` write/refresh the matching pointer when they create or advance an item. Pointers live outside `.shamt-core/` so `import-shamt` never clobbers them.
 
 ### Standing Tech Stories epic
 
-One-off work that does not belong to any real initiative — bug fixes and small standalone improvements — lives under a permanent **Tech Stories** epic, the home for the otherwise-orphaned work that strict nesting has no top-level place for.
+The standing **Tech Stories** epic (introduced above) is the home for one-off work — bug fixes and small standalone improvements — that strict nesting has no top-level place for.
 
-- **Standing fixtures, fixed reserved names.** `epics/{tech-stories-folder}/` contains two standing features, **Bugs** and **Quick Wins**. The epic + features use **fixed reserved folder names** (`tech-stories`, `bugs`, `quick-wins`) — *not* the `{ID}-{slug}-{brief}` convention, since they carry no ticket ID. They are seeded once by the install/sync flow (`init-shamt.sh` / `import-shamt.sh`, create-if-absent), not created per-initiative by `/p1-start-epic`. Their reserved slugs are globally unique, so the existing collision checks refuse any reuse.
-- **Local-only containers.** The standing epic + features never map to tracker work items; only the individual tickets filed under them map to tracker issues per the active profile (a bug = a GitHub issue / ADO bug). Tracker-agnostic.
-- **Fast-path entry.** `/p6-draft-tech-story [bugs|quick-wins]` seeds a story-ticket stub directly under the chosen feature and hands to `/e1-start-story` — bypassing the `/p1`→`/p4` decomposition cascade.
-- **Per-feature completion archive.** When a tech-story is finalized (`/e8-finalize-story`), its folder moves into `epics/{tech-stories-folder}/features/{f}/archive/`, keeping the standing features bounded.
-
-Resume any phase with the slug-first command: `/e4-execute-plan {slug}`, `/e7-resolve-feedback {slug}`, etc.
+- **Standing fixtures, fixed reserved names.** `epics/{tech-stories-folder}/` holds two standing features, **Bugs** and **Quick Wins**, under fixed reserved folder names (`tech-stories`, `bugs`, `quick-wins`) — *not* the `{ID}-{slug}-{brief}` convention, since they carry no ticket ID. Seeded once (create-if-absent) by the install/sync flow (`init-shamt.sh` / `import-shamt.sh`), never per-initiative by `/p1-start-epic`; their globally-unique reserved slugs make the existing collision checks refuse any reuse.
+- **Local-only, tracker-agnostic.** The standing epic + features never map to tracker work items — only the tickets filed under them do, per the active profile (a bug = a GitHub issue / ADO bug).
+- **Entry + archive.** `/p6-draft-tech-story [bugs|quick-wins]` seeds a ticket stub under the chosen feature and hands to `/e1-start-story` (bypassing the `/p1`→`/p4` cascade); on finalize, `/e8-finalize-story` moves the folder into the feature's `archive/`. See those command bodies for the mechanics.
 
 ---
 
@@ -199,11 +196,11 @@ Apply across Spec, Plan, Build, Test (when enabled), Review, and Polish:
 
 **Step 2 — Identify issues across dimensions.** First check alignment with `.shamt-core/project-specific-files/ARCHITECTURE.md` and `.shamt-core/project-specific-files/CODING_STANDARDS.md`.
 
-**Specs (8 dimensions):** Completeness; Correctness; Consistency; Helpfulness; Improvements; Missing proposals; Open questions; Standards/architecture alignment. Hard checks: per Pattern 3 (Spec Protocol) — multi-option pros/cons (Step 4), Open-Questions-answered-from-code (Step 5), the review-prevention surface inventory and the end-to-end cross-service data-lineage trace for schema changes (Step 5).
+**Specs (8 dimensions):** Completeness; Correctness; Consistency; Helpfulness; Improvements; Missing proposals; Open questions; Standards/architecture alignment. Hard checks per Pattern 3: multi-option pros/cons, Open-Questions-answered-from-code, review-prevention inventory, and the schema data-lineage trace.
 
-**Implementation Plans (8 dimensions):** Step clarity; Mechanical executability; File coverage; Operation specificity; Verification completeness; Dependency ordering; Requirements alignment; Naming clarity. Hard checks: per Pattern 5 (Implementation Planning) — no optional/if/consider branches, exact locate/replace, concrete CREATE paths, and review-prevention-gate mapping; plus imports listed for a file must be used there.
+**Implementation Plans (8 dimensions):** Step clarity; Mechanical executability; File coverage; Operation specificity; Verification completeness; Dependency ordering; Requirements alignment; Naming clarity. Hard checks per Pattern 5: no optional/if/consider branches, exact locate/replace, concrete CREATE paths, review-prevention-gate mapping; plus imports listed for a file must be used there.
 
-**Code Reviews (6 dimensions):** Correctness; Completeness; Helpfulness; Severity accuracy; Evidence; Standards/architecture alignment. Hard checks: review every changed file/function/branch independently and do not assume parallel files are identical; for removed/weakened security checks and tenant/path/object/document access changes, per `reference/review_categories.md` (boundary analysis + tenant-A→B bypass tracing).
+**Code Reviews (6 dimensions):** Correctness; Completeness; Helpfulness; Severity accuracy; Evidence; Standards/architecture alignment. Hard checks per `reference/review_categories.md`: review every changed file/function/branch independently (do not assume parallel files are identical); boundary analysis + tenant-A→B bypass tracing for removed/weakened checks and tenant/path/object/document access changes.
 
 **General Artifacts (5 dimensions):** Completeness; Clarity; Accuracy; Actionability; Standards/architecture alignment.
 
@@ -243,7 +240,7 @@ Exactly one LOW issue fixed still counts as a clean primary round. Any sub-agent
 
 **Step 1 — Ingest the ticket.** Apply the active-artifact pointer and global story-folder resolution. Read `ticket.md` (or provided content); extract ask, acceptance criteria, links, due dates, constraints; output a 3–5 bullet in-agent summary; do not write to disk yet. Empty/missing content → halt and ask.
 
-**Step 2 — Targeted research.** Scope to ticket references, not broad exploration: grep referenced files/functions/features; read `.shamt-core/project-specific-files/ARCHITECTURE.md` + `CODING_STANDARDS.md`; skim related code. Record findings in `context.md` (Standard) or `spec.md` Evidence (Quick). Required captures: **code shapes** (exact shapes needed for planning); **pre-existing gaps** (when refactoring — bring into scope or defer with reason; if none, say so); **current flow** (ASCII current-state once research suffices, unless narrowly in-process → record the N/A reason); **review-prevention risk inventory** (classify whether the story touches regulated/sensitive data, tenant isolation, auth/authorization, route/API contract, DB reads/writes, migrations, new service, monitoring, frontend rendering/auth flow, tests/test data, or removed/weakened checks — use `reference/pr_review_prevention.md`); **boundary-diagram evidence** (Mermaid is required for boundary-crossing stories — collect real source-backed component/interface names and flow evidence; a diagram cannot be the only place a component appears); **file placement** (record the governing rule under Architecture And Standards Notes when shared-utility placement matters).
+**Step 2 — Targeted research.** Scope to ticket references, not broad exploration: grep referenced files/functions/features; read `.shamt-core/project-specific-files/ARCHITECTURE.md` + `CODING_STANDARDS.md`; skim related code. Record findings in `context.md` (Standard) or `spec.md` Evidence (Quick). Required captures — **code shapes**, **pre-existing gaps**, **current flow**, **review-prevention risk inventory**, **boundary-diagram evidence**, and **file placement** — each enumerated in `reference/spec_protocol_reference.md` (which routes the risk inventory to `reference/pr_review_prevention.md`).
 
 **Step 3 — Draft skeletons.**
 
@@ -256,7 +253,7 @@ Optional Standard-path plan skeleton: after `spec.md`/`context.md`, create `impl
 
 **Step 4 — Architecture/design dialog (Gate 2a).** Present 1–3 design options inline in chat, not in `spec.md` yet: one option is fine when the choice is obvious, 2–3 are required for non-trivial user-facing forks; each needs description, pros, cons, effort (S/M/L), and a recommendation (if an option has no meaningful downside, say so). For open sub-questions, use `reference/question_brainstorm_categories.md` and omit empty categories. Mermaid diagrams are not part of Spec creation — for boundary-crossing stories, record enough approved design-option, workflow, schema, and source-backed component evidence for a later Mermaid generation step; an existing Mermaid block is optional supporting material, do not create or update it during Spec. **Wait for explicit user confirmation before proceeding.**
 
-**Step 5 — Flesh out spec/context.** Record the agreed approach: Standard keeps `spec.md` concise and approval-facing while `context.md` carries detailed rationale, evidence, current flow, standards notes, and code shapes; Quick keeps all of that inline in `spec.md`. Before placing anything in Open Questions, answer it from the codebase — only product/team/external-system decisions remain open, surfaced one at a time (Principle 2). For each applicable high-risk surface, state the approval-facing **prevention requirement**: no regulated or sensitive data in logs / responses / metrics / alarms; tenant identity source and enforcement point; route authorizer/integration expectation; DB writer routing for direct and transitive writes; standard monitoring on new services; tests or verification strategy; replacement/preservation for removed or weakened checks — Standard stores detailed evidence in `context.md`, Quick stores compact evidence inline in `spec.md`; if a prevention surface is itself a risk trigger, escalate to Standard path. For any schema, migration, or table-level change, the spec must explicitly trace the end-to-end cross-service read and write data lineage across service boundaries to ensure data is not written but ignored or dropped at runtime; if a required backchannel API, query route, or configuration endpoint does not exist yet, the spec must either include its creation as in-scope or list it as a Blocker under Open Questions and escalate for Gate 2a/2b pre-approval vetting; new tables list columns, existing-table changes list deltas only, candidate schema options must be reviewable when undecided, and explicitly defer schema changes when out of scope. Standard path does not add a Files Affected inventory to the spec (file-level work belongs in the plan); Quick uses Review Prevention Checklist and Build Checklist for files, prevention gates, and sequential mechanical steps. Resolve all parallel-skeleton `Blocked:` markers after Gate 2a.
+**Step 5 — Flesh out spec/context.** Record the agreed approach into the Step 3 artifacts (Standard: approval-facing `spec.md` + detailed `context.md`; Quick: all inline in `spec.md`). Before placing anything in Open Questions, answer it from the codebase — only product/team/external-system decisions remain open, surfaced one at a time (Principle 2). For each applicable high-risk surface state the approval-facing **prevention requirement**, and if a prevention surface is itself a risk trigger escalate to Standard path. For any schema, migration, or table-level change the spec must trace the end-to-end cross-service read **and** write data lineage across service boundaries (so data is not written but ignored at runtime), including any missing backchannel API / query route / config endpoint as in-scope **or** listing it a Blocker for Gate 2a/2b vetting. The per-surface prevention requirements, the schema/lineage rules (column/delta listing, reviewable candidate options, explicit deferral), and the path-specific spec/context split are enumerated in `reference/spec_protocol_reference.md`. Resolve all parallel-skeleton `Blocked:` markers after Gate 2a.
 
 **Step 6 — Validate.**
 
@@ -277,13 +274,7 @@ Each round ask, "What code should I have read that I haven't?" — and read it.
 
 ### Formal steps
 
-1. Fetch branch metadata read-only. When reviewing the current local feature branch, run `git status --short` first; if uncommitted changes exist, halt and ask whether to include, stash, commit, or ignore them. Gather commits, name-status, diff stats, and full diff against the fetched base. Create a changed-file inventory grouped by type before findings.
-2. Create `code_reviews/<sanitized-branch>/`.
-3. Write `overview.md` with ELI5, What, Why, How sections.
-4. Validate overview with Pattern 1 general dimensions; footer it.
-5. Read full changed files where surrounding context controls the finding — logging, exception handling, function decomposition, auth, tenant isolation, state/token handling, database routing, monitoring. Write review output with Summary, Verdict, Degree of Risk, Changed File Inventory, Blockers, Required Changes, Suggestions, Monitoring Checklist, Security Checklist, Positive Notes, and findings grouped by severity then category. Severities: BLOCKING, CONCERN, SUGGESTION, NITPICK.
-6. Validate review with Pattern 1 review dimensions; footer it.
-7. On re-review, create the next `review_vN.md` without overwriting. In story mode, write inside `stories/{slug}/feedback/`; in formal mode, keep using `code_reviews/<branch>/`. If `active_artifacts.md` exists, add `Baseline reviewed: vN`. v2 does not post formal-mode reviews back to external trackers — the artifact stays local; the user posts manually if desired.
+The formal-mode procedure is executed by the `review-executor` persona (full steps in that agent body + the `/e6-review-changes` command): a read-only fetch with a changed-file inventory (halt-and-ask on uncommitted local changes), a validated `overview.md` (ELI5 / What / Why / How), then `review_vN.md` — deep reading of files whose surrounding context controls the finding (logging, exception handling, auth, tenant isolation, state/token handling, DB routing, monitoring), the required review sections (Summary, Verdict, Degree of Risk, Changed File Inventory, Blockers, Required/Suggested Changes, Monitoring + Security Checklists, Positive Notes), and findings grouped by severity then category at **BLOCKING / CONCERN / SUGGESTION / NITPICK** — each artifact validated with Pattern 1. Re-reviews create the next `review_vN.md` without overwriting (add `Baseline reviewed: vN` when `active_artifacts.md` exists). v2 does not post formal-mode reviews back to external trackers — the artifact stays local; the user posts manually if desired.
 
 Every review must consider all 16 categories even when no finding is recorded; the category list, the mechanical checks, and the finding format all live in `reference/review_categories.md`.
 
@@ -307,7 +298,7 @@ The Standard path requires a validated implementation plan after spec approval a
 - stop planning if implementation is unclear;
 - verification failure is stop-and-escalate, not permission to improvise;
 - plans over one deploy boundary, any phase over 10 steps, or about 1500+ lines require a validated index plus validated phase files;
-- plans touching multiple repos include `Step 0-A`, `Step 0-B`, etc.; each branch-prep step must fetch the configured remote development branch and create `feature/{slug}/<owner-or-team>` from the fetched remote branch; commit `#{slug}: {message}`;
+- plans touching multiple repos include `Step 0-A`, `Step 0-B`, etc. (one per repo); each branch-prep step follows the **Story branch baseline rule** above (fetch the remote development branch, create `feature/{slug}/<owner-or-team>` from it); commit `#{slug}: {message}`;
 - include metadata, pre-execution checklist, files manifest with no optional rows, review-prevention gate mapping, numbered steps, verification, Notes, and `CODING_STANDARDS` compliance mapping.
 
 **Operation contracts:**
@@ -317,17 +308,11 @@ The Standard path requires a validated implementation plan after spec approval a
 - **DELETE:** file/section plus justification.
 - **MOVE:** separate create and delete sub-steps, each verified.
 
-**Hard planning checks** (each maps to a concrete step, a verification, or an explicit N/A before validation; expanded per-check detail in `reference/implementation_plan_reference.md`):
+**Hard planning checks** (each maps to a concrete step, a verification, or an explicit N/A before validation). Six checks have expanded per-check detail in `reference/implementation_plan_reference.md` — **review-prevention coverage**, **DB write routing** (direct **and** transitive writes, writer routing decided before any build step), **new-service/route manifest coverage** (handler, application/route modules, monitoring, packaging, environment, IAM/secrets, log retention, networking, deployment/stage — or N/A), **tenant-A-to-tenant-B bypass verification**, **removed/weakened-check replacement analysis** before the code-edit step, and **migration CREATE coverage** (table creation, row-level-security policy in the same block, information-schema verification). Three checks stay stated here:
 
-- every applicable review-prevention item from spec/context is covered;
-- DB write paths trace direct **and** transitive writes and decide writer routing before any build step;
-- new/changed services or routes have manifest coverage — handler, application module, route module, monitoring template, packaging, environment, IAM/secrets, log retention, networking, deployment/stage — or explicit N/A;
-- tenant/path/object/document changes plan a tenant-A-to-tenant-B bypass verification (or state why it cannot run);
-- removed/weakened checks get a replacement analysis before the code-edit step;
 - new service handlers enumerate the transitive call graph for imported shared utilities, reachable environment-variable keys, and reachable external-resource accesses, adding missing symbol/env/IAM steps before proceeding;
 - byte-for-byte copy files verify every called function has identical signature/behavior in every repo maintaining that file (else place the function repo-specifically and record why);
-- each applicable `.shamt-core/project-specific-files/CODING_STANDARDS.md` rule maps to a step or explicit N/A in `## CODING_STANDARDS Compliance` (saying it was read is insufficient);
-- migration CREATE steps cover table creation, any required row-level-security policy in the same block, and information-schema verification.
+- each applicable `.shamt-core/project-specific-files/CODING_STANDARDS.md` rule maps to a step or explicit N/A in `## CODING_STANDARDS Compliance` (saying it was read is insufficient).
 
 Skeleton-first authoring is recommended for plans with 5+ steps: write all headers, sanity-check structure, then fill locate strings and verification just-in-time.
 
@@ -351,8 +336,6 @@ Shamt treats token cost as a design constraint. Every flow / persona / phase has
 - Generated host skills should route to canonical rules/templates rather than duplicate full protocol text.
 - Read `.shamt-core/project-specific-files/ARCHITECTURE.md` and `.shamt-core/project-specific-files/CODING_STANDARDS.md` once during research, record story-specific standards digest inline, and reuse the digest.
 - The Standard-path mechanical Build is executed by the cheap-tier builder persona; the architect plans, the builder executes.
-- Adversarial review confirmations always use cheap-tier (Haiku), with no one-LOW allowance.
-- Strong context clears: after Gate 2b and after Gate 3.
 
 ## Default tier mapping
 

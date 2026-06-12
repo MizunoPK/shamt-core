@@ -53,7 +53,7 @@ Scope research to what the ticket references — not a broad codebase exploratio
 
 1. Grep the referenced files / functions / features and read the relevant slices.
 2. Read the project rules file (rendered from [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md)) plus `.shamt-core/project-specific-files/ARCHITECTURE.md` and `.shamt-core/project-specific-files/CODING_STANDARDS.md` per Pattern 3 Step 2. Record story-specific standards / architecture notes for reuse.
-3. Capture **research findings** — code shapes, pre-existing gaps, the current end-to-end flow, file-placement rules, review-prevention risk inventory (use [`reference/pr_review_prevention.md`](../../../../reference/pr_review_prevention.md)).
+3. Capture **research findings** — code shapes, pre-existing gaps, the current end-to-end flow, file-placement rules, review-prevention risk inventory (use [`reference/pr_review_prevention.md`](../../../../reference/pr_review_prevention.md)); see [`reference/spec_protocol_reference.md`](../../../../reference/spec_protocol_reference.md) for the full required-captures enumeration.
 4. Record:
    - **Standard path:** detailed findings in `stories/{slug}/context.md` (drafted from [`templates/context.template.md`](../../../../templates/context.template.md)).
    - **Quick path:** compact findings inline in `stories/{slug}/spec.md` under `## Evidence` (drafted from [`templates/spec.template.md`](../../../../templates/spec.template.md)).
