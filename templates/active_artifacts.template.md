@@ -10,6 +10,8 @@
 
 ## Active Files
 
+<!-- Paths are relative to the resolved story folder (located per templates/SHAMT_RULES.template.md §PO-tree resolution; the folder nests under epics/.../features/.../). -->
+
 | Artifact | Path |
 |---|---|
 | Spec | `stories/{slug}/spec_vN.md` |

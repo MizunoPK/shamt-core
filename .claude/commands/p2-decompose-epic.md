@@ -98,9 +98,9 @@ If either condition fails, surface the gap to the user and return to Step 5. Do 
 
 ### Step 7 — Detect global feature-slug collisions
 
-Feature slug uniqueness is **global** (flat layout). Before writing:
+Feature slug uniqueness is **global** (nested layout). Before writing:
 
-1. **For features in the New partition** (per Step 3 — and for all features on first decomposition): glob `features/{feature-slug}-*/`, `features/*-{feature-slug}-*/` (ID-prefixed folders), and `features/{feature-slug}/`. If **any** candidate slug collides with an existing feature folder, halt with: `feature slug "{slug}" collides with existing feature at features/{existing-folder}/. Choose a different title, or rename the existing feature.` Surface the conflict and let the user adjust the title (return to Step 5).
+1. **For features in the New partition** (per Step 3 — and for all features on first decomposition): resolve per §PO-tree resolution (tree-wide feature glob) to detect a global collision. If **any** candidate slug collides with an existing feature folder, halt with: `feature slug "{slug}" collides with existing feature. Choose a different title, or rename the existing feature.` Surface the conflict and let the user adjust the title (return to Step 5).
 2. **Exemption — re-decomposition Kept partition.** A Kept slug (per Step 3) is expected to collide with its own prior stub folder under the current epic. That is not a collision in the gate sense — proceed without halting and reuse the existing folder in Step 8. Apply the exemption only when the colliding folder appears in the prior `Decomposed …` line of *this* epic; collisions against features outside that prior list (e.g., a stub created by a different epic that happens to share the slug) are real and still halt.
 3. Repeat until every New candidate is unique (modulo the Kept exemption above).
 
@@ -108,9 +108,8 @@ Feature slug uniqueness is **global** (flat layout). Before writing:
 
 For each approved feature entry:
 
-- **New partition (per Step 3) — and every feature on first decomposition:** allocate a ticket ID `T{N}` for the feature (= `max` of the `^T([0-9]+)-` prefixes across `epics/`, `features/`, `stories/`, + 1 — per **# Ticket IDs**) and create `features/{ID}-{feature-slug}-{brief}/feature.md` from [`templates/feature.template.md`](../../../../templates/feature.template.md). Populate **only** these fields:
+- **New partition (per Step 3) — and every feature on first decomposition:** allocate a ticket ID `T{N}` for the feature (= `max` of the `^T([0-9]+)-` prefixes across `epics/`, `features/`, `stories/`, + 1 — per **# Ticket IDs**) and create `epics/{epic-folder}/features/{ID}-{feature-slug}-{brief}/feature.md` from [`templates/feature.template.md`](../../../../templates/feature.template.md) (nested under the resolved parent epic folder). Populate **only** these fields:
   - `**Ticket ID:** T{N}` — the feature's allocated ID; a header line directly under the H1.
-  - `**Parent Epic:** T{N} ({epic-slug})` — back-ref to the parent epic (its ID + slug), a header line directly under the H1. Plain markdown; no parser.
   - `## Goal` — the one-liner approved by the user in Step 5.
   - `## Scope / Non-Scope` — the feature's breadth **boundary**: what it covers vs. explicitly does not, drawn from the whole-set research (the in/out line, not detailed acceptance criteria). Fill `### In Scope` / `### Out of Scope` with the boundary as understood at decomposition; `/p3-start-feature` refines depth later.
   - `## Decomposition Context` — the bounded breadth bullets (dependencies on siblings, shared context, boundary rationale) discovered while researching the feature set. Replace the placeholder bullets with real content, or mark "none". **NOT a depth dump** — design / acceptance / implementation detail is `/p3-start-feature`'s job.
@@ -125,7 +124,7 @@ Update `epic.md`:
 1. **Rewrite `## Target Features` wholesale** with the approved list — one bullet per feature: `` `{feature-slug}` — {one-line goal} ``. If this is a re-decomposition (Step 3), replace the prior section's content entirely.
 2. **Rewrite `## Sequencing & Parallelization` wholesale** with the approved analysis (recommended order + parallelizable callout). Same wholesale-replace rule on re-decomposition.
 3. **Add (or replace) a `Decomposed YYYY-MM-DD — N feature stubs at features/{slug-1}, features/{slug-2}, …` line** immediately **above** the `Validated …` footer, so the validation footer remains the last line of the file. Use today's date.
-   - **Slug-only format.** Record the slug portion of each folder (`{feature-slug}`), not the full `{feature-slug}-{brief}` path. Slugs are globally unique, so the actual folder is always recoverable via `features/{slug}-*/` glob — recording only the slug keeps the line parseable on re-decomposition (Step 3 reads slugs directly without having to split a slug-brief concatenation, which is ambiguous because both are kebab-case).
+   - **Slug-only format.** Record the slug portion of each folder (`{feature-slug}`), not the full `{feature-slug}-{brief}` path. Slugs are globally unique, so the actual folder is always recoverable via `features/{slug}-*/` glob (recovered via §PO-tree resolution) — recording only the slug keeps the line parseable on re-decomposition (Step 3 reads slugs directly without having to split a slug-brief concatenation, which is ambiguous because both are kebab-case).
    - On first decomposition: insert the line.
    - On re-decomposition: replace the prior `Decomposed …` line in place. Only the latest decomposition is recorded.
 4. **Preserve the existing validation footer** as-is. The epic was validated before decomposition; decomposition does not re-invalidate it. Do not strip or duplicate the footer.
@@ -153,7 +152,7 @@ The left column is the slug as it appeared in the prior `Decomposed …` line; t
 Verify before exiting:
 
 - [ ] N feature-stub folders exist at `features/{ID}-{feature-slug}-{brief}/` with `feature.md` files.
-- [ ] **New stubs** (per Step 3 partition; and every stub on first decomposition) carry `**Parent Epic:** {epic-slug}`, a filled `## Goal`, a `## Scope / Non-Scope` boundary, and a `## Decomposition Context` breadth section, with the depth sections (`## Success Criteria` / `## Open Questions`) empty.
+- [ ] **New stubs** (per Step 3 partition; and every stub on first decomposition) carry `## Goal`, a `## Scope / Non-Scope` boundary, and a `## Decomposition Context` breadth section (the parent epic is the folder path), with the depth sections (`## Success Criteria` / `## Open Questions`) empty.
 - [ ] **Kept stubs** (re-decomposition only) are preserved unchanged from before this invocation — any user work inside (Open Questions / Success Criteria / Target Stories / Sequencing) survives untouched. The depth-sections-empty rule does not apply to Kept stubs.
 - [ ] Parent epic's `## Target Features` lists each stub with its one-liner.
 - [ ] Parent epic's `## Sequencing & Parallelization` carries the approved analysis (recommended order + parallelizable callout).
@@ -177,7 +176,7 @@ Each feature stub is **independently resumable**. The PO can drive `/p3-start-fe
 
 ## Exit criteria
 
-- N feature-stub folders exist at `features/{ID}-{feature-slug}-{brief}/feature.md`. **New** stubs (and every stub on first decomposition) carry `**Parent Epic:** {epic-slug}` + `## Goal` + `## Scope / Non-Scope` + `## Decomposition Context` filled, with the depth sections (`## Success Criteria` / `## Open Questions`) empty. **Kept** stubs (re-decomposition) are preserved unchanged from before this invocation.
+- N feature-stub folders exist at `epics/{epic-folder}/features/{ID}-{feature-slug}-{brief}/feature.md` (nested). **New** stubs (and every stub on first decomposition) carry `## Goal` + `## Scope / Non-Scope` + `## Decomposition Context` filled (the parent epic is the folder path), with the depth sections (`## Success Criteria` / `## Open Questions`) empty. **Kept** stubs (re-decomposition) are preserved unchanged from before this invocation.
 - The parent epic's `Target Features` and `Sequencing & Parallelization` sections carry the approved list and analysis.
 - The parent epic has a slug-only `Decomposed YYYY-MM-DD — N feature stubs at features/{slug-1}, features/{slug-2}, …` line directly above the preserved `Validated …` footer; actual folders are recoverable via `features/{slug}-*/` glob. For Kept entries, the cited slug points to the preserved existing folder.
 - The user has approved the list (gated once) and confirmed any derived-slug overrides.

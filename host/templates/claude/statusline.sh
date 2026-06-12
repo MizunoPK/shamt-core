@@ -5,23 +5,22 @@
 #   1. Active story:
 #        STORY {slug} | P{N} {phase-name} | feat: {feature-slug} | epic: {epic-slug}
 #      The `| feat: …` / `| epic: …` segments are omitted when the active
-#      story's ticket.md does not carry the corresponding back-ref headers.
+#      the active-story pointer path has no parent feature/epic segment.
 #   2. Active feature (no active story):
 #        FEATURE {feature-slug} | epic: {parent-epic-slug}
 #      The `| epic: …` segment is omitted when the active feature is standalone
-#      (no **Parent Epic:** header in feature.md).
+#      (the active-feature pointer path has no parent epic segment).
 #   3. Active epic (no active story, no active feature):
 #        EPIC {epic-slug}
 #   4. Idle:
 #        Shamt | idle
 #
 # Active resolution for each altitude (story / feature / epic):
-#   a. `{parent-dir}/.active` — explicit override (single line containing the
-#      active folder name; lets the user pin status when mtime is misleading,
-#      e.g. after a sweeping `git restore`).
-#   b. Most recently modified `{parent-dir}/*/` directory — directory mtimes
-#      update when files are added/removed inside, which matches how work
-#      advances through phases in normal use.
+#   Read the root-level pointer file in the project work tree —
+#   .shamt-state/active-{epic,feature,story} — each holding the active item's
+#   full resolved nested path (epics/<e>/features/<f>/stories/<s>/). The p*/e1
+#   commands write these as work advances. Parentage (feat:/epic:) is derived by
+#   walking up the active-story pointer path, not from back-ref headers.
 #
 # Cheap by design: only file reads and globs — no git, no network.
 # Registered in .claude/settings.json under "statusLine".
@@ -66,31 +65,26 @@ fi
 #
 # Prints the resolved path (or nothing) on stdout. Caller checks for empty.
 
+# Read the active {epic|feature|story} from its root-level pointer file
+# (.shamt-state/active-<altitude>), which holds the full resolved nested path.
+# Replaces the old flat {parent}/.active + most-recently-modified scan: under the
+# nested layout there is no flat top-level dir to scan. archive/ never appears in
+# a pointer (finalized epics are not active).
 resolve_active_dir() {
-  local parent="$1"
-  local active=""
-  [ -d "$parent" ] || return 0
-  if [ -f "$parent/.active" ]; then
-    local pinned
-    pinned="$(head -n 1 "$parent/.active" 2>/dev/null | tr -d '[:space:]')"
-    # `archive` is the finalized-epic store (/p5-finalize-epic), never an active item.
-    if [ -n "$pinned" ] && [ "$pinned" != "archive" ] && [ -d "$parent/$pinned" ]; then
-      active="$parent/$pinned"
-    fi
-  fi
-  if [ -z "$active" ]; then
-    # Exclude the archive/ subdir (finalized epics) from most-recently-modified resolution.
-    active="$(ls -1td "$parent"/*/ 2>/dev/null | grep -v '/archive/$' | head -1 | sed 's:/$::')"
-  fi
-  [ -n "$active" ] && [ -d "$active" ] && printf '%s' "$active"
+  local altitude="$1"            # epic | feature | story
+  local ptr=".shamt-state/active-${altitude}"
+  [ -f "$ptr" ] || return 0
+  local dir
+  dir="$(head -n 1 "$ptr" 2>/dev/null | tr -d '[:space:]')"
+  [ -n "$dir" ] && [ -d "$dir" ] && printf '%s' "$dir"
 }
 
 # ---- Pick the active story --------------------------------------------------
 
-ACTIVE_STORY_DIR="$(resolve_active_dir stories)"
+ACTIVE_STORY_DIR="$(resolve_active_dir story)"
 SLUG=""
 if [ -n "$ACTIVE_STORY_DIR" ]; then
-  SLUG="${ACTIVE_STORY_DIR#stories/}"
+  SLUG="$(basename "$ACTIVE_STORY_DIR")"
 fi
 
 # ---- Story rendering --------------------------------------------------------
@@ -149,15 +143,16 @@ if [ -n "$ACTIVE_STORY_DIR" ]; then
   fi
 
   if [ -n "$PHASE_NAME" ]; then
-    # Parent feature / epic from ticket.md (PO-flow back-refs).
+    # Parent feature / epic derived from the active-story pointer's nested path:
+    #   epics/<epic>/features/<feature>/stories/<story>/  → walk up two levels.
     FEATURE_SLUG=""
     EPIC_SLUG=""
-    if [ -f "$ACTIVE_STORY_DIR/ticket.md" ]; then
-      FEATURE_SLUG="$(grep -m1 -oE '\*\*Parent Feature:\*\*[[:space:]]+[A-Za-z0-9._-]+' "$ACTIVE_STORY_DIR/ticket.md" 2>/dev/null \
-        | sed -E 's/^\*\*Parent Feature:\*\*[[:space:]]+//' || true)"
-      EPIC_SLUG="$(grep -m1 -oE '\*\*Parent Epic:\*\*[[:space:]]+[A-Za-z0-9._-]+' "$ACTIVE_STORY_DIR/ticket.md" 2>/dev/null \
-        | sed -E 's/^\*\*Parent Epic:\*\*[[:space:]]+//' || true)"
-    fi
+    case "$ACTIVE_STORY_DIR" in
+      */features/*/stories/*)
+        FEATURE_SLUG="$(basename "$(dirname "$(dirname "$ACTIVE_STORY_DIR")")")"
+        EPIC_SLUG="$(basename "$(dirname "$(dirname "$(dirname "$(dirname "$ACTIVE_STORY_DIR")")")")")"
+        ;;
+    esac
 
     OUTPUT="STORY ${SLUG} | P${PHASE_NUM} ${PHASE_NAME}"
     [ -n "$FEATURE_SLUG" ] && OUTPUT="${OUTPUT} | feat: ${FEATURE_SLUG}"
@@ -169,25 +164,22 @@ fi
 
 # ---- PO-flow fallback: feature, then epic, then idle ------------------------
 
-ACTIVE_FEATURE_DIR="$(resolve_active_dir features)"
+ACTIVE_FEATURE_DIR="$(resolve_active_dir feature)"
 if [ -n "$ACTIVE_FEATURE_DIR" ]; then
-  FEATURE_SLUG="${ACTIVE_FEATURE_DIR#features/}"
+  FEATURE_SLUG="$(basename "$ACTIVE_FEATURE_DIR")"
   PARENT_EPIC_SLUG=""
-  if [ -f "$ACTIVE_FEATURE_DIR/feature.md" ]; then
-    # Same grep+sed pattern as the story-side back-ref reader above, kept
-    # in sync deliberately.
-    PARENT_EPIC_SLUG="$(grep -m1 -oE '\*\*Parent Epic:\*\*[[:space:]]+[A-Za-z0-9._-]+' "$ACTIVE_FEATURE_DIR/feature.md" 2>/dev/null \
-      | sed -E 's/^\*\*Parent Epic:\*\*[[:space:]]+//' || true)"
-  fi
+  case "$ACTIVE_FEATURE_DIR" in
+    epics/*/features/*) PARENT_EPIC_SLUG="$(basename "$(dirname "$(dirname "$ACTIVE_FEATURE_DIR")")")" ;;
+  esac
   OUTPUT="FEATURE ${FEATURE_SLUG}"
   [ -n "$PARENT_EPIC_SLUG" ] && OUTPUT="${OUTPUT} | epic: ${PARENT_EPIC_SLUG}"
   printf '%s' "$OUTPUT"
   exit 0
 fi
 
-ACTIVE_EPIC_DIR="$(resolve_active_dir epics)"
+ACTIVE_EPIC_DIR="$(resolve_active_dir epic)"
 if [ -n "$ACTIVE_EPIC_DIR" ]; then
-  EPIC_SLUG="${ACTIVE_EPIC_DIR#epics/}"
+  EPIC_SLUG="$(basename "$ACTIVE_EPIC_DIR")"
   printf 'EPIC %s' "$EPIC_SLUG"
   exit 0
 fi

@@ -20,17 +20,17 @@ The slug passed to `/e1-start-story {slug}` resolves to a story folder via glob,
 
 | Slug form | Resolves to |
 |-----------|-------------|
-| `{slug}` | `stories/{slug}-*/` (the existing folder). If zero or multiple folders match, the command halts with a clear error. |
+| `{slug}` | the story folder resolved per §PO-tree resolution (tree-wide glob + legacy-flat fallback). If zero or multiple folders match, the command halts with a clear error. |
 
 The numeric-prefix convention used by `ado` and `github` profiles is **optional** in `local` mode — any slug is legal as long as exactly one matching story folder exists. The folder must already contain a `ticket.md` file; `/e1-start-story` does not create one in this mode (it treats the local file as the source of truth).
 
-For the PO-flow commands (`/p1-start-epic` / `/p3-start-feature`), folder layout follows the flat folder layout: `epics/{slug}-*/epic.md`, `features/{slug}-*/feature.md` (flat layout, globally unique slugs; the folder name is `{slug}-{brief}` and is matched by glob the same way stories are). Same rule: the file must already exist or be created by the PO-flow command itself.
+For the PO-flow commands (`/p1-start-epic` / `/p3-start-feature`), folders resolve per `templates/SHAMT_RULES.template.md` §PO-tree resolution: epics are top-level (`epics/{slug}-*/epic.md`), features nest under their epic (`epics/*/features/{slug}-*/feature.md`), with the legacy-flat fallback. Globally unique slugs; the folder name is `{slug}-{brief}`. Same rule as stories: the file must already exist or be created by the PO-flow command itself.
 
 ---
 
 ## Primary fetch
 
-None — the file is the source of truth. `/e1-start-story {slug}` reads `stories/{slug}-*/ticket.md` directly and proceeds to the open-questions iterative dialog for any unresolved sections.
+None — the file is the source of truth. `/e1-start-story {slug}` reads `stories/{slug}-*/ticket.md` (resolved per §PO-tree resolution) directly and proceeds to the open-questions iterative dialog for any unresolved sections.
 
 If the file is missing, the command halts with an error directing the user to create it (typically by running an upstream PO-flow command, or by writing it by hand from [`templates/ticket.ado.template.md`](../../templates/ticket.ado.template.md) or [`templates/ticket.github.template.md`](../../templates/ticket.github.template.md) — either template works as a freeform skeleton; the `local` profile does not enforce a specific one).
 
@@ -68,7 +68,7 @@ None. Not applicable.
 
 ## Supported work-item types
 
-- **Any** — `local` mode imposes no constraint on work-item type. `/e1-start-story`, `/p3-start-feature`, and `/p1-start-epic` all work, each reading the corresponding local file (`stories/{slug}-*/ticket.md`, `features/{slug}-*/feature.md`, `epics/{slug}-*/epic.md`).
+- **Any** — `local` mode imposes no constraint on work-item type. `/e1-start-story`, `/p3-start-feature`, and `/p1-start-epic` all work, each reading the corresponding local file (`stories/{slug}-*/ticket.md`, `epics/*/features/{slug}-*/feature.md`, `epics/{slug}-*/epic.md`) (resolved per §PO-tree resolution).
 
 Because the `Any` value covers every possible request, the freeform-fallback rule never fires for this profile — every command takes the file-read path.
 

@@ -24,7 +24,7 @@ Mirrors the `/e2-define-spec {slug}` slash command. Same canonical body, two hos
 
 ## Protocol
 
-Follow the canonical `/e2-define-spec` command body verbatim — see [`commands/e2-define-spec.md`](../../commands/e2-define-spec.md). Summary:
+Follow the canonical `/e2-define-spec` command body verbatim — see [`commands/e2-define-spec.md`](../../commands/e2-define-spec.md). Resolve the story folder per `templates/SHAMT_RULES.template.md` §PO-tree resolution (tree-wide glob + legacy-flat fallback); `stories/{slug}/` below denotes that resolved folder. Summary:
 
 1. **Ingest the ticket** (`stories/{slug}/ticket.md`). Halt if missing or empty.
 2. **Targeted research** — grep referenced files; read `.shamt-core/project-specific-files/ARCHITECTURE.md` and `.shamt-core/project-specific-files/CODING_STANDARDS.md`; capture findings (Standard: `context.md`; Quick: `spec.md` Evidence). Populate the review-prevention risk inventory using [`reference/pr_review_prevention.md`](../../../../../reference/pr_review_prevention.md).

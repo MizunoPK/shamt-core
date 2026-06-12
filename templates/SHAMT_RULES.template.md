@@ -16,7 +16,7 @@ Shamt is a quality framework for AI-assisted development under Claude Code. It d
 - **The story** as the handoff artifact between the two roles.
 - **A path system inside the Engineer flow** — every story runs the **Quick path** (default, low-ceremony) unless a risk trigger escalates it to the **Standard path**.
 
-The Engineer flow is the load-bearing surface. The PO flow exists for initiatives large enough to warrant top-down decomposition; standalone stories with no parent epic/feature are first-class and run the Engineer flow directly. Within the PO flow, **decomposition catalogs breadth-context** — a bounded `## Decomposition Context` section plus each child's breadth boundary (`## Scope / Non-Scope` for a feature, the scope one-liner for a story) — and **start-\* deepens depth** from that seed before its existing terminal gate (`/p3-start-feature` → `/validate-artifact` handoff; `/e1-start-story` → Intake confirmation).
+The Engineer flow is the load-bearing surface. The PO flow exists for initiatives large enough to warrant top-down decomposition. There are no top-level orphans: every feature nests under an epic and every story under a feature (see §PO-tree resolution). One-off / standalone work (bugs, quick wins, tech stories) lives under the standing **Tech Stories** epic and runs the Engineer flow from there. Within the PO flow, **decomposition catalogs breadth-context** — a bounded `## Decomposition Context` section plus each child's breadth boundary (`## Scope / Non-Scope` for a feature, the scope one-liner for a story) — and **start-\* deepens depth** from that seed before its existing terminal gate (`/p3-start-feature` → `/validate-artifact` handoff; `/e1-start-story` → Intake confirmation).
 
 Core files:
 
@@ -129,7 +129,30 @@ After Phase 4 (or Phase 5 when testing is enabled), `/e5b-write-manual-testing-p
 Both role flows end with a **Finalize** command modelled on `/f6-archive-proposal`, each behind explicit user confirmation:
 
 - **`/e8-finalize-story {slug}`** — the Engineer flow's terminal phase. Commits the story's work as a scoped unit (clean-tree guard: commit only the story's own files, halt-and-ask on unrelated changes) after confirming prior phases are complete (Review ran + feedback resolved; Test PASSes when testing is enabled), then marks the work item done via the active tracker (ADO sets State, GitHub closes the issue, local flips status) and writes `**Status: Done**` into `ticket.md` — the profile-independent signal the status line reads to render the Finalize phase.
-- **`/p5-finalize-epic {slug}`** — the PO flow's terminal command at the Epic altitude. After confirming every child feature/story is finalized, marks the epic done and **moves the epic folder into `epics/archive/`** (analogous to `proposals/archive/`). On the current flat layout this is **move-epic-only** — the epic's child features/stories stay in their sibling top-level dirs, their `**Parent Epic:**` back-refs still resolving. There is no per-feature finalize command (features close implicitly when their stories are done). `epics/archive/` is excluded from active-epic status-line resolution.
+- **`/p5-finalize-epic {slug}`** — the PO flow's terminal command at the Epic altitude. After confirming every child feature/story is finalized (found by walking the nested tree inside the epic folder), marks the epic done and **moves the epic folder into `epics/archive/`** (analogous to `proposals/archive/`). Under the nested layout this is a **whole-subtree move** — the epic's features/stories live inside the epic folder, so they ride along in one operation (parentage is the path, nothing dangles). There is no per-feature finalize command (features close implicitly when their stories are done). `epics/archive/` is excluded from active-epic status-line resolution.
+
+### §PO-tree resolution
+
+The PO hierarchy nests: features under their epic, stories under their feature.
+
+```
+epics/{ID}-{epic-slug}-{brief}/
+  epic.md
+  features/{ID}-{feature-slug}-{brief}/
+    feature.md
+    stories/{ID}-{story-slug}-{brief}/
+      ticket.md, spec.md, implementation_plan.md, feedback/, raw/, ...
+```
+
+Slug-first commands resolve a folder by a **tree-wide glob with a legacy-flat fallback** (slugs are globally unique, so the `{slug}-*` tail is unambiguous; exactly one match — halt on zero or multiple):
+
+- **Epic** (top-level): `epics/{ID}-*/` · `epics/{slug}-*/` · `epics/*-{slug}-*/`.
+- **Feature**: `epics/*/features/{ID}-*/` · `epics/*/features/{slug}-*/` · `epics/*/features/*-{slug}-*/`; legacy fallback `features/{slug}-*/`.
+- **Story**: `epics/*/features/*/stories/{ID}-*/` · `…/stories/{slug}-*/` · `…/stories/*-{slug}-*/`; legacy fallback `stories/{slug}-*/`.
+
+New work is **written nested**; pre-existing flat folders stay and resolve via the fallback (no migration). Parentage is encoded by the path — there are **no `**Parent Epic:**` / `**Parent Feature:**` back-ref headers**. Throughout command / skill / template / reference bodies, `epics/{slug}/`, `features/{slug}/`, and `stories/{slug}/` denote **the resolved folder** (located via the globs above; leaf still `…-{brief}/`) — path-relative shorthands, not literal top-level paths.
+
+**Active-item pointers.** The status line resolves the active epic / feature / story from root-level pointer files in the project work tree — `.shamt-state/active-epic`, `.shamt-state/active-feature`, `.shamt-state/active-story` — each holding the active item's full resolved nested path (parentage derived by walking up that path). The `p*` start/decompose commands and `/e1-start-story` write/refresh the matching pointer when they create or advance an item. Pointers live outside `.shamt-core/` so `import-shamt` never clobbers them.
 
 Resume any phase with the slug-first command: `/e4-execute-plan {slug}`, `/e7-resolve-feedback {slug}`, etc.
 
@@ -377,11 +400,10 @@ Unversioned names remain baseline v1. Do not rename or overwrite them.
 
 Every epic, feature, and story is a **ticket** with a short, globally-unique **ticket ID** of the form `T{N}` (`T1`, `T2`, …) used alongside its slug. The ID prefixes the folder — `epics/{ID}-{slug}-{brief}/`, `features/{ID}-{slug}-{brief}/`, `stories/{ID}-{slug}-{brief}/` — mirroring the `proposals/{NN}-{slug}.md` convention.
 
-- **Allocation.** A new ticket's ID is `max(existing T-number across epics/, features/, AND stories/) + 1` — **scanned from disk** (parse a leading `^T([0-9]+)-` run on each folder name across all three roots), **no counter file**, never reused. The sequence is **global** (one space across all ticket types — an epic might be `T1`, its feature `T2`, a story `T3`) and **flat** (an ID does not encode its parent). A project with only slug-only folders allocates `T1` first.
-- **Addressing.** Commands accept either the ID or the slug — see Principle 1.2's resolver (ID glob `{root}/{ID}-*/`; otherwise the both-positions slug glob `{root}/{slug}-*/` ∪ `{root}/*-{slug}-*/`).
+- **Allocation.** A new ticket's ID is `max(existing T-number across the whole epic/feature/story tree) + 1` — **scanned from disk** (parse a leading `^T([0-9]+)-` run on each epic/feature/story folder name, walking the nested tree under `epics/` plus any legacy flat folders), **no counter file**, never reused. The sequence is **global** (one space across all ticket types — an epic might be `T1`, its feature `T2`, a story `T3`) and **flat** (an ID does not encode its parent). A project with only slug-only folders allocates `T1` first.
+- **Addressing.** Commands accept either the ID or the slug, resolved per §PO-tree resolution (tree-wide glob matching the ID or slug at the appropriate altitude anywhere in the nested tree, with the legacy-flat fallback).
 - **New-tickets-only.** Existing slug-only folders are **not** renamed; they keep resolving via the slug glob. IDs accrue as new tickets are created.
 - **Stub IDs are preserved.** `/p2-decompose-epic` and `/p4-decompose-feature` allocate each child's ID at stub time; `/p3-start-feature` (fleshing a feature stub) and `/e1-start-story` (fleshing a story stub) **preserve** that ID — they do not re-allocate.
-- **Parent back-refs** use `T{N} (slug)` — the stable parent ID plus the slug for readability (e.g. `**Parent Epic:** T1 (auth-overhaul)`).
 
 ---
 

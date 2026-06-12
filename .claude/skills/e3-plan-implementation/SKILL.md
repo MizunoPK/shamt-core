@@ -29,6 +29,9 @@ Follow the canonical `/e3-plan-implementation` command body verbatim — see [`c
 
 1. **Path check** — if the active spec declares `Path: Quick path`, report skip-with-rationale and exit (unless the user explicitly requests Gate 3 planning).
 2. **Read spec/context and confirm decisions** — apply active-artifact pointer; re-read spec/context completely; research repo conventions for file placement, sibling shapes, naming, deployment.
+
+Resolve the story folder per `templates/SHAMT_RULES.template.md` §PO-tree resolution (tree-wide glob + legacy-flat fallback); `stories/{slug}/` below denotes that resolved folder.
+
 3. **Create the mechanical plan** at `stories/{slug}/implementation_plan.md` from [`templates/implementation_plan.template.md`](../../../../../templates/implementation_plan.template.md). Skeleton-first authoring for 5+ steps. Apply the **open-questions iterative dialog** principle. Honor the plan contract — no optional branches, exact locate strings, concrete CREATE content, multi-repo `Step 0-A` / `0-B` branch-prep, Review Prevention Gate Mapping, CODING_STANDARDS compliance mapping.
 4. **Validate** via `/validate-artifact stories/{slug}/implementation_plan.md` — 8 plan dimensions, primary clean + 1 sub-agent confirmation. Footer.
 5. **Chain into `/e3b-write-testing-plan {slug}`** when `.shamt-core/shamt-config.json` sets `testing: "enabled"`. Wait for the testing plan to validate before Gate 3.

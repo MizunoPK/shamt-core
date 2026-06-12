@@ -61,7 +61,7 @@ State the chosen mode in one line before the first action.
 
 1. Apply the active-artifact pointer; resolve `spec`, `context` (Standard only), `implementation_plan` (Standard only), and `testing_plan` (when testing is enabled **and** the story uses a full artifact rather than the Quick-path inline checklist in `spec.md`) paths.
 2. Confirm each resolved artifact has a validation footer. If any is missing, halt — review starts after approved gates. (Quick-path inline test checklists live under the spec's footered surface and don't need a separate footer check.)
-3. Walk `stories/{slug}/feedback/` (when present) for existing `review_v*.md` files; the next review version is `vN+1`.
+3. Resolve the story folder per `templates/SHAMT_RULES.template.md` §PO-tree resolution (tree-wide glob + legacy-flat fallback); `stories/{slug}/` below denotes that resolved folder. Walk `stories/{slug}/feedback/` (when present) for existing `review_v*.md` files; the next review version is `vN+1`.
 
 ### Step 2 — Plan Alignment pre-pass
 

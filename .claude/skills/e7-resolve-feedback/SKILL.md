@@ -23,7 +23,7 @@ Mirrors the `/e7-resolve-feedback {slug}` slash command. Same canonical body, tw
 
 ## Protocol
 
-Follow the canonical `/e7-resolve-feedback` command body verbatim — see [`commands/e7-resolve-feedback.md`](../../commands/e7-resolve-feedback.md). Summary:
+Follow the canonical `/e7-resolve-feedback` command body verbatim — see [`commands/e7-resolve-feedback.md`](../../commands/e7-resolve-feedback.md). Resolve the story folder per `templates/SHAMT_RULES.template.md` §PO-tree resolution (tree-wide glob + legacy-flat fallback). Summary:
 
 1. **Inventory feedback** — pick the latest `feedback/review_vN.md`; read its leadership sections, checklists, and `## Documentation Impact`. Carry forward `Pending` / `Needs user decision` rows from a prior `addressed_feedback.md`.
 2. **Open or update `addressed_feedback.md`** — one row per reviewer comment; fields `Source`, `Disposition`, `Action taken`, `Root cause`, `Notes`.

@@ -66,6 +66,7 @@ Validated YYYY-MM-DD — N rounds, 1 adversarial sub-agent confirmed
 **Commits:** N commits | **Files changed:** N files (+X -Y lines)
 [Formal mode: **Overview:** See `overview.md`]
 [Story mode: **Story:** stories/{slug}/]
+[<!-- Paths are relative to the resolved story folder (located per templates/SHAMT_RULES.template.md §PO-tree resolution; the folder nests under epics/.../features/.../). -->]
 [When multiple baselines exist: **Baseline reviewed:** vN]
 
 [Story mode only:

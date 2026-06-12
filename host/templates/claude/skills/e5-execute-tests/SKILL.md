@@ -19,7 +19,7 @@ triggers:
 
 ## Overview
 
-Mirrors the `/e5-execute-tests {slug}` slash command. Same canonical body, two host wirings.
+Mirrors the `/e5-execute-tests {slug}` slash command. Same canonical body, two host wirings. Resolve the story folder per `templates/SHAMT_RULES.template.md` §PO-tree resolution (tree-wide glob + legacy-flat fallback).
 
 ## Protocol
 

@@ -4,7 +4,7 @@ description: Phase 4 of the PO flow — break a validated feature into N story-t
 
 # /p4-decompose-feature
 
-**Purpose:** Run Phase 4 of the PO flow. Read a validated `feature.md`, propose a list of stories (title + one-line scope each), enforce the **individually-testable rubric**, gate the whole list with the user once, derive story slugs, run the decomposition exit gate, then write N story-ticket-stub folders under `stories/` (each carrying `**Parent Feature:**` and `**Parent Epic:**` back-ref headers + scope one-liner + a `## Decomposition Context` breadth section) and append `Target Stories` + `Sequencing & Parallelization` back onto the parent feature. Per-story deep dialog is deferred to `/e1-start-story` (stub-aware).
+**Purpose:** Run Phase 4 of the PO flow. Read a validated `feature.md`, propose a list of stories (title + one-line scope each), enforce the **individually-testable rubric**, gate the whole list with the user once, derive story slugs, run the decomposition exit gate, then write N story-ticket-stub folders nested under `epics/{epic-folder}/features/{feature-folder}/stories/` (each carrying back-ref headers for parent feature + scope one-liner + a `## Decomposition Context` breadth section; parentage is the folder path) and append `Target Stories` + `Sequencing & Parallelization` back onto the parent feature. Per-story deep dialog is deferred to `/e1-start-story` (stub-aware).
 
 **Recommended model:** Reasoning (Opus). Decomposition involves the individually-testable rubric, dependency analysis, parallelization callout, and global-slug discipline — all benefit from Opus's reasoning depth. Same justification as `/p2-decompose-epic`. See [`reference/model_selection.md`](../../../../reference/model_selection.md).
 
@@ -18,22 +18,22 @@ description: Phase 4 of the PO flow — break a validated feature into N story-t
 
 ## Arguments
 
-- `{slug}` (required) — feature slug. Resolved against `features/`.
+- `{slug}` (required) — feature slug. Resolved against the nested feature tree per §PO-tree resolution.
 - `--allow-unvalidated` (optional, discouraged) — proceed even if `feature.md` carries no `Validated …` footer. Use only when the PO explicitly wants to decompose a draft to test the breakdown shape; rerun `/validate-artifact` afterwards. Same semantics as `/p2-decompose-epic`'s flag of the same name.
 
 ## Prerequisites
 
-- `features/{slug}-*/feature.md` must exist. If not, halt and direct the user to `/p3-start-feature {slug}` first.
-- `feature.md` should carry a `Validated …` footer. If it does not, halt with a clear message and direct the user to `/validate-artifact features/{slug}-*/feature.md` — unless `--allow-unvalidated` is passed.
+- The feature folder (resolved per §PO-tree resolution) must exist with a populated `feature.md`. If not, halt and direct the user to `/p3-start-feature {slug}` first.
+- `feature.md` should carry a `Validated …` footer. If it does not, halt with a clear message and direct the user to `/validate-artifact` on the feature's path — unless `--allow-unvalidated` is passed.
 
 ## Step-by-step
 
 ### Step 1 — Resolve the slug to a feature folder
 
-Apply the global slug-resolution rule from [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md) (Principle 1):
+Apply the global slug-resolution rule from [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md) (Principle 1) — resolve per §PO-tree resolution:
 
-1. If `{id-or-slug}` is a ticket ID (`^T[0-9]+$`), glob `features/{ID}-*/feature.md`; otherwise try `features/{slug}/feature.md` (exact match).
-2. If still not found (a slug), glob **both** `features/{slug}-*/feature.md` and `features/*-{slug}-*/feature.md`.
+1. Glob the nested feature path: `epics/*/features/{ID}-*/feature.md` (for a ticket ID) or, for a slug, **both** `epics/*/features/{slug}-*/feature.md` and `epics/*/features/*-{slug}-*/feature.md` (tree-wide feature glob). Also check the legacy-flat fallback: `features/{ID}-*/feature.md`, `features/{slug}-*/feature.md`, or `features/*-{slug}-*/feature.md` (for backwards compatibility with flat-layout features).
+2. Verify only one match exists.
 3. **Multiple matches** → halt; ask the user which folder to use.
 4. **One match** → that folder is the feature folder.
 5. **Zero matches** → halt; direct the user to `/p3-start-feature {slug}`.
@@ -61,7 +61,7 @@ On first decomposition (no prior `Decomposed …` line), every approved story is
 
 ### Step 4 — Read the feature and propose the story list
 
-1. Read `feature.md`: `Goal`, `Success Criteria`, `Scope / Non-Scope` (including any `**Architecture impact:** …` line), `**Parent Epic:**` back-ref header (if present — needed for the back-ref headers in Step 8), and (when present) the **All Remaining Fields** appendix.
+1. Read `feature.md`: `Goal`, `Success Criteria`, `Scope / Non-Scope` (including any `**Architecture impact:** …` line), the parent epic (the feature's folder path), and (when present) the **All Remaining Fields** appendix.
 2. Draft a proposed story list. Each entry: **title** + **one-line scope**. Capture the list as a flat enumerated proposal — no nested sub-stories, no per-story deep dialog (that is `/e1-start-story`'s job).
 3. **Enforce the individually-testable rubric** — **the rubric, in full:**
 
@@ -118,9 +118,9 @@ If either condition fails, surface the gap to the user and return to Step 5. Do 
 
 ### Step 7 — Detect global story-slug collisions
 
-Story slug uniqueness is **global** (flat layout). Before writing:
+Story slug uniqueness is **global** (tree-wide). Before writing:
 
-1. **For stories in the New partition** (per Step 3 — and for all stories on first decomposition): glob `stories/{story-slug}-*/`, `stories/*-{story-slug}-*/` (ID-prefixed folders), and `stories/{story-slug}/`. If **any** candidate slug collides with an existing story folder, halt with: `story slug "{slug}" collides with existing story at stories/{existing-folder}/. Choose a different title, or rename the existing story.` Surface the conflict and let the user adjust the title (return to Step 5).
+1. **For stories in the New partition** (per Step 3 — and for all stories on first decomposition): resolve per §PO-tree resolution (tree-wide story glob) to detect a global collision. If **any** candidate slug collides with an existing story folder, halt with: `story slug "{slug}" collides with existing story. Choose a different title, or rename the existing story.` Surface the conflict and let the user adjust the title (return to Step 5).
 2. **Exemption — re-decomposition Kept partition.** A Kept slug (per Step 3) is expected to collide with its own prior stub folder under the current feature. That is not a collision in the gate sense — proceed without halting and reuse the existing folder in Step 8. Apply the exemption only when the colliding folder appears in the prior `Decomposed …` line of *this* feature; collisions against stories outside that prior list (e.g., a stub created by a different feature that happens to share the slug) are real and still halt.
 3. Repeat until every New candidate is unique (modulo the Kept exemption above).
 
@@ -128,16 +128,13 @@ Story slug uniqueness is **global** (flat layout). Before writing:
 
 For each approved story entry:
 
-- **New partition (per Step 3) — and every story on first decomposition:** allocate a ticket ID `T{N}` for the story (= `max` of the `^T([0-9]+)-` prefixes across `epics/`, `features/`, `stories/`, + 1 — per **# Ticket IDs**) and create `stories/{ID}-{story-slug}-{brief}/ticket.md` from the active tracker's per-provider ticket template. **Template selection rule:** read `work_item_tracker` from `.shamt-core/shamt-config.json`:
+- **New partition (per Step 3) — and every story on first decomposition:** allocate a ticket ID `T{N}` for the story (= `max` of the `^T([0-9]+)-` prefixes across `epics/`, `features/`, `stories/`, + 1 — per **# Ticket IDs**) and create `epics/{e}/features/{feature-folder}/stories/{ID}-{story-slug}-{brief}/ticket.md` from the active tracker's per-provider ticket template (nested under the resolved parent feature). **Template selection rule:** read `work_item_tracker` from `.shamt-core/shamt-config.json`:
   - `ado` → [`templates/ticket.ado.template.md`](../../../../templates/ticket.ado.template.md)
   - `github` → [`templates/ticket.github.template.md`](../../../../templates/ticket.github.template.md)
   - `local` or `none` → [`templates/ticket.github.template.md`](../../../../templates/ticket.github.template.md) as the **generic baseline** (GitHub-flavored sections are closer to the generic structural shape). **Replace the template's `**Tracker profile:** GitHub (see …)` metadata line with `**Tracker profile:** {local|none}` to match the active config** — leaving the static GitHub text would mislead a fresh agent reading the stub. The rest of the template body (Summary, Description, etc.) is generic-enough to carry over unchanged.
 
   Populate **only** these fields:
-  - **Back-ref headers** under H1, in order:
-    - `**Parent Feature:** T{N} ({feature-slug})` (the parent feature's ID + slug) — required for every stub written by this command.
-    - `**Parent Epic:** T{N} ({parent-epic-slug})` — populated from the parent feature's `**Parent Epic:**` header (read in Step 4 sub-step 1). **Omit the Parent Epic line entirely** when the parent feature is standalone (i.e., the feature's `**Parent Epic:**` header is blank or absent).
-  - **Body section** (under the existing template's free-form intake area — the paragraph immediately after the back-ref headers and metadata block, marked by the template as "Paste ticket content here — any format accepted"): write the story's scope one-liner verbatim. The Spec phase extracts structure later.
+  - **Body section** (under the existing template's free-form intake area — the paragraph immediately after the metadata block, marked by the template as "Paste ticket content here — any format accepted"): write the story's scope one-liner verbatim. The Spec phase extracts structure later. (Parentage is the folder path.)
   - **`## Decomposition Context` section:** populate the bounded breadth bullets (dependencies on siblings, shared context, boundary rationale) discovered while researching the story set; replace the placeholder bullets or mark "none". **NOT a depth dump** — acceptance / spec detail is the Engineer flow's job. (The scope one-liner written above is this story's breadth boundary — the ticket template has no `## Scope / Non-Scope` section.)
   - Other template sections (Summary, Description, Acceptance Criteria, Related Work, Comments, Update History, All Remaining Fields, Open Questions, etc.) are **left empty / placeholder** as they appear in the template. This matches how a freeform `/e1-start-story` would leave them; `/e1-start-story` (stub-aware) fills them in later.
   - No `Validated …` footer — `/e1-start-story` and the subsequent Engineer-flow phases own validation at the story altitude.
@@ -177,8 +174,8 @@ The left column is the slug as it appeared in the prior `Decomposed …` line; t
 
 Verify before exiting:
 
-- [ ] N story-stub folders exist at `stories/{ID}-{story-slug}-{brief}/` with `ticket.md` files.
-- [ ] **New stubs** (per Step 3 partition; and every stub on first decomposition) carry `**Parent Feature:** {feature-slug}` and (when the parent feature has an epic) `**Parent Epic:** {parent-epic-slug}` back-ref headers under H1, plus the scope one-liner in the body and a populated `## Decomposition Context` breadth section. **Parent Epic is omitted** when the parent feature is standalone.
+- [ ] N story-stub folders exist at `epics/{epic-folder}/features/{feature-folder}/stories/{ID}-{story-slug}-{brief}/` with `ticket.md` files (nested).
+- [ ] **New stubs** (per Step 3 partition; and every stub on first decomposition) carry the scope one-liner in the body and a populated `## Decomposition Context` breadth section (parentage is the folder path).
 - [ ] **Kept stubs** (re-decomposition only) are preserved unchanged from before this invocation — any user / engineer work inside (Spec / Plan / Build / Review artifacts) survives untouched. The "other sections empty" rule does not apply to Kept stubs.
 - [ ] Every stub's scope one-liner passes the individually-testable rubric (Step 4 sub-step 3) per the gate in Step 6.
 - [ ] Parent feature's `## Target Stories` lists each stub with its one-liner.
@@ -203,15 +200,15 @@ Each story stub is **independently resumable**. The engineer can drive `/e1-star
 
 ## Exit criteria
 
-- N story-stub folders exist at `stories/{ID}-{story-slug}-{brief}/ticket.md`. **New** stubs (and every stub on first decomposition) carry `**Parent Feature:** {feature-slug}` (always) and `**Parent Epic:** {parent-epic-slug}` (when the parent feature has an epic) back-ref headers + scope one-liner in the body + a populated `## Decomposition Context` breadth section, with every other template section empty. **Kept** stubs (re-decomposition) are preserved unchanged from before this invocation.
+- N story-stub folders exist at `epics/{epic-folder}/features/{feature-folder}/stories/{ID}-{story-slug}-{brief}/ticket.md` (nested). **New** stubs (and every stub on first decomposition) carry scope one-liner in the body + a populated `## Decomposition Context` breadth section (parentage is the folder path), with every other template section empty. **Kept** stubs (re-decomposition) are preserved unchanged from before this invocation.
 - Every stub's scope one-liner passes the individually-testable rubric per Step 4 sub-step 3.
 - The parent feature's `Target Stories` and `Sequencing & Parallelization` sections carry the approved list and analysis.
-- The parent feature has a slug-only `Decomposed YYYY-MM-DD — N story stubs at stories/{slug-1}, stories/{slug-2}, …` line directly above the preserved `Validated …` footer; actual folders are recoverable via `stories/{slug}-*/` glob. For Kept entries, the cited slug points to the preserved existing folder.
+- The parent feature has a slug-only `Decomposed YYYY-MM-DD — N story stubs at stories/{slug-1}, stories/{slug-2}, …` line directly above the preserved `Validated …` footer; actual folders are recoverable via tree-wide story glob (see §PO-tree resolution). For Kept entries, the cited slug points to the preserved existing folder.
 - The user has approved the list (gated once, with rubric verdicts surfaced) and confirmed any derived-slug overrides.
 
 ## Notes
 
-- **Fresh-agent runnable.** Every input lives on disk (`feature.md`, the active tracker's ticket template, the existing `stories/` tree, `.shamt-core/shamt-config.json`). No conversation history required.
+- **Fresh-agent runnable.** Every input lives on disk (`feature.md` in its nested location, the active tracker's ticket template, the existing nested `stories/` tree, `.shamt-core/shamt-config.json`). No conversation history required.
 - **Decomposition exit gate ≠ `/validate-artifact`.** The gate in Step 6 is a 2-condition stub-batch check run **before** stubs are written; `/validate-artifact` is the full Pattern 1 loop that runs against `feature.md` (already, before `/p4-decompose-feature`) and against each story-level artifact (later, after `/e2-define-spec`, `/e3-plan-implementation`, etc. — Engineer-flow validations). Do not conflate the two.
 - **The individually-testable rubric is the hard constraint** on output. The Engineer flow can refuse a story that violates this; PO-flow enforcement at decomposition time is the contract. The rubric is reproduced in full inline in Step 4 sub-step 3 — not just by reference — so a fresh agent reading this command can apply it without external lookup.
 - **Development-order dependencies between siblings are allowed.** They live in the parallelization analysis (`Recommended order`) and are not testability violations. Do not reject candidate stories that have sibling build-order dependencies.
@@ -220,7 +217,7 @@ Each story stub is **independently resumable**. The engineer can drive `/e1-star
 - **No feature-level review phase.** Per Pattern 4, the 16-category code-review framework stays story-level. This command does not invoke `/e6-review-changes`.
 - **No `/e1-start-story` auto-invocation.** Per Principle 1, every command stays independently runnable. Chaining would force a multi-phase session and would couple resumability across altitudes.
 - **Parallelization is PO-flow output, not runtime coordination.** The `Parallelizable` callout informs the engineer; running stories concurrently is a "second terminal tab" exercise.
-- **Parent Epic back-ref propagation.** Step 8 reads the parent feature's `**Parent Epic:** {epic-slug}` header and copies it onto each new story stub. When the parent feature is standalone (no parent epic), the `**Parent Epic:**` line is **omitted** from the stub — not written as blank — so the back-ref headers remain grep-clean.
+- **Parentage derivation.** The parent epic is derived from the feature's folder path, which is read in Step 4. When the parent feature is standalone (no parent epic folder), stories nest under the Tech Stories epic. Parentage is the folder path; no back-ref headers are written.
 
 ---
 <!-- Managed by Shamt — do not edit. Regenerate from shamt-core/host/templates/claude/commands/p4-decompose-feature.md. -->

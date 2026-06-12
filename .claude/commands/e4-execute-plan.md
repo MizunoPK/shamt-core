@@ -28,7 +28,7 @@ See [`reference/model_selection.md`](../../../../reference/model_selection.md).
 
 ## Prerequisites
 
-- Story folder resolves; if `stories/{slug}/active_artifacts.md` exists, read it first and use the artifact paths listed under **Active Files**.
+- Resolve the story folder per `templates/SHAMT_RULES.template.md` §PO-tree resolution (tree-wide glob + legacy-flat fallback); `stories/{slug}/` below denotes that resolved folder. If `stories/{slug}/active_artifacts.md` exists, read it first and use the artifact paths listed under **Active Files**.
 - The active spec exists with a validation footer and is approved at Gate 2b.
 - **Standard path:** the active `implementation_plan.md` (or the active phase file from a phase-decomposed plan) exists with a validation footer and is approved at Gate 3. If missing or unfootered, halt and direct the user to `/e3-plan-implementation {slug}`.
 - **Quick path:** the active `spec.md` has a populated `## Build Checklist` section. If missing, halt and direct the user back to `/e2-define-spec {slug}`.

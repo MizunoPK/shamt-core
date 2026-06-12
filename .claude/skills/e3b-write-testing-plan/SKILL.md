@@ -28,6 +28,9 @@ Follow the canonical `/e3b-write-testing-plan` command body verbatim — see [`c
 
 1. **No-op gate** — if `.shamt-core/shamt-config.json` sets `testing: "disabled"`, print one line and exit. Do not touch any file.
 2. **Read the spec's `## Test Strategy`** — extract test kinds, existing files, new files, conventions.
+
+Resolve the story folder per `templates/SHAMT_RULES.template.md` §PO-tree resolution (tree-wide glob + legacy-flat fallback); `stories/{slug}/` below denotes that resolved folder.
+
 3. **Decide artifact shape:**
    - **Quick path + small scope** (≤5 steps **and** no new test file) → update the spec's inline `### Quick path inline test checklist`.
    - **Quick path + larger scope** OR **Standard path** → create `stories/{slug}/testing_plan.md` from [`templates/testing_plan.template.md`](../../../../../templates/testing_plan.template.md).

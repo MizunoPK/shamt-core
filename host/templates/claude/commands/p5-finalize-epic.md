@@ -1,5 +1,5 @@
 ---
-description: Phase 5 (Finalize) of the Shamt PO flow at the Epic altitude — guard that every child feature/story is finalized, commit, mark the epic done via the active tracker, and move the done epic into epics/archive/ (move-epic-only on the flat layout)
+description: Phase 5 (Finalize) of the Shamt PO flow at the Epic altitude — guard that every child feature/story is finalized, commit, mark the epic done via the active tracker, and move the done epic subtree into epics/archive/ (a whole-subtree move under the nested layout)
 ---
 
 # /p5-finalize-epic
@@ -18,7 +18,7 @@ description: Phase 5 (Finalize) of the Shamt PO flow at the Epic altitude — gu
 
 ## Arguments
 
-- `{slug}` (required) — epic slug or ticket ID (`T{N}`). Resolves the epic folder exact-then-glob — `epics/{slug}/`, then `epics/{slug}-*/` (the `{ID}-{slug}-{brief}` folder shape; matches at most one, halt on multiple). The `epics/archive/` subdirectory is **excluded** from resolution.
+- `{slug}` (required) — epic slug or ticket ID (`T{N}`). Resolves the epic folder per `templates/SHAMT_RULES.template.md` §PO-tree resolution (epics are top-level: `epics/{ID}-*/` · `epics/{slug}-*/` · `epics/*-{slug}-*/`; matches at most one, halt on multiple). The `epics/archive/` subdirectory is **excluded** from resolution.
 - `--tracker={ado|github|local}` (optional) — one-off override of the project's default `work_item_tracker`, per [`reference/trackers/_contract.md`](../../../../reference/trackers/_contract.md).
 
 ## Prerequisites
@@ -33,7 +33,7 @@ description: Phase 5 (Finalize) of the Shamt PO flow at the Epic altitude — gu
 
 The epic finalizes only after all its work is done.
 
-1. Find the epic's children. On the **current flat layout**, children live in sibling top-level dirs linked by back-ref headers: features in `features/*/feature.md` carrying `**Parent Epic:** {this-epic-slug}`, and stories in `stories/*/ticket.md` carrying `**Parent Epic:** {this-epic-slug}`.
+1. Find the epic's children by walking the **nested tree inside the epic folder** (parentage is the path, per `templates/SHAMT_RULES.template.md` §PO-tree resolution): features at `epics/{epic-folder}/features/*/feature.md`, stories at `epics/{epic-folder}/features/*/stories/*/ticket.md`.
 2. For each child, confirm it is finalized: its artifact carries `**Status: Done**` (written by `/e8-finalize-story` for stories; features close implicitly when all their stories are done — confirm each child story of each child feature is `**Status: Done**`).
 3. If any child is not finalized, **halt** and list the unfinished children with their remediation (`/e8-finalize-story {story-slug}` for each). Do not proceed.
 
@@ -54,9 +54,7 @@ Read `work_item_tracker` from `.shamt-core/shamt-config.json` (or `--tracker=`).
 ### Step 4 — Move the epic to archive
 
 1. Ensure `epics/archive/` exists. If not, create it.
-2. Move the resolved epic folder → `epics/archive/{same-folder-name}` (`git mv` when tracked, plain `mv` when untracked). **Move-epic-only:** the epic's child features/stories stay in their sibling top-level `features/` / `stories/` dirs — their `**Parent Epic:**` back-ref headers keep resolving to the now-archived epic.
-
-> **Forward note.** When `po-nested-folder-layout` (proposal #14) lands, features/stories nest *inside* the epic folder, so this move becomes a natural whole-subtree cascade and the move-epic-only caveat above is revisited.
+2. Move the resolved epic folder → `epics/archive/{same-folder-name}` (`git mv` when tracked, plain `mv` when untracked). **Whole-subtree move:** under the nested layout the epic's features and stories live *inside* the epic folder, so moving the folder carries the entire subtree along in one operation — no per-child relocation, no dangling links (parentage is the path).
 
 ### Step 5 — Commit
 
@@ -67,7 +65,7 @@ Stage the epic finalize (the `epic.md` status flip + the archive move) and commi
 ```text
 Epic {slug} finalized and archived to epics/archive/{slug}/.
 Epic work item: {marked Done via ado | local Status: Done | github n/a}.
-{N} child features / stories left in place (flat layout).
+{N} child features / stories archived with the epic (nested subtree).
 PO flow complete for this epic.
 ```
 
@@ -80,7 +78,7 @@ No next-phase suggestion. The PO flow ends at the epic-finalize for a delivered 
 
 ## Notes
 
-- **Move-epic-only (flat layout).** Only the epic folder moves; children stay put and keep resolving via back-ref headers. This is intentional for the current flat layout; the cascade is revisited under proposal #14's nested layout.
+- **Whole-subtree archive (nested layout).** Moving the epic folder carries its nested features/stories with it in one move — parentage is the path, so nothing dangles. (Legacy flat-layout folders, if any predate the nested rework, would need manual child relocation; new work is nested.)
 - **Status-line exclusion.** `epics/archive/` is excluded from active-epic resolution (see `statusline.sh`), so an archived epic does not surface as the active `EPIC {slug}`.
 - **Epic only.** There is no per-feature finalize command; features close implicitly when their stories are finalized. Stories finalize via `/e8-finalize-story`.
 - **Fresh-agent runnable** — epic folder, its children, config, and working-tree state are sufficient. No conversation history required.

@@ -1,9 +1,5 @@
 # Story {slug} Ticket
 
-<!-- Parent back-refs (optional). Present when this story was created by /p4-decompose-feature; absent for standalone stories. -->
-**Parent Feature:** {feature-slug}
-**Parent Epic:** {epic-slug}
-
 **Tracker profile:** GitHub (see `reference/trackers/github.md` for fetch commands and field mapping)
 **Source:** [GitHub Issues / verbal / etc.]
 **Date received:** [YYYY-MM-DD]

@@ -28,7 +28,7 @@ See [`reference/model_selection.md`](../../../../reference/model_selection.md).
 ## Prerequisites
 
 - `.shamt-core/shamt-config.json` exists. Read `testing`. If `disabled`, **this command is a no-op**: print one line — `Testing is disabled in .shamt-core/shamt-config.json — no testing plan needed.` — and exit. Do not create or modify any file.
-- Story folder resolves; apply the active-artifact pointer if `stories/{slug}/active_artifacts.md` exists.
+- Resolve the story folder per `templates/SHAMT_RULES.template.md` §PO-tree resolution (tree-wide glob + legacy-flat fallback); `stories/{slug}/` below denotes that resolved folder. Apply the active-artifact pointer if `stories/{slug}/active_artifacts.md` exists.
 - The active spec exists with a validation footer and is approved at Gate 2b. The spec must include a `## Test Strategy` section per [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md#when-automated-testing-is-enabled).
 - If `.shamt-core/project-specific-files/ARCHITECTURE.md` and `.shamt-core/project-specific-files/CODING_STANDARDS.md` exist, read them for test runner / file naming / fixture / assertion conventions.
 

@@ -28,7 +28,7 @@ See [`reference/model_selection.md`](../../../../reference/model_selection.md) f
 
 ## Prerequisites
 
-- Story folder resolves by ticket ID or slug (ID glob `stories/{ID}-*/`, else the both-positions slug glob `stories/{slug}-*/` ∪ `stories/*-{slug}-*/`; halt on multiple or zero matches) per the Global Story Invariants in [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md).
+- Resolve the story folder per `templates/SHAMT_RULES.template.md` §PO-tree resolution (tree-wide glob + legacy-flat fallback); `stories/{slug}/` below denotes that resolved folder.
 - `ticket.md` exists in that folder and is non-empty. If not, halt and direct the user to `/e1-start-story {slug}`.
 - `.shamt-core/project-specific-files/ARCHITECTURE.md` and `.shamt-core/project-specific-files/CODING_STANDARDS.md` exist at the project root. Note their absence inline if either is missing (per the **Standards check** invariant in [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md#global-story-invariants)) and continue.
 - If `stories/{slug}/active_artifacts.md` exists, read it first and use the artifact paths listed under **Active Files** instead of unversioned baselines.

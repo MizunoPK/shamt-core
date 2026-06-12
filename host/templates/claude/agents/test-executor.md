@@ -17,7 +17,7 @@ This phase **blocks until every step passes** (per `templates/SHAMT_RULES.templa
 
 ## Inputs (provided by the caller)
 
-- `slug` — story slug. Resolve the folder via the global rules (exact, then `stories/{slug}-*/` glob; halt on multiple or zero matches).
+- `slug` — story slug. Resolve the story folder per templates/SHAMT_RULES.template.md §PO-tree resolution (tree-wide glob + legacy-flat fallback; halt on multiple or zero).
 - `testing_plan_path` — the path to the validated `testing_plan.md` (or `testing_plan_vN.md` per `active_artifacts.md`). On the Quick path with the inline checklist, this is the active `spec.md` and the executor reads `### Quick path inline test checklist` instead of the full artifact.
 - `active_artifacts_path` — `stories/{slug}/active_artifacts.md` when it exists; honour it ahead of unversioned defaults.
 

@@ -4,6 +4,7 @@
 
 **Created:** [Date]
 **Story:** stories/{slug}/
+<!-- Paths are relative to the resolved story folder (located per templates/SHAMT_RULES.template.md §PO-tree resolution; the folder nests under epics/.../features/.../). -->
 **Spec:** stories/{slug}/spec.md (or `spec_vN.md` for re-baselined stories)
 **Context:** stories/{slug}/context.md (or `context_vN.md` for re-baselined stories) (Optional/N/A for Quick path)
 **Path:** Quick path (escalation only) | Standard path

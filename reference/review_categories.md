@@ -116,4 +116,4 @@ In the **Quick path**, when no issues are found, creating a separate `review_v1.
 **Findings:** No issues found. Verified all Build Checklist steps sequentially.
 ```
 
-If issues are found, the reviewer should create a durable review artifact at `stories/{slug}/feedback/review_v1.md` following the standard template and categories.
+If issues are found, the reviewer should create a durable review artifact at `stories/{slug}/feedback/review_v1.md` (the resolved story folder, located per `templates/SHAMT_RULES.template.md` §PO-tree resolution — nested under `epics/.../features/...`) following the standard template and categories.

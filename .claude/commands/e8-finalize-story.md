@@ -18,7 +18,7 @@ description: Phase 8 (Finalize) of the Shamt Engineer flow — commit the story'
 
 ## Arguments
 
-- `{slug}` (required) — story slug or ticket ID (`T{N}`). Resolves the story folder exact-then-glob — `stories/{slug}/`, then `stories/{slug}-*/` (the `{ID}-{slug}-{brief}` folder shape; matches at most one, halt on multiple).
+- `{slug}` (required) — story slug or ticket ID (`T{N}`). Resolves the story folder per `templates/SHAMT_RULES.template.md` §PO-tree resolution (tree-wide glob + legacy-flat fallback; matches at most one, halt on zero or multiple). `stories/{slug}/` below denotes that resolved folder.
 - `--tracker={ado|github|local}` (optional) — one-off override of the project's default `work_item_tracker` for this invocation only, per [`reference/trackers/_contract.md`](../../../../reference/trackers/_contract.md).
 
 ## Prerequisites

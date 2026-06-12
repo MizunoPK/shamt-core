@@ -27,7 +27,7 @@ Mirrors the `/e5b-write-manual-testing-plan {slug}` slash command. Same canonica
 
 ## Protocol
 
-Follow the canonical `/e5b-write-manual-testing-plan` command body verbatim — see [`commands/e5b-write-manual-testing-plan.md`](../../commands/e5b-write-manual-testing-plan.md). Summary:
+Follow the canonical `/e5b-write-manual-testing-plan` command body verbatim — see [`commands/e5b-write-manual-testing-plan.md`](../../commands/e5b-write-manual-testing-plan.md). Resolve the story folder per `templates/SHAMT_RULES.template.md` §PO-tree resolution (tree-wide glob + legacy-flat fallback); `stories/{slug}/` below denotes that resolved folder. Summary:
 
 1. **Resolve mode** — apply the active-artifact pointer; pick **Author / Patch / Re-validate / Author-continue** based on whether the artifact exists and whether the footer is present.
 2. **Read spec / plan / context / testing_plan** — extract scope, requirements, Review Prevention Gates, verification, file manifest, and what automated tests already cover (so the `## Coverage Note` can delineate cleanly).

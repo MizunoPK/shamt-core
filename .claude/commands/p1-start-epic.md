@@ -38,7 +38,7 @@ description: Phase 1 of the PO flow — resolve a slug, fetch the tracker payloa
 
 ### Step 2 — Resolve the slug to an epic folder
 
-Apply the global slug-resolution rule from [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md) (Principle 1):
+Apply the global slug-resolution rule from [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md) (Principle 1) (epics are top-level; see §PO-tree resolution):
 
 1. If `{id-or-slug}` is a ticket ID (`^T[0-9]+$`), glob `epics/{ID}-*/epic.md`; otherwise try `epics/{slug}/epic.md` (exact match).
 2. If still not found (a slug), glob **both** `epics/{slug}-*/epic.md` and `epics/*-{slug}-*/epic.md`.
@@ -129,6 +129,7 @@ Verify before exiting:
 - [ ] `## Open Questions` is empty (every question resolved, with answers folded into the artifact).
 - [ ] `Goal`, `Success Criteria`, and `Scope / Non-Scope` are drafted.
 - [ ] `Target Features` and `Sequencing & Parallelization` are **left empty** (owned by `/p2-decompose-epic`).
+- [ ] Before exiting, write the resolved epic-folder path to `.shamt-state/active-epic` (create `.shamt-state/` if absent) — the status-line active-epic pointer.
 - [ ] No `Validated …` footer present yet — `/validate-artifact` appends it.
 - [ ] User has confirmed the slug + content.
 

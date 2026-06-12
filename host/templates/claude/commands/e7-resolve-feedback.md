@@ -27,7 +27,7 @@ See [`reference/model_selection.md`](../../../../reference/model_selection.md).
 
 ## Prerequisites
 
-- Story folder resolves; if `stories/{slug}/active_artifacts.md` exists, read it first.
+- Resolve the story folder per `templates/SHAMT_RULES.template.md` §PO-tree resolution (tree-wide glob + legacy-flat fallback); `stories/{slug}/` below denotes that resolved folder. If `stories/{slug}/active_artifacts.md` exists, read it first.
 - The active spec exists with a validation footer.
 - `stories/{slug}/feedback/` contains at least one `review_vN.md` with a validation footer. If `feedback/` is empty (Quick-path no-issue path used the `## Post-Build Review` block in the spec instead), this command is mostly a TODO-scan no-op — see Step 6.
 - `.shamt-core/project-specific-files/ARCHITECTURE.md` and `.shamt-core/project-specific-files/CODING_STANDARDS.md` paths are known (read the active review's `## Documentation Impact` block to learn whether either needs an update).

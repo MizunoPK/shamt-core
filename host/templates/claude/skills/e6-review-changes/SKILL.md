@@ -37,6 +37,9 @@ Follow the canonical `/e6-review-changes` command body verbatim — see [`comman
 2. **Plan Alignment pre-pass** — Quick: `N/A`. Standard: walk Step Coverage, Change Fidelity, Scope Discipline, Verification Passage, Zero Builder Design Decisions. Write `## Plan Alignment` at the top of `review_vN.md`.
 3. **16-category sweep** — apply every category from [`reference/review_categories.md`](../../../../../reference/review_categories.md); apply the Review Prevention Gates overlay from [`reference/pr_review_prevention.md`](../../../../../reference/pr_review_prevention.md); hard checks include per-file-and-function fresh review, removed-check replacement analysis, tenant-A-to-tenant-B bypass consideration, end-to-end DB lineage.
 4. **Documentation Impact Assessment** (the architecture-impact consult / Standards check) — does the change require `.shamt-core/project-specific-files/ARCHITECTURE.md` or `.shamt-core/project-specific-files/CODING_STANDARDS.md` updates? Write `## Documentation Impact` with `Required | Not required` + reason + Polish action.
+
+Resolve the story folder per `templates/SHAMT_RULES.template.md` §PO-tree resolution (tree-wide glob + legacy-flat fallback); `stories/{slug}/` below denotes that resolved folder.
+
 5. **Write `review_vN.md`** — Severities BLOCKING / CONCERN / SUGGESTION / NITPICK; required sections per [`templates/code_review.template.md`](../../../../../templates/code_review.template.md). Quick-path no-issue shortcut: append a `## Post-Build Review` block to the spec instead of writing a durable artifact.
 6. **Validate** — `/validate-artifact stories/{slug}/feedback/review_vN.md` (7 dimensions — 6 review + Plan Alignment). Footer.
 7. **Exit** — `/e7-resolve-feedback {slug}` if findings exist.

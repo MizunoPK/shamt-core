@@ -29,7 +29,7 @@ See [`reference/model_selection.md`](../../../../reference/model_selection.md).
 
 ## Prerequisites
 
-- Story folder resolves; if `stories/{slug}/active_artifacts.md` exists, read it first and use the artifact paths listed under **Active Files**.
+- Resolve the story folder per `templates/SHAMT_RULES.template.md` §PO-tree resolution (tree-wide glob + legacy-flat fallback); `stories/{slug}/` below denotes that resolved folder. If `stories/{slug}/active_artifacts.md` exists, read it first and use the artifact paths listed under **Active Files**.
 - The active spec exists with a validation footer and is approved at Gate 2b.
 - On the Standard path, the active `implementation_plan.md` exists with a validation footer (preferred but not required — drafting can proceed from the spec alone if the user explicitly wants a manual test plan before Plan validates).
 - Phase 4 (Build) has completed for the story — this artifact walks a tester through verifying *what got built*. Halt and direct the user to `/e4-execute-plan {slug}` if Build has not run.

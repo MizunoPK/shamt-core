@@ -4,7 +4,7 @@ description: Phase 3 of the PO flow — flesh out a feature (stub from /p2-decom
 
 # /p3-start-feature
 
-**Purpose:** Run Phase 3 of the PO flow at the **Feature** altitude. Resolve a slug, branch on three input modes (flesh out an existing stub written by `/p2-decompose-epic`, create a standalone feature from scratch, or seed from a tracker work-item payload), drive an open-questions iterative dialog over `Goal`, `Success Criteria`, and `Scope / Non-Scope`, and produce `features/{ID}-{slug}-{brief}/feature.md`. Leaves `Target Stories` and `Sequencing & Parallelization` empty — `/p4-decompose-feature` fills them later.
+**Purpose:** Run Phase 3 of the PO flow at the **Feature** altitude. Resolve a slug, branch on three input modes (flesh out an existing stub written by `/p2-decompose-epic`, create a standalone feature from scratch, or seed from a tracker work-item payload), drive an open-questions iterative dialog over `Goal`, `Success Criteria`, and `Scope / Non-Scope`, and produce the feature under its parent epic — `epics/{parent-epic-folder}/features/{ID}-{slug}-{brief}/feature.md` (the parent epic is the stub's epic, or the Tech Stories epic for standalone work). Leaves `Target Stories` and `Sequencing & Parallelization` empty — `/p4-decompose-feature` fills them later.
 
 **Recommended model:** Reasoning (Opus). Feature drafting is a design / multi-dimensional scoping task — same justification as `/p1-start-epic`. See [`reference/model_selection.md`](../../../../reference/model_selection.md).
 
@@ -18,7 +18,7 @@ description: Phase 3 of the PO flow — flesh out a feature (stub from /p2-decom
 
 ## Arguments
 
-- `{slug}` (required) — feature slug. **Globally unique across `features/`** (flat layout). Form depends on the active tracker profile:
+- `{slug}` (required) — feature slug. **Globally unique across the tree** (see §PO-tree resolution). Form depends on the active tracker profile:
   - **ado** — leading-numeric (`5102-payments-rewrite`) so the slug can resolve to a Feature work-item ID.
   - **github / local / none** — any descriptive kebab-case slug; resolved by folder glob.
 - `--tracker={ado|github|local}` (optional) — one-off override of the project's default `work_item_tracker` for this invocation only. Same semantics as `/e1-start-story` and `/p1-start-epic`. Legal values: any profile file in [`reference/trackers/`](../../../../reference/trackers/). The default comes from `.shamt-core/shamt-config.json`. Per [`reference/trackers/_contract.md`](../../../../reference/trackers/_contract.md).
@@ -39,13 +39,13 @@ description: Phase 3 of the PO flow — flesh out a feature (stub from /p2-decom
 
 ### Step 2 — Resolve the slug to a feature folder
 
-Apply the global slug-resolution rule from [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md) (Principle 1):
+Apply the global slug-resolution rule from [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md) (Principle 1) — resolve per `templates/SHAMT_RULES.template.md` §PO-tree resolution:
 
-1. If `{id-or-slug}` is a ticket ID (`^T[0-9]+$`), glob `features/{ID}-*/feature.md`; otherwise try `features/{slug}/feature.md` (exact match).
-2. If still not found (a slug), glob **both** `features/{slug}-*/feature.md` and `features/*-{slug}-*/feature.md`.
+1. Glob the nested feature path: `epics/*/features/{ID}-*/feature.md` (for a ticket ID) or, for a slug, **both** `epics/*/features/{slug}-*/feature.md` and `epics/*/features/*-{slug}-*/feature.md` (tree-wide feature glob). Also check the legacy-flat fallback: `features/{ID}-*/feature.md`, `features/{slug}-*/feature.md`, or `features/*-{slug}-*/feature.md` (for backwards compatibility with flat-layout features).
+2. If any match is found, verify it is the only one; if multiple matches exist for the same slug, halt and ask the user which folder to use.
 3. **Multiple matches** → halt and ask the user which folder to use.
 4. **One match** → that folder is the feature folder. **Detect Mode A vs. re-entry** by inspecting `feature.md`:
-   - If `feature.md` has its **decomposition-authored fields** filled — `**Ticket ID:** T{N}` + `**Parent Epic:** T{N} ({epic-slug})` + `## Goal`, plus (on a richer-cataloging stub) `## Scope / Non-Scope` + `## Decomposition Context` — but the **depth sections `## Success Criteria` and `## Open Questions` are still empty** (per the `/p2-decompose-epic` Step 8 contract), this is a **stub** — proceed to **Mode A** under Step 4.
+   - If `feature.md` has its **decomposition-authored fields** filled — `**Ticket ID:** T{N}` + `## Goal`, plus (on a richer-cataloging stub) `## Scope / Non-Scope` + `## Decomposition Context` — but the **depth sections `## Success Criteria` and `## Open Questions` are still empty** (per the `/p2-decompose-epic` Step 8 contract), this is a **stub** — proceed to **Mode A** under Step 4. (The parent epic is the folder path.)
    - If `feature.md` has its **depth sections drafted** (`## Success Criteria` / `## Open Questions` populated — a prior `/p3-start-feature` deep-dive ran), this is a **re-entry**. Confirm with the user how to proceed. **Available options depend on whether the active tracker actually has a Feature fetch path** (resolved in Step 1 plus the profile's `## Supported work-item types`):
      - **Fetching profile that declares Feature support** (e.g., `ado`): offer all four — **refetch**, **overwrite**, **extend**, **exit**.
      - **Fetching profile that does *not* declare Feature support** (e.g., `github`): same options as `local` / `none` — **overwrite**, **extend**, **exit**. Refetch is suppressed because the profile would just fall through to freeform anyway (per the freeform-fallback rule), making the offered branch pointless.
@@ -58,7 +58,7 @@ Apply the global slug-resolution rule from [`SHAMT_RULES.template.md`](../../../
      - **Extend** — preserve existing content and add to it. **If a prior `Validated …` footer is present, strip it before continuing** — extension changes the artifact and invalidates the prior pass; `/validate-artifact` must re-run.
      - **Exit** — leave the file untouched and return. No footer change.
 
-     **Preserve the `**Ticket ID:**` and back-ref headers verbatim on re-entry.** The `**Ticket ID:** …`, `**Parent Epic:** …` and (when present) `**Parent Feature:** …` lines are never rewritten by `/p3-start-feature` regardless of the chosen branch — they are decomposition-owned per the decomposition step. Only the body sections are touched.
+     **Preserve the `**Ticket ID:**` header verbatim on re-entry.** The `**Ticket ID:** …` line is never rewritten by `/p3-start-feature` regardless of the chosen branch — it is decomposition-owned per the decomposition step. Only the body sections are touched. (Parentage is the folder path.)
 5. **Zero matches** → continue to Step 3 (Mode B or Mode C, decided in Step 4).
 
 ### Step 3 — Derive the brief description and propose the folder name
@@ -73,25 +73,25 @@ Applies only when the slug does not yet resolve to a folder (i.e., Mode A is rul
 
 The command supports three input modes. **Mode disambiguation order:**
 
-1. **Mode A — flesh out an existing stub** if Step 2 resolved to a folder whose `feature.md` matches the stub shape (decomposition-authored fields filled — Parent Epic header + Goal one-liner, plus `## Scope / Non-Scope` + `## Decomposition Context` on a richer-cataloging stub — but the depth sections `## Success Criteria` / `## Open Questions` still empty).
+1. **Mode A — flesh out an existing stub** if Step 2 resolved to a folder whose `feature.md` matches the stub shape (decomposition-authored fields filled — Goal one-liner, plus `## Scope / Non-Scope` + `## Decomposition Context` on a richer-cataloging stub — but the depth sections `## Success Criteria` / `## Open Questions` still empty; parentage is the folder path).
 2. **Mode C — tracker-seeded** if Mode A did not apply AND the active tracker profile declares Feature work-item type support AND the slug parses to a tracker ID per the profile's `## Slug resolution` rule.
 3. **Mode B — standalone from scratch** otherwise.
 
 #### Mode A — flesh out an existing stub (the common case after `/p2-decompose-epic`)
 
-The folder exists; `feature.md` already carries the `**Parent Epic:** {epic-slug}` back-ref header and a populated `## Goal` from `/p2-decompose-epic` Step 8 — and, for a stub created under richer-cataloging decomposition, a populated `## Scope / Non-Scope` boundary and a `## Decomposition Context` section.
+The folder exists; `feature.md` already carries a populated `## Goal` from `/p2-decompose-epic` Step 8 — and, for a stub created under richer-cataloging decomposition, a populated `## Scope / Non-Scope` boundary and a `## Decomposition Context` section. (The parent epic is the folder path.)
 
-1. **Preserve the back-ref header and `## Goal` verbatim.** Do not rewrite them.
+1. **Preserve the `## Goal` verbatim.** Do not rewrite it.
 2. **Consume the stub's `## Decomposition Context` as a research seed when present** — a stub created before #12 (or via a path that didn't catalog it) lacks the section, so fall back to the existing `## Goal` alone (and `## Scope / Non-Scope` if it was already populated), with no failure. Then proceed to Step 5 (architecture consult) and Step 6 (open-questions dialog) to populate `Success Criteria` + `Open Questions` and the `## Scope / Non-Scope` boundary — **deepening** it when decomposition pre-populated it (a richer-cataloging stub), or **populating it from scratch** when it is empty (an older stub). The existing `/validate-artifact` handoff at the end of the command is unchanged; validation is not folded in here.
 3. Leave `Target Stories` and `Sequencing & Parallelization` empty — those are `/p4-decompose-feature`'s output.
 4. **No `## All Remaining Fields` appendix** — there was no tracker fetch in this mode.
 
 #### Mode B — create a standalone feature from scratch
 
-The folder did not exist before Step 3. There is no parent epic.
+The folder did not exist before Step 3. There is no explicit parent epic input from the user.
 
-1. Write `features/{ID}-{slug}-{brief}/feature.md` from [`templates/feature.template.md`](../../../../templates/feature.template.md).
-2. **Leave `**Parent Epic:**` blank** — standalone features have no parent epic — the back-ref is optional and absent for standalone work. Same behavior as `/p1-start-epic`'s create-from-scratch mode.
+1. Write `epics/{parent-epic-folder}/features/{ID}-{slug}-{brief}/feature.md` from [`templates/feature.template.md`](../../../../templates/feature.template.md). After writing feature.md, write its path to `.shamt-state/active-feature` (and `.shamt-state/active-epic` for its parent epic when nested).
+2. **Mode B has no top-level home** — a standalone feature is created under the standing Tech Stories epic (`epics/{parent-epic-folder}/features/{ID}-{slug}-{brief}/feature.md` (here `{parent-epic-folder}` = the Tech Stories epic), per #15). There is no blank-parent / top-level feature. (If #15 has not landed alongside, the executor halts per the index's sequencing precondition.)
 3. Proceed to Step 5 (architecture consult), then Step 6 (open-questions dialog) to populate `Goal`, `Success Criteria`, and `Scope / Non-Scope` from scratch.
 4. Leave `Target Stories` and `Sequencing & Parallelization` empty.
 5. **No `## All Remaining Fields` appendix** — there was no tracker fetch in this mode.
@@ -115,11 +115,11 @@ Apply the profile's `## Slug resolution` rule. If the slug does not parse to a t
    - **Title / Type / State / Assignee / Project / Iteration/Milestone** → used to seed the H1 line and to inform the agent (not their own section in `feature.template.md`; record them in the **All Remaining Fields** appendix described in sub-step C.5).
    - **Description** → narrative input for the `Goal` section; the agent rewrites it as "what this feature exists to accomplish" rather than verbatim paste.
    - **Acceptance Criteria** → seed for `Success Criteria` bullets.
-   - **Parent work-item link** (when the profile surfaces a parent Epic relation) → populate `**Parent Epic:** {epic-slug}` only if the parent's slug resolves to an existing local epic folder under `epics/`. Otherwise leave blank — the back-ref is project-local and a remote parent ID does not automatically map to a local slug.
+   - **Parent work-item link** (when the profile surfaces a parent Epic relation) → the parent work-item link determines the feature's nesting parent — create the feature under the matched local epic folder when the parent's slug resolves to one under `epics/`, else under the Tech Stories epic (#15). No back-ref header is written (parentage is the folder path, C3).
    - Apply the markdown normalization rules from [`templates/ticket.ado.template.md`](../../../../templates/ticket.ado.template.md) / [`templates/ticket.github.template.md`](../../../../templates/ticket.github.template.md) (entity decoding, attribute stripping, U+FFFD preservation, long-field rendering).
 5. **All Remaining Fields appendix.** Any non-empty payload fields the agent wants to preserve for fidelity (custom fields, long design notes, attachment URLs, etc.) go into a final `## All Remaining Fields` subsection appended **immediately above the validation footer slot** (i.e., below `Sequencing & Parallelization`). Same pattern as `/p1-start-epic` — no `raw/` subfolder. Omit the subsection entirely when there is nothing worth preserving.
 6. Detect `## Auth failure modes` patterns. If the primary fetch fails on auth, surface the profile's fallback notice and **fall through to Mode B** (or Mode A if Step 2 resolved to a stub).
-7. After populating the seed content, proceed to Step 5 (architecture consult) and Step 6 (open-questions dialog) to fill any gaps the tracker payload does not cover.
+7. After populating the seed content, write its path to `.shamt-state/active-feature` (and `.shamt-state/active-epic` for its parent epic when nested). Then proceed to Step 5 (architecture consult) and Step 6 (open-questions dialog) to fill any gaps the tracker payload does not cover.
 
 ### Step 5 — Consult `.shamt-core/project-specific-files/ARCHITECTURE.md` (advisory)
 
@@ -150,13 +150,14 @@ After writing the folder and feature:
 
 Verify before exiting:
 
-- [ ] `features/{ID}-{slug}-{brief}/feature.md` exists and is non-empty.
+- [ ] `epics/{parent-epic-folder}/features/{ID}-{slug}-{brief}/feature.md` exists and is non-empty (nested).
 - [ ] `## Open Questions` is empty (every question resolved, with answers folded into the artifact).
 - [ ] `Goal`, `Success Criteria`, and `Scope / Non-Scope` are drafted.
 - [ ] `Target Stories` and `Sequencing & Parallelization` are **left empty** (owned by `/p4-decompose-feature`).
-- [ ] **Mode A:** the original `**Parent Epic:**` back-ref header and `## Goal` one-liner from the stub are preserved verbatim.
-- [ ] **Mode B:** `**Parent Epic:**` is left blank.
+- [ ] **Mode A:** the original `## Goal` one-liner from the stub is preserved verbatim.
+- [ ] **Mode B:** created under the Tech Stories epic (per #15).
 - [ ] **Mode C:** `## All Remaining Fields` appendix is present iff the fetched payload had non-empty fields worth preserving.
+- [ ] `.shamt-state/active-feature` and `.shamt-state/active-epic` pointers have been written.
 - [ ] No `Validated …` footer present yet — `/validate-artifact` appends it.
 - [ ] User has confirmed the slug + content.
 
@@ -168,7 +169,7 @@ Surface — but do **not** auto-invoke — the next command:
 
 ```
 /clear
-/validate-artifact features/{ID}-{slug}-{brief}/feature.md
+/validate-artifact epics/{parent-epic-folder}/features/{ID}-{slug}-{brief}/feature.md
 ```
 
 After validation appends the footer, `/p4-decompose-feature {slug}` can run. This command stays independently runnable by a fresh agent off on-disk state per Principle 1 — chaining validation here would couple the two phases.
@@ -184,7 +185,7 @@ When the fetch succeeds, raw payload data is preserved inline in `feature.md`'s 
 - `features/{ID}-{slug}-{brief}/feature.md` exists, is non-empty, and has `Goal`, `Success Criteria`, `Scope / Non-Scope` drafted.
 - `Target Stories` and `Sequencing & Parallelization` remain empty (decomposition output).
 - `## Open Questions` is empty.
-- `**Parent Epic:**` header reflects the input mode: stub-preserved (Mode A), blank (Mode B), or seeded if the tracker payload's parent maps to a local epic folder (Mode C).
+- Parentage is the folder path; nesting is determined by the input mode: stub's parent (Mode A), Tech Stories epic (Mode B), or tracker-matched epic or Tech Stories (Mode C).
 - No validation footer yet — `/validate-artifact` adds it.
 - The user has confirmed slug + content; the next command has been suggested in chat.
 

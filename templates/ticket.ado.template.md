@@ -1,9 +1,5 @@
 # Story {slug} Ticket
 
-<!-- Parent back-refs (optional). Present when this story was created by /p4-decompose-feature; absent for standalone stories. -->
-**Parent Feature:** {feature-slug}
-**Parent Epic:** {epic-slug}
-
 **Tracker profile:** ADO (see `reference/trackers/ado.md` for fetch commands and field mapping)
 **Source:** [Azure DevOps / verbal / etc.]
 **Date received:** [YYYY-MM-DD]

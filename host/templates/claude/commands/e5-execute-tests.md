@@ -41,7 +41,7 @@ Per [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md#wh
 
 ## Prerequisites (testing enabled)
 
-- Story folder resolves; if `stories/{slug}/active_artifacts.md` exists, read it first and use the artifact paths listed under **Active Files**.
+- Resolve the story folder per `templates/SHAMT_RULES.template.md` §PO-tree resolution (tree-wide glob + legacy-flat fallback); `stories/{slug}/` below denotes that resolved folder. If `stories/{slug}/active_artifacts.md` exists, read it first and use the artifact paths listed under **Active Files**.
 - The active spec exists with a validation footer.
 - The active plan exists with a validation footer **and Phase 4 (Build) has completed** — code-under-test is in the working tree. If Build has not run yet, halt and direct the user to `/e4-execute-plan {slug}` first.
 - One of the following is true (per the path):

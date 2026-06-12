@@ -111,30 +111,26 @@ Every command above is **slug-first** and **fresh-agent runnable** per Principle
 
 ```text
 <child-project>/
-├── epics/                                # flat, globally unique slugs
-│   ├── {epic-slug}-{brief}/
-│   │   └── epic.md                       # no raw/ subfolder; All Remaining Fields appendix holds fetched fidelity
-│   └── archive/{epic-slug}-{brief}/      # finalized epics, moved here by /p5-finalize-epic (excluded from active-epic status-line resolution)
-├── features/                             # flat, globally unique slugs
-│   └── {feature-slug}-{brief}/
-│       └── feature.md                    # **Parent Epic:** back-ref header under H1 (blank for standalone)
-└── stories/                              # flat, globally unique slugs (Engineer-flow runtime)
-    └── {story-slug}-{brief}/
-        ├── ticket.md                     # **Parent Feature:** + **Parent Epic:** back-ref headers under H1 when PO-flow-seeded
-        ├── raw/                          # tracker payloads (stories only — distinct from epic/feature altitudes)
-        ├── spec.md, implementation_plan.md, ...
-        └── feedback/, ...
+└── epics/                                       # epics are top-level; globally unique slugs
+    ├── {ID}-{epic-slug}-{brief}/
+    │   ├── epic.md
+    │   └── features/                            # features nest under their epic
+    │       └── {ID}-{feature-slug}-{brief}/
+    │           ├── feature.md
+    │           └── stories/                     # stories nest under their feature
+    │               └── {ID}-{story-slug}-{brief}/
+    │                   ├── ticket.md            # no back-ref headers — parentage is the path
+    │                   ├── raw/                 # tracker payloads
+    │                   ├── spec.md, implementation_plan.md, ...
+    │                   └── feedback/, ...
+    └── archive/{ID}-{epic-slug}-{brief}/        # finalized epics (/p5-finalize-epic); excluded from active-epic resolution
 ```
 
-Epic and feature folders contain **only the main artifact** — no `raw/`, no `feedback/`, no nested per-story content. Per-story artifacts stay under their own story folder. Slugs are **globally unique at each altitude** (flat layout); collisions across `epics/`, `features/`, `stories/` are surfaced at write time by every command.
+Epic and feature folders carry their own artifact (`epic.md` / `feature.md`) plus their nested children. Slugs are **globally unique at each altitude**; the global uniqueness is what lets the `{slug}-*` tail resolve unambiguously by tree-wide glob (see `templates/SHAMT_RULES.template.md` §PO-tree resolution). Pre-existing flat layouts resolve via the legacy fallback — new work is written nested.
 
-#### Back-ref headers and the story handoff
+#### Parentage is the path
 
-Linking is plain-markdown header lines under the H1 — no parser, no sidecar file:
-
-- `epic.md` has no back-ref (top of the hierarchy).
-- `feature.md` carries `**Parent Epic:** {epic-slug}` (blank for standalone features created by `/p3-start-feature` from scratch).
-- `ticket.md` (when written by `/p4-decompose-feature`) carries `**Parent Feature:** {feature-slug}` and (when the parent feature has an epic) `**Parent Epic:** {parent-epic-slug}` — the second line is **omitted entirely** for stories under a standalone feature. `/p4-decompose-feature` populates both headers; `/e1-start-story` is **stub-aware** and **preserves them verbatim** when fleshing out the rest of the Intake content (no new command flag — the presence of the back-ref headers is the signal). Pre-existing freeform stories (no headers) behave unchanged.
+Linking is encoded by the folder path — `feature.md` lives inside its epic, `ticket.md` inside its feature. There are no `**Parent Epic:**` / `**Parent Feature:**` back-ref headers and no sidecar file; `/e1-start-story` derives parentage by walking up the resolved path (see §PO-tree resolution). One-off / parentless work lives under the standing **Tech Stories** epic.
 
 #### Individually-testable rubric (the hard PO-flow constraint)
 
@@ -154,12 +150,12 @@ Both `/p1-start-epic` and `/p3-start-feature` consult `.shamt-core/project-speci
 
 The status line surfaces PO-flow context by falling back through altitudes — first-match-wins:
 
-1. **Active story** → `STORY {slug} | P{N} {phase} | feat: {feature-slug} | epic: {epic-slug}` (the `feat:` / `epic:` segments come from the active `ticket.md`'s back-ref headers — omitted when absent).
+1. **Active story** → `STORY {slug} | P{N} {phase} | feat: {feature-slug} | epic: {epic-slug}` (the `feat:` / `epic:` segments are derived from the active-story pointer's path — omitted for a story directly under the Tech Stories epic with no distinct feature).
 2. **No active story, active feature** → `FEATURE {feature-slug} | epic: {parent-epic-slug}` (omits the `epic: …` segment for standalone features).
 3. **No active story or feature, active epic** → `EPIC {epic-slug}`.
 4. Otherwise → `Shamt | idle`.
 
-"Active" at every altitude resolves the same way: `{altitude}/.active` (single-line override pinning a folder) if present, else most-recently-modified subdirectory. See the [Status-line registration](#status-line-registration) table below for the full layout.
+"Active" at every altitude resolves from a root-level pointer file in the project work tree — `.shamt-state/active-epic`, `.shamt-state/active-feature`, `.shamt-state/active-story` — each holding the active item's full resolved nested path; the `p*` / `e1` commands write them as work advances. The `feat:` / `epic:` segments are derived by walking up the active-story pointer's path (not from back-ref headers). See the [Status-line registration](#status-line-registration) table below.
 
 ### Framework update flow (Part 3 — master-side)
 

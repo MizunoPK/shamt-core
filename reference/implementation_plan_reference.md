@@ -8,7 +8,7 @@ Expanded formatting and execution details for Pattern 5. `SHAMT_RULES.template.m
 
 The **Quick path** embeds a compact `## Build Checklist` inside `spec.md` instead of creating `implementation_plan.md`.
 
-**Escalate to a full Implementation Plan at `stories/{slug}/implementation_plan.md` when:**
+**Escalate to a full Implementation Plan at `stories/{slug}/implementation_plan.md` (the resolved story folder, per §PO-tree resolution) when:**
 
 - The build checklist exceeds 10 steps.
 - The build will be delegated to a builder sub-agent.

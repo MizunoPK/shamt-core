@@ -1,9 +1,7 @@
-<!-- Feature artifact. Lives at features/{ID}-{slug}-{brief}/feature.md ({ID}- prefix is the ticket ID; globally unique slug). -->
+<!-- Feature artifact. Lives at epics/{ID}-{epic-slug}-{brief}/features/{ID}-{slug}-{brief}/feature.md — nested under its parent epic (epics are top-level). Globally unique slug; resolved per §PO-tree resolution. -->
 # Feature {slug}
 
 **Ticket ID:** {ID}
-
-**Parent Epic:** [T{N} ({epic-slug}) — the parent epic's ticket ID + slug; leave blank for standalone features created via `/p3-start-feature` from scratch (no parent epic). Plain markdown; no parser.]
 
 ## Open Questions
 

@@ -1,7 +1,7 @@
 # Proposal: po-nested-folder-layout
 
 **Created:** 2026-06-10
-**Status:** Draft
+**Status:** Implemented
 **Number:** 14
 **Proposed by:** [master-local]
 **Project context:** [master-local]
@@ -42,7 +42,7 @@ Under nesting, the folder path is the single source of truth for parentage (the
 back-ref headers are dropped), a done epic becomes one movable subtree (the #13
 archive cascade resolves naturally), and the work is self-contained per
 initiative. Because `stories/{slug}/`-style paths are hardcoded across nearly the
-entire Engineer + PO canonical surface, the change is large (~46 canonical files)
+entire Engineer + PO canonical surface, the change is large (~50 canonical files)
 and **Phase 3 (`/f2-plan-update-implementation`) is required.**
 
 **Cross-proposal dependency.** Strict nesting removes the top-level `features/`
@@ -55,7 +55,7 @@ land alongside or before this proposal's nested layout.
 
 ## Proposed Changes
 
-> Row count is **46 canonical file operations (> 10)** → **Phase 3 required.**
+> Row count is **50 canonical file operations (> 10)** → **Phase 3 required.**
 > Run `/f2-plan-update-implementation po-nested-folder-layout` after validation;
 > the implementation will need phase-file splitting. All design questions are
 > resolved (see Resolved Questions): row 1 already includes the shared
@@ -143,6 +143,19 @@ land alongside or before this proposal's nested layout.
 | 45 | `shamt-core/host/templates/claude/agents/plan-executor.md` | EDIT | The builder persona resolves the **story-altitude** folder by globbing `stories/{slug}/` from the project root (Step 1) — repoint it at the §PO-tree resolution convention (tree-wide glob); update story-altitude path literals. The framework-altitude (`proposals/`) path is unaffected. |
 | 46 | `shamt-core/host/templates/claude/agents/test-executor.md` | EDIT | The test persona resolves the story folder "via the global rules" (`stories/{slug}-*/` glob) — repoint at §PO-tree resolution; update `stories/{slug}/testing_plan.md` / `active_artifacts.md` path literals. |
 
+**Group H — #13 finalize-command revisit (`/p5-finalize-epic` + `/e8-finalize-story`, folded in at the diff-coverage gate)**
+
+Both #13 finalize commands post-dated this proposal's plan, so the Engineer/PO sweep (Groups B–C) missed them; the diff-coverage gate surfaced their flat-layout assumptions.
+
+| # | Canonical path | Operation | One-line change description |
+|---|----------------|-----------|------------------------------|
+| 47 | `shamt-core/host/templates/claude/commands/p5-finalize-epic.md` | EDIT | #13's finalize-epic command finds children via `**Parent Epic:**` back-ref headers (flat) — repoint to a nested-tree walk inside the epic folder (`epics/{epic}/features/*/stories/*/`), change the archive from move-epic-only to a whole-subtree move (drop all back-ref language), and cite §PO-tree resolution for epic resolution. |
+| 48 | `shamt-core/host/templates/claude/skills/p5-finalize-epic/SKILL.md` | EDIT | Mirror row 47 in the skill summary. |
+| 49 | `shamt-core/host/templates/claude/commands/e8-finalize-story.md` | EDIT | #13's finalize-story command resolves the story folder by a **root-level flat glob** (`stories/{slug}/`) that won't find nested stories — repoint its resolution to §PO-tree resolution (tree-wide glob + legacy-flat fallback); artifact literals stay path-relative. |
+| 50 | `shamt-core/host/templates/claude/skills/e8-finalize-story/SKILL.md` | EDIT | Mirror row 49 in the skill summary. |
+
+> **Row-1 extension (rules sweep).** Row 1's "remove the back-ref-header convention" also covers the back-ref remnants #13 added *after* this proposal was drafted: the §Finalize-phase `/p5-finalize-epic` bullet (flat move-epic-only → nested whole-subtree) and the §Ticket-IDs convention (the obsolete "Parent back-refs use `T{N} (slug)`" bullet removed; the Allocation scan + Addressing resolver reworded to the nested tree / §PO-tree resolution).
+
 **Path discipline note.** The inclusion criterion is: a file changes iff it
 **resolves a folder from the project root** or **documents the top-level
 location** of one. Two canonical files that match the broad path-grep are
@@ -180,10 +193,14 @@ No generated `.claude/` paths appear.
   top-level `stories/` / `features/` to scan, so the resolution model is reworked
   to root-level active-pointer files (row 3). If row 3 is missed, the status line
   goes blank/wrong.
-- **#13 coupling** — proposal #13's `/p5-finalize-epic` archives move-epic-only;
-  once this lands, its archive step should cascade the whole subtree. This
-  proposal does not edit #13's command (it is additive to the layout); the
-  cascade revisit is tracked as a follow-up, not folded here.
+- **#13 coupling — folded here (was deferred).** #13's `/p5-finalize-epic`
+  finds an epic's children via `**Parent Epic:**` back-ref headers (flat layout)
+  and archives move-epic-only. Removing back-ref headers (this proposal) would
+  break it and contradict the rules' "no back-ref headers" statement. Surfaced
+  at the diff-coverage gate during implementation, the p5 revisit is therefore
+  **folded into this proposal** (Group H, rows 47–48 + the row-1 rules sweep):
+  child-discovery becomes a nested-tree walk and the archive becomes a
+  whole-subtree move (simpler under nesting). #13 and #14/#15 thus land coherent.
 - **Open-questions debt** — none; all design questions (resolver phrasing,
   active-resolution model, standalone-statement reconciliation) are resolved in
   Resolved Questions below and reflected in the change list.
@@ -254,5 +271,7 @@ _(none — all resolved below)_
 - ~~Active-resolution model under nesting?~~ → A: **Root-level pointer files.** Each altitude has a pointer (e.g. `active-story` / `active-feature` / `active-epic`) holding the full nested path; the status line reads one file per altitude (cheap, deterministic). The commands write/refresh the pointer as work advances (folded into the existing command edit rows). Pointers live in the **project work tree** (not under `.shamt-core/`, so `/sync-import-shamt` does not clobber them). Replaces the per-altitude `{parent}/.active` + most-recently-modified scan, which has no flat parent to scan under nesting.
 - ~~Rules "standalone stories run the Engineer flow directly" statement — reword here or defer?~~ → A: **Reword in this proposal** (row 1). The rules edit updates the statement so standalone/one-off work is described as living under the standing **Tech Stories** epic (cross-referencing `tech-stories-epic`) rather than as a top-level home, keeping the rules internally consistent the moment nesting lands instead of leaving a transient window where the rules describe a removed top-level home.
 
+
+
 ---
-Validated 2026-06-10 — 3 rounds, 1 adversarial sub-agent confirmed
+Validated 2026-06-12 — in-place amendment (p5+e8 finalize-command fold) re-validated

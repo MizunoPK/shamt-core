@@ -42,7 +42,7 @@ If the user explicitly requests Gate 3 planning on a Quick story, escalate to St
 
 ## Prerequisites
 
-- Story folder resolves; if `stories/{slug}/active_artifacts.md` exists, read it first and use the Active Files instead of unversioned baselines.
+- Resolve the story folder per `templates/SHAMT_RULES.template.md` §PO-tree resolution (tree-wide glob + legacy-flat fallback); `stories/{slug}/` below denotes that resolved folder. If `stories/{slug}/active_artifacts.md` exists, read it first and use the Active Files instead of unversioned baselines.
 - `spec.md` (or the active baseline) exists, has a validation footer, and is approved at Gate 2b. If not, halt and direct the user to `/e2-define-spec {slug}`.
 - On Standard path, `context.md` (or the active baseline) exists with a validation footer.
 - `Open Questions` in the active spec is empty (or contains only explicitly deferred items with reasons). If unresolved questions remain, halt and ask.
