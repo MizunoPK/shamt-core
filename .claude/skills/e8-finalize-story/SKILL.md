@@ -32,6 +32,7 @@ Follow the canonical `/e8-finalize-story` command body verbatim — see [`comman
 4. **Guard — explicit confirmation** — show the exact files to commit + the work item to close + the `Status: Done` marker; wait for a yes (the remote close is outward-facing).
 5. **Commit + mark done** — scoped commit on the feature branch; then per the active tracker profile: ado `az boards work-item update --state`, github `gh issue close`, local = the marker itself.
 6. **Local finalize marker** — write `**Status: Done**` into `ticket.md` for all profiles (the status line's profile-independent Finalize signal).
+6b. **Tech-story completion archive** — if the story is nested under the standing **Tech Stories** epic (`epics/{tech-stories-folder}/features/{bugs|quick-wins}/stories/…`), `git mv` the finalized story folder into its feature's `archive/` within the same commit; for a normal story, skip.
 7. **Exit** — terminal; no next-phase suggestion. The Engineer flow ends here.
 
 ## Recommended model

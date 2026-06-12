@@ -65,6 +65,10 @@ If the remote close command fails, halt and report the git/CLI output — do not
 
 **In all profiles**, write `**Status: Done**` into the story's `ticket.md` header (replacing any prior `**Status:**` line, or adding one). This is the profile-independent, no-network signal the status line reads to render the `Finalize` phase. Include it in the Step 3 commit (or amend it in if Step 4 ran after the commit).
 
+### Step 5b — Tech-story completion archive
+
+If the resolved story folder is nested under the standing **Tech Stories** epic (its path is `epics/{tech-stories-folder}/features/{bugs|quick-wins}/stories/…`), **move the finalized story folder into its feature's `archive/`** — `epics/{tech-stories-folder}/features/{f}/archive/{same-folder-name}/` (`git mv` when tracked) — within the same Step 3 commit. This keeps the standing Bugs / Quick Wins features from growing without bound (mirroring how `/p5-finalize-epic` archives a done epic and `/f6-archive-proposal` archives an implemented proposal). For a normal (non-Tech-Stories) story, **skip this step** — the story folder stays in place.
+
 ### Step 6 — Exit
 
 State the exit clearly:

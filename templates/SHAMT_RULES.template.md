@@ -154,6 +154,15 @@ New work is **written nested**; pre-existing flat folders stay and resolve via t
 
 **Active-item pointers.** The status line resolves the active epic / feature / story from root-level pointer files in the project work tree — `.shamt-state/active-epic`, `.shamt-state/active-feature`, `.shamt-state/active-story` — each holding the active item's full resolved nested path (parentage derived by walking up that path). The `p*` start/decompose commands and `/e1-start-story` write/refresh the matching pointer when they create or advance an item. Pointers live outside `.shamt-core/` so `import-shamt` never clobbers them.
 
+### Standing Tech Stories epic
+
+One-off work that does not belong to any real initiative — bug fixes and small standalone improvements — lives under a permanent **Tech Stories** epic, the home for the otherwise-orphaned work that strict nesting has no top-level place for.
+
+- **Standing fixtures, fixed reserved names.** `epics/{tech-stories-folder}/` contains two standing features, **Bugs** and **Quick Wins**. The epic + features use **fixed reserved folder names** (`tech-stories`, `bugs`, `quick-wins`) — *not* the `{ID}-{slug}-{brief}` convention, since they carry no ticket ID. They are seeded once by the install/sync flow (`init-shamt.sh` / `import-shamt.sh`, create-if-absent), not created per-initiative by `/p1-start-epic`. Their reserved slugs are globally unique, so the existing collision checks refuse any reuse.
+- **Local-only containers.** The standing epic + features never map to tracker work items; only the individual tickets filed under them map to tracker issues per the active profile (a bug = a GitHub issue / ADO bug). Tracker-agnostic.
+- **Fast-path entry.** `/p6-draft-tech-story [bugs|quick-wins]` seeds a story-ticket stub directly under the chosen feature and hands to `/e1-start-story` — bypassing the `/p1`→`/p4` decomposition cascade.
+- **Per-feature completion archive.** When a tech-story is finalized (`/e8-finalize-story`), its folder moves into `epics/{tech-stories-folder}/features/{f}/archive/`, keeping the standing features bounded.
+
 Resume any phase with the slug-first command: `/e4-execute-plan {slug}`, `/e7-resolve-feedback {slug}`, etc.
 
 ---

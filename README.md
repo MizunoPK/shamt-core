@@ -85,7 +85,7 @@ No bidirectional guide-editing sync. No `export.sh`. The child's project work (s
 
 ### Product Owner flow (Part 2)
 
-Five commands across two altitudes — Epic (top) and Feature (one level down). Each `start-*` command defines an artifact; each `decompose-*` command breaks it into stubs at the next altitude; `/p5-finalize-epic` is the terminal Epic-altitude command. The story is the handoff into the Engineer flow.
+Six commands across two altitudes — Epic (top) and Feature (one level down). Each `start-*` command defines an artifact; each `decompose-*` command breaks it into stubs at the next altitude; `/p5-finalize-epic` is the terminal Epic-altitude command, and `/p6-draft-tech-story` is a fast path for one-off work. The story is the handoff into the Engineer flow.
 
 ```text
             Epic                       <-- /p1-start-epic, /p2-decompose-epic
@@ -104,6 +104,7 @@ Five commands across two altitudes — Epic (top) and Feature (one level down). 
 | `/p3-start-feature {slug}` | Feature intake/define | shipped |
 | `/p4-decompose-feature {slug}` | Feature → story stubs | shipped |
 | `/p5-finalize-epic {slug}` | Epic finalize → `epics/archive/` | shipped |
+| `/p6-draft-tech-story [bugs\|quick-wins] [slug]` | Fast-path: one-off bug/quick-win → Tech Stories epic | shipped |
 
 Every command above is **slug-first** and **fresh-agent runnable** per Principle 1: pass a slug, the command resolves the folder, reads on-disk state, executes its phase. Each one mirrors `/e1-start-story`'s tracker plumbing: when the active profile (read from `.shamt-core/shamt-config.json`) declares the matching work-item type (e.g., ADO supports Epic + Feature + Story; GitHub supports Issue only), the slug-to-ID parse and payload fetch happen — otherwise the command falls through to freeform mode with a one-line notice (`tracker profile {name} has no {Type} work-item type — proceeding freeform`).
 
@@ -124,6 +125,8 @@ Every command above is **slug-first** and **fresh-agent runnable** per Principle
     │                   ├── spec.md, implementation_plan.md, ...
     │                   └── feedback/, ...
     └── archive/{ID}-{epic-slug}-{brief}/        # finalized epics (/p5-finalize-epic); excluded from active-epic resolution
+
+> A permanent **Tech Stories** epic (`epics/tech-stories/` with standing `features/bugs/` + `features/quick-wins/`, fixed reserved names, seeded at install) is the home for one-off bugs / quick wins filed via `/p6-draft-tech-story`. Finished tech-stories archive into their feature's `archive/`. See `templates/SHAMT_RULES.template.md` §Standing Tech Stories epic.
 ```
 
 Epic and feature folders carry their own artifact (`epic.md` / `feature.md`) plus their nested children. Slugs are **globally unique at each altitude**; the global uniqueness is what lets the `{slug}-*` tail resolve unambiguously by tree-wide glob (see `templates/SHAMT_RULES.template.md` §PO-tree resolution). Pre-existing flat layouts resolve via the legacy fallback — new work is written nested.

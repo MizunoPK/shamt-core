@@ -483,6 +483,45 @@ else
   warn "  Run it manually after init: bash $regen_script --target $TARGET_DIR"
 fi
 
+# ---- Seed the standing Tech Stories epic (project work tree) -----------------
+# The home for one-off bugs / quick wins filed via /p6-draft-tech-story. Fixed
+# reserved folder names (no ticket ID). Create-if-absent, idempotent. This is the
+# first init step that writes project-work-tree content (epics/...), so it is
+# SKIPPED on self-host — the shamt-core repo itself does no PO work.
+seed_tech_stories_epic() {
+  local root="$1"
+  local ts="$root/epics/tech-stories"
+  [ -f "$ts/epic.md" ] || { mkdir -p "$ts" && cat > "$ts/epic.md" <<'EOF'
+# Epic: Tech Stories
+
+**Status:** Standing
+
+The permanent home for one-off work that does not belong to any real initiative —
+bug fixes and small standalone improvements. Not created per-initiative; seeded
+once at install. File work under it with `/p6-draft-tech-story [bugs|quick-wins]`.
+A local-only organizational container (no tracker work item).
+EOF
+  }
+  local f
+  for f in bugs quick-wins; do
+    local fd="$ts/features/$f"
+    [ -f "$fd/feature.md" ] || { mkdir -p "$fd" && cat > "$fd/feature.md" <<EOF
+# Feature: ${f}
+
+**Status:** Standing
+
+Standing Tech Stories feature. $( [ "$f" = bugs ] && echo "Catches one-off bug fixes." || echo "Catches small standalone improvements (quick wins)." )
+Tickets are filed here via \`/p6-draft-tech-story $f\` and archived into \`archive/\` on finalize.
+EOF
+    }
+  done
+}
+
+if [ "$SELF_HOST" -eq 0 ]; then
+  log "Seeding standing Tech Stories epic (epics/tech-stories/) …"
+  seed_tech_stories_epic "$TARGET_DIR"
+fi
+
 # ---- Summary ----------------------------------------------------------------
 
 log ""

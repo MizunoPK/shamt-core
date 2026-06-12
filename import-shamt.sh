@@ -367,6 +367,37 @@ else
   warn "regenerate-framework.sh not found at $regen_script — .claude/ NOT regenerated."
 fi
 
+# ---- Re-seed the standing Tech Stories epic (idempotent) --------------------
+# Existing children that predate the Tech Stories epic get it on next import.
+# Create-if-absent — never overwrite an existing epic.md / feature.md (preserves
+# any in-progress tickets the child has filed under it).
+ts="$TARGET_DIR/epics/tech-stories"
+if [ ! -f "$ts/epic.md" ]; then
+  mkdir -p "$ts" && cat > "$ts/epic.md" <<'EOF'
+# Epic: Tech Stories
+
+**Status:** Standing
+
+The permanent home for one-off work that does not belong to any real initiative —
+bug fixes and small standalone improvements. File work under it with
+`/p6-draft-tech-story [bugs|quick-wins]`. A local-only organizational container.
+EOF
+  log "Seeded standing Tech Stories epic (was absent)."
+fi
+for _f in bugs quick-wins; do
+  _fd="$ts/features/$_f"
+  if [ ! -f "$_fd/feature.md" ]; then
+    mkdir -p "$_fd" && cat > "$_fd/feature.md" <<EOF
+# Feature: ${_f}
+
+**Status:** Standing
+
+Standing Tech Stories feature. Tickets are filed via \`/p6-draft-tech-story $_f\`
+and archived into \`archive/\` on finalize.
+EOF
+  fi
+done
+
 # ---- Summary ----------------------------------------------------------------
 
 log ""
