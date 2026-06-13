@@ -50,6 +50,13 @@ The work tree (`epics/`, `features/`, `stories/`, `code_reviews/`) and the
 child (shown above), at the repo root on master/self-host. Only `CLAUDE.md` and
 `.claude/` ever live at a child's project root.
 
+**Git-ignored in a child.** A child install does **not** track Shamt's generated
+footprint: `init-shamt.sh` adds a managed `.gitignore` block for `/.shamt-core/`,
+`/.claude/`, and `/CLAUDE.md` (the last only when init *seeded* it — a
+pre-existing child `CLAUDE.md` is preserved and kept tracked). All of it is
+re-derivable — `.shamt-core/` via `import-shamt`, `.claude/` via
+`/f4-regen-framework` — so a fresh clone restores the wiring with one regen/import.
+
 The master repo has additional `proposals/` subfolders that **never appear in a child project**: `incoming/` (child-submitted proposals awaiting triage), `archive/` (implemented proposals), `rejected/` (closed with a top-of-file note), and `deferred/` (on hold). Master's presence is what `/sync-submit-proposal` and `/sync-triage-proposals` use to discriminate the two sides — child projects rely on the absence of `proposals/incoming/` as the master-side check.
 
 Files with a `Managed by Shamt` footer (or files in `.shamt-core/`'s master sync set) are owned by master / regen — they get overwritten by `import-shamt` and `/f4-regen-framework`. Files outside that set are user-owned and preserved.
@@ -247,6 +254,7 @@ Behavior:
 - Copies canonical sources from `<source>/shamt-core/` into `<target>/.shamt-core/` (skipped on self-host).
 - Seeds the child's `CLAUDE.md` at `<target>/` (from `templates/SHAMT_RULES.template.md`), and the two project-specific docs `ARCHITECTURE.md` + `CODING_STANDARDS.md` (with `Last Updated` set to today) under `<target>/.shamt-core/project-specific-files/`. `README.md` and `proposals/_template.md` travel inside the `.shamt-core/` canonical-source copy — they are not separately seeded. Skipped on self-host.
 - Writes the install config (`<target>/shamt-config.json` on self-host, `<target>/.shamt-core/shamt-config.json` otherwise) from the prompted answers. Ends with a copy/pastable completion prompt that drives an agent to fill in and `/validate-artifact` both project-specific docs.
+- Appends a managed `# >>> Shamt (managed)` block to the child's `.gitignore` (create-if-absent, idempotent — skipped if already present) that ignores `/.shamt-core/` + `/.claude/`, plus `/CLAUDE.md` **only when init seeded it** (a pre-existing child `CLAUDE.md` stays tracked). Skipped on self-host.
 - Runs `regenerate-framework.sh --target <target>` to produce `<target>/.claude/`.
 
 ### `import-shamt.sh` — framework pull
