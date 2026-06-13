@@ -47,7 +47,7 @@ gh issue view {id} --repo <org>/<repo> \
   --json number,title,body,state,stateReason,labels,milestone,assignees,author,url,createdAt,updatedAt,closedAt,projectItems,reactionGroups
 ```
 
-The consuming command writes the verbatim JSON to `stories/{slug}-*/raw/issue.json`. PO-flow variants (`epics/{slug}-*/raw/issue.json`, `features/{slug}-*/raw/issue.json` — under the nested layout per §PO-tree resolution) do not apply here, because `/p1-start-epic` and `/p3-start-feature` against this profile fall through to freeform mode (see [Supported work-item types](#supported-work-item-types) below).
+The consuming command writes the verbatim JSON to `stories/{ID}-{slug}-{brief}/raw/issue.json` (the folder located by ticket ID or slug per §PO-tree resolution). PO-flow variants (`epics/{ID}-{slug}-{brief}/raw/issue.json`, `features/{ID}-{slug}-{brief}/raw/issue.json` — under the nested layout) do not apply here, because `/p1-start-epic` and `/p3-start-feature` against this profile fall through to freeform mode (see [Supported work-item types](#supported-work-item-types) below).
 
 Custom issue types (the repo-level GraphQL `IssueType` field, in repos that have opted into the feature) are not exposed by `gh issue view --json` as of this writing; if a project depends on them, augment with the GraphQL form:
 

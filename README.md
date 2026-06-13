@@ -119,7 +119,7 @@ Six commands across two altitudes — Epic (top) and Feature (one level down). E
 | `/p5-finalize-epic {slug}` | Epic finalize → `epics/archive/` | shipped |
 | `/p6-draft-tech-story [bugs\|quick-wins] [slug]` | Fast-path: one-off bug/quick-win → Tech Stories epic | shipped |
 
-Every command above is **slug-first** and **fresh-agent runnable** per Principle 1: pass a slug, the command resolves the folder, reads on-disk state, executes its phase. Each one mirrors `/e1-start-story`'s tracker plumbing: when the active profile (read from `.shamt-core/shamt-config.json`) declares the matching work-item type (e.g., ADO supports Epic + Feature + Story; GitHub supports Issue only), the slug-to-ID parse and payload fetch happen — otherwise the command falls through to freeform mode with a one-line notice (`tracker profile {name} has no {Type} work-item type — proceeding freeform`).
+Every command above is **ID-or-slug-first** and **fresh-agent runnable** per Principle 1: pass a **ticket ID or slug** (`{id-or-slug}` — the tables show the common `{slug}` form, but a ticket ID like `T5` works equally, resolved per §PO-tree resolution / # Ticket IDs), the command resolves the folder, reads on-disk state, executes its phase. Each one mirrors `/e1-start-story`'s tracker plumbing: when the active profile (read from `.shamt-core/shamt-config.json`) declares the matching work-item type (e.g., ADO supports Epic + Feature + Story; GitHub supports Issue only), the slug-to-ID parse and payload fetch happen — otherwise the command falls through to freeform mode with a one-line notice (`tracker profile {name} has no {Type} work-item type — proceeding freeform`).
 
 #### Hierarchy + folder layout
 

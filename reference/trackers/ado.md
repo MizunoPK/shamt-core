@@ -53,7 +53,7 @@ If the slug does not begin with a numeric segment, the command treats it as free
 az boards work-item show --id {id} --expand all --output json
 ```
 
-`--expand all` returns the work item with `fields`, `relations`, and `_links` populated in a single call. The consuming command writes the verbatim JSON to `stories/{slug}-*/raw/issue.json` (or `epics/{slug}-*/raw/issue.json` / `features/{slug}-*/raw/issue.json` for the PO-flow variants once `/p1-start-epic` and `/p3-start-feature` ship — resolved per §PO-tree resolution; the feature variant nests under its epic (epics/*/features/{slug}-*/raw/issue.json)).
+`--expand all` returns the work item with `fields`, `relations`, and `_links` populated in a single call. The consuming command writes the verbatim JSON to `stories/{ID}-{slug}-{brief}/raw/issue.json` (or `epics/{ID}-{slug}-{brief}/raw/issue.json` / `features/{ID}-{slug}-{brief}/raw/issue.json` for the PO-flow variants once `/p1-start-epic` and `/p3-start-feature` ship — the folder located by ticket ID or slug per §PO-tree resolution; the feature variant nests under its epic (`epics/*/features/{ID}-{slug}-{brief}/raw/issue.json`)).
 
 ---
 
