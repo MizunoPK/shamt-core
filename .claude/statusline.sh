@@ -16,9 +16,10 @@
 #        Shamt | idle
 #
 # Active resolution for each altitude (story / feature / epic):
-#   Read the root-level pointer file in the project work tree —
-#   .shamt-state/active-{epic,feature,story} — each holding the active item's
-#   full resolved nested path (epics/<e>/features/<f>/stories/<s>/). The p*/e1
+#   Read the pointer file at {work-root}/shamt-state/active-{epic,feature,story}
+#   (work root = .shamt-core/ in a child, repo root on master/self-host) — each
+#   holding the active item's work-root-relative nested path
+#   (epics/<e>/features/<f>/stories/<s>/). The p*/e1
 #   commands write these as work advances. Parentage (feat:/epic:) is derived by
 #   walking up the active-story pointer path, not from back-ref headers.
 #
@@ -65,17 +66,21 @@ fi
 #
 # Prints the resolved path (or nothing) on stdout. Caller checks for empty.
 
-# Read the active {epic|feature|story} from its root-level pointer file
-# (.shamt-state/active-<altitude>), which holds the full resolved nested path.
-# Replaces the old flat {parent}/.active + most-recently-modified scan: under the
-# nested layout there is no flat top-level dir to scan. archive/ never appears in
-# a pointer (finalized epics are not active).
+# Read the active {epic|feature|story} from its pointer file at
+# {work-root}/shamt-state/active-<altitude>, which holds the work-root-relative
+# nested path. The work root is .shamt-core/ in a child, the repo root on
+# master/self-host. archive/ never appears in a pointer (finalized epics are not
+# active).
 resolve_active_dir() {
   local altitude="$1"            # epic | feature | story
-  local ptr=".shamt-state/active-${altitude}"
+  # Work root: .shamt-core/ in a child, repo root on master/self-host.
+  local wr="."; [ -d .shamt-core ] && wr=".shamt-core"
+  local ptr="${wr}/shamt-state/active-${altitude}"
   [ -f "$ptr" ] || return 0
   local dir
   dir="$(head -n 1 "$ptr" 2>/dev/null | tr -d '[:space:]')"
+  # Pointer content is work-root-relative; resolve it under the work root.
+  [ -n "$dir" ] && dir="${wr}/${dir}"
   [ -n "$dir" ] && [ -d "$dir" ] && printf '%s' "$dir"
 }
 

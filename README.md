@@ -34,15 +34,21 @@ A child project that has installed Shamt looks like this:
 │   ├── project-specific-files/
 │   │   ├── ARCHITECTURE.md         #   required at init (template provided)
 │   │   └── CODING_STANDARDS.md     #   required at init (template provided)
-│   └── proposals/                  # framework-update proposals (locally authored)
-│       ├── _template.md            #   (master-owned — resynced by /sync-import-shamt; do not edit locally)
-│       ├── submitted/              # submitted to master, awaiting decision
-│       └── already-merged/         # came back via master sync (auto-moved on import)
-├── stories/                        # runtime — per-story artifacts
-├── epics/                          # runtime — PO-flow artifacts (when used)
-├── features/                       # runtime — PO-flow artifacts (when used)
-└── code_reviews/                   # formal-mode review output
+│   ├── proposals/                  # framework-update proposals (locally authored)
+│   │   ├── _template.md            #   (master-owned — resynced by /sync-import-shamt; do not edit locally)
+│   │   ├── submitted/              # submitted to master, awaiting decision
+│   │   └── already-merged/         # came back via master sync (auto-moved on import)
+│   ├── epics/                      # runtime — PO-flow work tree (when used)
+│   ├── features/                   # runtime — PO-flow work tree (when used)
+│   ├── stories/                    # runtime — per-story artifacts
+│   ├── code_reviews/               # runtime — formal-mode review output
+│   └── shamt-state/                # active-item pointers (active-{epic,feature,story})
 ```
+
+The work tree (`epics/`, `features/`, `stories/`, `code_reviews/`) and the
+`shamt-state/` pointers are **work-root-relative** — under `.shamt-core/` in a
+child (shown above), at the repo root on master/self-host. Only `CLAUDE.md` and
+`.claude/` ever live at a child's project root.
 
 The master repo has additional `proposals/` subfolders that **never appear in a child project**: `incoming/` (child-submitted proposals awaiting triage), `archive/` (implemented proposals), `rejected/` (closed with a top-of-file note), and `deferred/` (on hold). Master's presence is what `/sync-submit-proposal` and `/sync-triage-proposals` use to discriminate the two sides — child projects rely on the absence of `proposals/incoming/` as the master-side check.
 
@@ -111,8 +117,8 @@ Every command above is **slug-first** and **fresh-agent runnable** per Principle
 #### Hierarchy + folder layout
 
 ```text
-<child-project>/
-└── epics/                                       # epics are top-level; globally unique slugs
+<child-project>/.shamt-core/                     # the Shamt work root in a child (repo root on master/self-host)
+└── epics/                                       # top-level within the work tree; globally unique slugs
     ├── {ID}-{epic-slug}-{brief}/
     │   ├── epic.md
     │   └── features/                            # features nest under their epic
@@ -158,7 +164,7 @@ The status line surfaces PO-flow context by falling back through altitudes — f
 3. **No active story or feature, active epic** → `EPIC {epic-slug}`.
 4. Otherwise → `Shamt | idle`.
 
-"Active" at every altitude resolves from a root-level pointer file in the project work tree — `.shamt-state/active-epic`, `.shamt-state/active-feature`, `.shamt-state/active-story` — each holding the active item's full resolved nested path; the `p*` / `e1` commands write them as work advances. The `feat:` / `epic:` segments are derived by walking up the active-story pointer's path (not from back-ref headers). See the [Status-line registration](#status-line-registration) table below.
+"Active" at every altitude resolves from a pointer file at `{work-root}/shamt-state/active-{epic,feature,story}` (`.shamt-core/shamt-state/` in a child, the repo root on master/self-host) — each holding the active item's full **work-root-relative** nested path; the `p*` / `e1` commands write them as work advances. The `feat:` / `epic:` segments are derived by walking up the active-story pointer's path (not from back-ref headers). See the [Status-line registration](#status-line-registration) table below.
 
 ### Framework update flow (Part 3 — master-side)
 

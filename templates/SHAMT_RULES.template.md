@@ -40,7 +40,7 @@ These two principles apply to **every** multi-phase flow and every artifact-gene
 Every multi-phase flow follows this pattern:
 
 1. **One slash command per phase.** No single mega-orchestrator. Each phase is invoked explicitly: `/e1-start-story`, `/e2-define-spec`, `/e3-plan-implementation` are separate commands, not steps inside one `/run-story`.
-2. **Every command takes a ticket ID or slug.** `/command {id-or-slug}` resolves to a folder: if the key is a ticket ID (matches `^T[0-9]+$`), glob `{root}/{ID}-*/`. Otherwise treat the key as a slug — try exact `{root}/{slug}/`, then glob **both** `{root}/{slug}-*/` (slug at the folder start — pre-ID folders) **and** `{root}/*-{slug}-*/` (slug after an ID prefix — `{ID}-{slug}-{brief}/` folders), unioning the matches. Halt if ambiguous (more than one folder); halt if none. See **# Ticket IDs**.
+2. **Every command takes a ticket ID or slug.** `/command {id-or-slug}` resolves to exactly one folder (ID `^T[0-9]+$` → `{root}/{ID}-*/`; slug → exact `{root}/{slug}/` ∪ `{root}/{slug}-*/` ∪ `{root}/*-{slug}-*/`, unioned); halt if ambiguous (>1) or none. Globs are work-root-relative — see §PO-tree resolution and **# Ticket IDs**.
 3. **Fresh-agent runnable.** A new agent with no conversation history reads the on-disk artifacts under the resolved folder, determines current state from artifact presence (and from `active_artifacts.md` when re-baselined), and executes the requested phase.
 4. **No state file, no orchestrator memory.** State lives in the filesystem. If the prior phase's artifact exists and passes its exit gate, the next phase can run.
 5. **Skills mirror slash commands.** Each slash command has a corresponding auto-triggered skill (natural-language phrases like "spec this ticket") that runs the same flow. Both surfaces, same canonical body.
@@ -150,9 +150,9 @@ Slug-first commands resolve a folder by a **tree-wide glob with a legacy-flat fa
 - **Feature**: `epics/*/features/{ID}-*/` · `epics/*/features/{slug}-*/` · `epics/*/features/*-{slug}-*/`; legacy fallback `features/{slug}-*/`.
 - **Story**: `epics/*/features/*/stories/{ID}-*/` · `…/stories/{slug}-*/` · `…/stories/*-{slug}-*/`; legacy fallback `stories/{slug}-*/`.
 
-New work is **written nested**; pre-existing flat folders stay and resolve via the fallback (no migration). Parentage is encoded by the path — there are **no `**Parent Epic:**` / `**Parent Feature:**` back-ref headers**. Throughout command / skill / template / reference bodies, `epics/{slug}/`, `features/{slug}/`, `stories/{slug}/` denote **the resolved folder** (per the globs above; leaf still `…-{brief}/`), not literal top-level paths.
+New work is **written nested**; pre-existing flat folders stay and resolve via the fallback (no migration). Parentage is encoded by the path — there are **no `**Parent Epic:**` / `**Parent Feature:**` back-ref headers**. Throughout command / skill / template / reference bodies, `epics/{slug}/`, `features/{slug}/`, `stories/{slug}/` denote **the resolved folder** (per the globs above; leaf still `…-{brief}/`). **Work root:** all bare `epics/`/`features/`/`stories/`/`code_reviews/`/`shamt-state/` paths are **work-root-relative** — repo root on self-host, `.shamt-core/` in a child (resolve the work root once via `.shamt-core/`-presence before globbing/writing). A child writes work-tree artifacts only under `.shamt-core/`; its project root holds only `CLAUDE.md` + `.claude/`.
 
-**Active-item pointers.** The status line resolves the active epic / feature / story from root-level pointer files — `.shamt-state/active-{epic,feature,story}` — each holding the active item's full resolved nested path (parentage derived by walking it up). The `p*` start/decompose commands and `/e1-start-story` write/refresh the matching pointer when they create or advance an item. Pointers live outside `.shamt-core/` so `import-shamt` never clobbers them.
+**Active-item pointers.** The status line reads `{work-root}/shamt-state/active-{epic,feature,story}` (`.shamt-core/shamt-state/` in a child), each holding the active item's **work-root-relative** nested path (parentage = walk it up). The `p*`/`e1` commands write/refresh the matching pointer as work advances; `import-shamt` preserves them (outside its sync set).
 
 ### Standing Tech Stories epic
 
@@ -168,7 +168,7 @@ The standing **Tech Stories** epic (introduced above) is the home for one-off wo
 
 Apply across Spec, Plan, Build, Test (when enabled), Review, and Polish:
 
-- **Story folder resolution.** For `{id-or-slug}`, resolve the folder using file-based anchors. If the key is a ticket ID (`^T[0-9]+$`), glob `stories/{ID}-*/ticket.md`. Otherwise (a slug) try `stories/{slug}/ticket.md`, then glob **both** `stories/{slug}-*/ticket.md` and `stories/*-{slug}-*/ticket.md`, deriving the folder from the matched path. Multiple matches → halt and ask. No matches → halt and report.
+- **Story folder resolution.** Resolve the story folder per §PO-tree resolution (globs are **work-root-relative** — `.shamt-core/` in a child), anchored on `ticket.md`: ID → `stories/{ID}-*/ticket.md`; slug → `stories/{slug}/ticket.md` ∪ `stories/{slug}-*/ticket.md` ∪ `stories/*-{slug}-*/ticket.md`. Multiple → halt and ask; none → halt and report.
 - **Active artifact pointer.** When `stories/{slug}/active_artifacts.md` exists, read it first and use files listed under "Active Files" instead of assuming unversioned names.
 - **TODO gate.** TODO comments are allowed only for team-discussion placeholders or temporary debug logging that must be removed before merge. Polish cannot complete while any TODO remains in the implementation plan or code. If `.shamt-core/project-specific-files/CODING_STANDARDS.md` is stricter, follow it.
 - **Re-baseline rule.** When a post-approval requirement change makes the active spec or plan misleading, stop and create a new baseline instead of patching the old one in place. See the Re-baseline Protocol below.

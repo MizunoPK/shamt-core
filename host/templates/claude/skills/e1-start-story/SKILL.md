@@ -34,7 +34,7 @@ Follow the canonical `/e1-start-story` command body verbatim — see [`commands/
    - `local` — `ticket.md` must already exist; halt otherwise.
    - `none` — freeform capture.
 5. Freeform capture (when applicable) applies the **open-questions iterative dialog** — surface each question to the user one at a time, update the ticket, repeat.
-6. Detect slug collisions; confirm the intake summary with the user; write the resolved story-folder path to `.shamt-state/active-story` (and `.shamt-state/active-feature` / `active-epic` for its parents when nested); create `.shamt-state/` if absent; suggest `/clear` + `/e2-define-spec {slug}`.
+6. Detect slug collisions; confirm the intake summary with the user; write the resolved story-folder path to `shamt-state/active-story` (and `shamt-state/active-feature` / `active-epic` for its parents when nested); create `shamt-state/` if absent; suggest `/clear` + `/e2-define-spec {slug}`.
 
 ## Recommended model
 

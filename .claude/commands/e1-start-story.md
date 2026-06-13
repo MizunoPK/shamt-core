@@ -110,7 +110,7 @@ Present an intake summary inline in chat:
 
 **Gate:** the user explicitly confirms the slug and ticket content. If the user wants changes, apply them, then re-prompt.
 
-Write the resolved story-folder path to `.shamt-state/active-story` (and `.shamt-state/active-feature` / `active-epic` for its parents when nested); create `.shamt-state/` if absent.
+Write the resolved story-folder path to `shamt-state/active-story` (and `shamt-state/active-feature` / `active-epic` for its parents when nested); create `shamt-state/` if absent.
 
 Suggest a context-clear before Phase 2 — `/clear`, then `/e2-define-spec {slug}` — per the context-clear-breakpoints guidance in [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md).
 

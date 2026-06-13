@@ -90,7 +90,7 @@ The folder exists; `feature.md` already carries a populated `## Goal` from `/p2-
 
 The folder did not exist before Step 3. There is no explicit parent epic input from the user.
 
-1. Write `epics/{parent-epic-folder}/features/{ID}-{slug}-{brief}/feature.md` from [`templates/feature.template.md`](../../../../templates/feature.template.md). After writing feature.md, write its path to `.shamt-state/active-feature` (and `.shamt-state/active-epic` for its parent epic when nested).
+1. Write `epics/{parent-epic-folder}/features/{ID}-{slug}-{brief}/feature.md` from [`templates/feature.template.md`](../../../../templates/feature.template.md). After writing feature.md, write its path to `shamt-state/active-feature` (and `shamt-state/active-epic` for its parent epic when nested).
 2. **Mode B has no top-level home** — a standalone feature is created under the standing Tech Stories epic (`epics/{parent-epic-folder}/features/{ID}-{slug}-{brief}/feature.md` (here `{parent-epic-folder}` = the Tech Stories epic), per #15). There is no blank-parent / top-level feature. (If #15 has not landed alongside, the executor halts per the index's sequencing precondition.)
 3. Proceed to Step 5 (architecture consult), then Step 6 (open-questions dialog) to populate `Goal`, `Success Criteria`, and `Scope / Non-Scope` from scratch.
 4. Leave `Target Stories` and `Sequencing & Parallelization` empty.
@@ -119,7 +119,7 @@ Apply the profile's `## Slug resolution` rule. If the slug does not parse to a t
    - Apply the markdown normalization rules from [`templates/ticket.ado.template.md`](../../../../templates/ticket.ado.template.md) / [`templates/ticket.github.template.md`](../../../../templates/ticket.github.template.md) (entity decoding, attribute stripping, U+FFFD preservation, long-field rendering).
 5. **All Remaining Fields appendix.** Any non-empty payload fields the agent wants to preserve for fidelity (custom fields, long design notes, attachment URLs, etc.) go into a final `## All Remaining Fields` subsection appended **immediately above the validation footer slot** (i.e., below `Sequencing & Parallelization`). Same pattern as `/p1-start-epic` — no `raw/` subfolder. Omit the subsection entirely when there is nothing worth preserving.
 6. Detect `## Auth failure modes` patterns. If the primary fetch fails on auth, surface the profile's fallback notice and **fall through to Mode B** (or Mode A if Step 2 resolved to a stub).
-7. After populating the seed content, write its path to `.shamt-state/active-feature` (and `.shamt-state/active-epic` for its parent epic when nested). Then proceed to Step 5 (architecture consult) and Step 6 (open-questions dialog) to fill any gaps the tracker payload does not cover.
+7. After populating the seed content, write its path to `shamt-state/active-feature` (and `shamt-state/active-epic` for its parent epic when nested). Then proceed to Step 5 (architecture consult) and Step 6 (open-questions dialog) to fill any gaps the tracker payload does not cover.
 
 ### Step 5 — Consult `.shamt-core/project-specific-files/ARCHITECTURE.md` (advisory)
 
@@ -157,7 +157,7 @@ Verify before exiting:
 - [ ] **Mode A:** the original `## Goal` one-liner from the stub is preserved verbatim.
 - [ ] **Mode B:** created under the Tech Stories epic (per #15).
 - [ ] **Mode C:** `## All Remaining Fields` appendix is present iff the fetched payload had non-empty fields worth preserving.
-- [ ] `.shamt-state/active-feature` and `.shamt-state/active-epic` pointers have been written.
+- [ ] `shamt-state/active-feature` and `shamt-state/active-epic` pointers have been written.
 - [ ] No `Validated …` footer present yet — `/validate-artifact` appends it.
 - [ ] User has confirmed the slug + content.
 

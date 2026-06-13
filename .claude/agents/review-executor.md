@@ -39,7 +39,7 @@ The artifact is **local only**. Even though the active tracker profile (`referen
    Then diff against the fetched ref (e.g., `origin/<base>...<feature-branch>`). If a fetch fails, halt and report — do not silently fall back to a local SHA.
 3. Compute the merge base, full commit list (SHAs + subjects), `--name-status`, and `--stat`. Compute the full unified diff against the merge base.
 4. Build the **Changed File Inventory** grouped by area (backend handlers, infra / IaC, frontend, migrations / data, config / scripts / test data, other). Use the project's natural groupings; do not invent groupings the project does not use.
-5. Sanitize the branch name for the output folder (e.g., `feature/123-foo-bar` → `feature-123-foo-bar`). Create `code_reviews/<sanitized-branch>/`.
+5. Sanitize the branch name for the output folder (e.g., `feature/123-foo-bar` → `feature-123-foo-bar`). Create `code_reviews/<sanitized-branch>/` — **work-root-relative**: in a child project this is `.shamt-core/code_reviews/<sanitized-branch>/` (the work root is `.shamt-core/` when it exists, the repo root on master/self-host); never write `code_reviews/` at the child's project root.
 
 ## Phase A — overview.md
 

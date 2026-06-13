@@ -19,7 +19,7 @@ shamt-core/
 └── shamt-config.example.json       # schema-by-example for the per-project config
 ```
 
-A child project that installs Shamt keeps just two Shamt entries at its project root — `CLAUDE.md` (a managed section rendered from `SHAMT_RULES.template.md`) and the generated `.claude/` directory (which Claude Code requires at the root). Everything else lives under a hidden `.shamt-core/` directory: the copied canonical sources, `shamt-config.json` (initialized from the example), `README.md`, the `proposals/` working area, and `project-specific-files/{ARCHITECTURE,CODING_STANDARDS}.md`.
+A child project that installs Shamt keeps just two Shamt entries at its project root — `CLAUDE.md` (a managed section rendered from `SHAMT_RULES.template.md`) and the generated `.claude/` directory (which Claude Code requires at the root). Everything else lives under a hidden `.shamt-core/` directory: the copied canonical sources, `shamt-config.json` (initialized from the example), `README.md`, the `proposals/` working area, `project-specific-files/{ARCHITECTURE,CODING_STANDARDS}.md`, the PO/Engineer **work tree** (`epics/`, `features/`, `stories/`, `code_reviews/`), and the `shamt-state/` active-item pointers. `.shamt-core/` is the **Shamt work root** in a child — every `epics/`/`features/`/`stories/`/`code_reviews/`/`shamt-state/` path the commands and rules write resolves relative to it (the repo root on master/self-host); the framework never writes a work-tree artifact at a child's project root.
 
 ---
 

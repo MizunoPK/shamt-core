@@ -486,8 +486,10 @@ fi
 # ---- Seed the standing Tech Stories epic (project work tree) -----------------
 # The home for one-off bugs / quick wins filed via /p6-draft-tech-story. Fixed
 # reserved folder names (no ticket ID). Create-if-absent, idempotent. This is the
-# first init step that writes project-work-tree content (epics/...), so it is
-# SKIPPED on self-host — the shamt-core repo itself does no PO work.
+# first init step that writes project-work-tree content (.shamt-core/epics/...),
+# so it is SKIPPED on self-host — the shamt-core repo itself does no PO work. In a
+# child the work tree is rooted under .shamt-core/ (the Shamt work root), so the
+# project root holds only CLAUDE.md + .claude/.
 seed_tech_stories_epic() {
   local root="$1"
   local ts="$root/epics/tech-stories"
@@ -518,8 +520,9 @@ EOF
 }
 
 if [ "$SELF_HOST" -eq 0 ]; then
-  log "Seeding standing Tech Stories epic (epics/tech-stories/) …"
-  seed_tech_stories_epic "$TARGET_DIR"
+  log "Seeding standing Tech Stories epic (.shamt-core/epics/tech-stories/) …"
+  # Child work tree is rooted under the Shamt work root (.shamt-core/).
+  seed_tech_stories_epic "$TARGET_DIR/.shamt-core"
 fi
 
 # ---- Summary ----------------------------------------------------------------

@@ -129,7 +129,7 @@ Verify before exiting:
 - [ ] `## Open Questions` is empty (every question resolved, with answers folded into the artifact).
 - [ ] `Goal`, `Success Criteria`, and `Scope / Non-Scope` are drafted.
 - [ ] `Target Features` and `Sequencing & Parallelization` are **left empty** (owned by `/p2-decompose-epic`).
-- [ ] Before exiting, write the resolved epic-folder path to `.shamt-state/active-epic` (create `.shamt-state/` if absent) — the status-line active-epic pointer.
+- [ ] Before exiting, write the resolved epic-folder path to `shamt-state/active-epic` (create `shamt-state/` if absent) — the status-line active-epic pointer.
 - [ ] No `Validated …` footer present yet — `/validate-artifact` appends it.
 - [ ] User has confirmed the slug + content.
 

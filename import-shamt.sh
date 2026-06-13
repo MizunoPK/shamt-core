@@ -370,8 +370,10 @@ fi
 # ---- Re-seed the standing Tech Stories epic (idempotent) --------------------
 # Existing children that predate the Tech Stories epic get it on next import.
 # Create-if-absent — never overwrite an existing epic.md / feature.md (preserves
-# any in-progress tickets the child has filed under it).
-ts="$TARGET_DIR/epics/tech-stories"
+# any in-progress tickets the child has filed under it). The child work tree is
+# rooted under the Shamt work root (.shamt-core/); it sits outside MASTER_SYNC_DIRS,
+# so the sync passes above never clobber or warn on it.
+ts="$TARGET_DIR/.shamt-core/epics/tech-stories"
 if [ ! -f "$ts/epic.md" ]; then
   mkdir -p "$ts" && cat > "$ts/epic.md" <<'EOF'
 # Epic: Tech Stories
