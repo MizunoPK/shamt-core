@@ -31,7 +31,7 @@ See [`reference/model_selection.md`](../../../../reference/model_selection.md).
 - `proposals/{slug}.md` exists with a Phase 2 validation footer. If missing or unfootered, halt and direct the user to `/f1-propose-update {slug}` and then `/validate-artifact proposals/{slug}.md`.
 - If the proposal declares a Phase 3 note (`Phase 3 required — file count {N} > 10.`) or `proposals/{slug}_PLAN.md` exists, the plan must also carry a validation footer. If missing or unfootered, halt and direct the user to `/f2-plan-update-implementation {slug}` then `/validate-artifact proposals/{slug}_PLAN.md`.
 - `proposals/archive/{slug}.md` does **not** exist. If it does, halt and report — this slug has already been implemented.
-- Working tree is clean except for the proposal/plan files. Halt and confirm if the tree has unrelated staged or unstaged changes. (Authoring/validation/planning ran on the base branch; this command creates the proposal branch — see Step 1.5.)
+- Unrelated working-tree state is **expected and accepted** — ad-hoc proposal captures (new files under `proposals/`, or commits on the base branch adding them) and any other in-progress work ride this flow and fold into the eventual `/f6` landing. **Never halt or revert on unrelated tree state.** (Authoring/validation/planning ran on the base branch; this command creates the proposal branch — see Step 1.5.)
 
 ## Path selection
 
@@ -111,10 +111,9 @@ Creating a branch is not a commit — the "No commits here" rule (Notes) still h
 Walk the Proposed Changes table one final time. For each row, confirm the working-tree diff contains the change. Run `git status` and `git diff --stat` against the project root to make the diff visible. The exit gate is:
 
 - [ ] Every Proposed Changes row corresponds to a real change in the diff (or a deletion).
-- [ ] No file outside the canonical roots is in the diff.
-- [ ] No generated `.claude/` file is in the diff.
+- [ ] Each described change touches only the canonical roots — never a `.claude/` file. (A **per-row** check on the proposal's own edits; the gate does **not** scan the whole working-tree diff for non-canonical or `.claude/` files.)
 
-If any row is uncovered, treat it as a `Step failed` — diagnose. If the diff contains extra changes not in the table, treat it as scope creep — halt and surface to the user; decide whether to remove the changes or, when a change is genuinely wanted, legitimize it via an **[in-place amendment](f1-propose-update.md#in-place-amendment)** (append the row for it, strip the proposal's prior footer, re-run `/validate-artifact`) rather than a full `/f1-propose-update` re-run.
+If any row is uncovered, treat it as a `Step failed` — diagnose. **Unrelated tree state is accepted** — ad-hoc proposal captures (new files under `proposals/`) or other in-progress work ride the landing and are **not** scope creep; never halt or revert on them. The **in-place amendment** path still applies to the distinct case where the agent's *own* work legitimately needs a canonical change not yet in the table (a genuinely-missing row): legitimize it via an **[in-place amendment](f1-propose-update.md#in-place-amendment)** (append the row for it, strip the proposal's prior footer, re-run `/validate-artifact`) rather than a full `/f1-propose-update` re-run.
 
 ### Step 4 — Suggest the next phase
 
