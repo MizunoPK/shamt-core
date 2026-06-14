@@ -42,7 +42,7 @@ Optional in both modes:
 
 ## Prerequisites
 
-- `.shamt-core/project-specific-files/ARCHITECTURE.md` and `.shamt-core/project-specific-files/CODING_STANDARDS.md` exist at the project root (note their absence inline if missing — `## Standards check` invariant — and continue).
+- `.shamt-core/project-specific-files/ARCHITECTURE.md`, `.shamt-core/project-specific-files/CODING_STANDARDS.md`, and `.shamt-core/project-specific-files/TESTING_STANDARDS.md` exist at the project root (note their absence inline if missing — `## Standards check` invariant — and continue).
 - **Story mode:** story folder resolves; the active spec is present; Build and Test (Phase 5, required) have completed.
 - **Formal mode:** `git` is available; the configured remote is reachable for the fetch. If the current local branch is the feature branch being reviewed, run `git status --short` first — if there are uncommitted changes, halt and ask whether to include, stash, commit, or ignore them.
 
@@ -91,7 +91,7 @@ Hard checks (Pattern 1 code-review dimensions in [`SHAMT_RULES.template.md`](../
 
 ### Step 4 — Documentation Impact Assessment
 
-At the end of the sweep, answer **explicitly**: does this change require an `.shamt-core/project-specific-files/ARCHITECTURE.md` or `.shamt-core/project-specific-files/CODING_STANDARDS.md` update?
+At the end of the sweep, answer **explicitly**: does this change require an `.shamt-core/project-specific-files/ARCHITECTURE.md`, `.shamt-core/project-specific-files/CODING_STANDARDS.md`, or `.shamt-core/project-specific-files/TESTING_STANDARDS.md` update?
 
 Triggers include: new service / boundary / data store added; deprecated pattern; new convention introduced; or this change actually touches a doc whose `Last Updated` field is stale (older than `.shamt-core/shamt-config.json` → `doc_staleness_threshold_days`). Story-level Doc Impact only fires when this change touches the doc — pure staleness without a touching change is the audit's D6 (doc currency) dimension, not Phase 6's responsibility.
 
@@ -102,6 +102,7 @@ Record the assessment as a `## Documentation Impact` block at the bottom of `rev
 
 - **.shamt-core/project-specific-files/ARCHITECTURE.md:** Required | Not required — <one-line reason>
 - **.shamt-core/project-specific-files/CODING_STANDARDS.md:** Required | Not required — <one-line reason>
+- **.shamt-core/project-specific-files/TESTING_STANDARDS.md:** Required | Not required — <one-line reason>
 - **Polish action:** <Specific update Polish must apply, or "None.">
 ```
 

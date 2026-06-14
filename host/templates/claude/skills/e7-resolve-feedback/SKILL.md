@@ -3,7 +3,7 @@ name: e7-resolve-feedback
 description: >
   Run Phase 7 (Polish) of the Shamt Engineer flow. Apply each comment from the
   latest review_vN.md, log dispositions in addressed_feedback.md, perform the
-  .shamt-core/project-specific-files/ARCHITECTURE.md / .shamt-core/project-specific-files/CODING_STANDARDS.md updates the Review phase flagged, and
+  .shamt-core/project-specific-files/ARCHITECTURE.md / .shamt-core/project-specific-files/CODING_STANDARDS.md / .shamt-core/project-specific-files/TESTING_STANDARDS.md updates the Review phase flagged, and
   route generalizable root causes to .shamt-core/proposals/ rather than patching framework
   files in-story. Invoke when the user wants to address review feedback,
   resolve comments, polish the story, run phase 7, or apply review fixes.
@@ -28,7 +28,7 @@ Follow the canonical `/e7-resolve-feedback` command body verbatim — see [`comm
 1. **Inventory feedback** — a feedback source is the latest `feedback/review_vN.md` **and/or a Phase-5 bug routed here by `/e5-execute-tests`** (a FAILed `agent_test_session.md` scenario or a `test-executor` Story-bug, logged as a feedback item). Read the review's leadership sections, checklists, and `## Documentation Impact`. Carry forward `Pending` / `Needs user decision` rows from a prior `addressed_feedback.md`.
 2. **Open or update `addressed_feedback.md`** — one row per reviewer comment; fields `Source`, `Disposition`, `Action taken`, `Root cause`, `Notes`. For a **Phase-5 test-surfaced bug** the `Root cause` is required and must name which phase let it through — Spec (missing requirement) / Plan (missing or wrong step) / Build (execution defect) — plus the prevention.
 3. **Resolve one at a time** — descending severity. Understand the finding; choose Fix in-story / Defer (explicit user accept + forward link) / Needs user decision; verify against the active plan's (or spec's) `## Verification`; reflect on root cause. For Standard-path non-trivial fixes, re-hand off to the `plan-executor` builder for the modified step.
-4. **Documentation Impact update** — when the Review flagged `Required`, apply the `Polish action` to `.shamt-core/project-specific-files/ARCHITECTURE.md` / `.shamt-core/project-specific-files/CODING_STANDARDS.md`, update `Last Updated` + `Update History`, re-validate via `/validate-artifact`. Commit.
+4. **Documentation Impact update** — when the Review flagged `Required`, apply the `Polish action` to `.shamt-core/project-specific-files/ARCHITECTURE.md` / `.shamt-core/project-specific-files/CODING_STANDARDS.md` / `.shamt-core/project-specific-files/TESTING_STANDARDS.md`, update `Last Updated` + `Update History`, re-validate via `/validate-artifact`. Commit.
 5. **Root-cause / upstream proposals** — generalizable patterns → `.shamt-core/proposals/<proposal-slug>.md` (descriptive slug, not the story slug) via the framework-update flow. Story-specific patterns stay in-story.
 6. **TODO scan** — Global Story Invariants TODO gate; remove or explicitly justify every remaining marker; honour stricter `.shamt-core/project-specific-files/CODING_STANDARDS.md` rules.
 7. **Exit gate** — every comment `Resolved` / `Deferred — <reason>` / `Needs user decision` with active follow-up; doc updates applied; TODO gate passes; proposals filed. **User explicitly signals complete.**

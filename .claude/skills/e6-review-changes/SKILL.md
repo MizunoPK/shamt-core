@@ -36,7 +36,7 @@ Follow the canonical `/e6-review-changes` command body verbatim — see [`comman
 1. **Resolve & gate-check** — apply the active-artifact pointer; confirm spec / plan / testing artifact validation footers.
 2. **Plan Alignment pre-pass** — Quick: `N/A`. Standard: walk Step Coverage, Change Fidelity, Scope Discipline, Verification Passage, Zero Builder Design Decisions. Write `## Plan Alignment` at the top of `review_vN.md`.
 3. **16-category sweep** — apply every category from [`reference/review_categories.md`](../../../../../reference/review_categories.md); apply the Review Prevention Gates overlay from [`reference/pr_review_prevention.md`](../../../../../reference/pr_review_prevention.md); hard checks include per-file-and-function fresh review, removed-check replacement analysis, tenant-A-to-tenant-B bypass consideration, end-to-end DB lineage.
-4. **Documentation Impact Assessment** (the architecture-impact consult / Standards check) — does the change require `.shamt-core/project-specific-files/ARCHITECTURE.md` or `.shamt-core/project-specific-files/CODING_STANDARDS.md` updates? Write `## Documentation Impact` with `Required | Not required` + reason + Polish action.
+4. **Documentation Impact Assessment** (the architecture-impact consult / Standards check) — does the change require `.shamt-core/project-specific-files/ARCHITECTURE.md`, `.shamt-core/project-specific-files/CODING_STANDARDS.md`, or `.shamt-core/project-specific-files/TESTING_STANDARDS.md` updates? Write `## Documentation Impact` with `Required | Not required` + reason + Polish action.
 
 Resolve the story folder per `templates/SHAMT_RULES.template.md` §PO-tree resolution (tree-wide glob + legacy-flat fallback); `stories/{slug}/` below denotes that resolved folder.
 

@@ -18,7 +18,7 @@ The audit exists to keep the framework **complete** (it covers what it should, w
 |-----|------|----------------------------|
 | D3 | Bidirectional coverage | Every documented pattern/rule has a host implementation; every host body cites a pattern/rule it implements. Nothing documented is unimplemented; nothing implemented is undocumented. |
 | D5 | Template-protocol alignment | Each template carries every section its producing/consuming protocol writes or reads — and no orphan sections the protocol abandoned. |
-| D6 | Project-doc currency | The required project docs (`ARCHITECTURE.md`, `CODING_STANDARDS.md`) exist and are within the staleness threshold — the inputs the Engineer flow depends on are present and fresh. |
+| D6 | Project-doc currency | The required project docs (`ARCHITECTURE.md`, `CODING_STANDARDS.md`, `TESTING_STANDARDS.md`) exist and are within the staleness threshold — the inputs the Engineer flow depends on are present and fresh. |
 | D8 | Content completeness | No half-finished content — no stray `TODO` / `TBD` / `FIXME` / unfilled `[placeholder]` left in a canonical body. |
 | D12 | Rules-file size budget | The canonical rules file (`templates/SHAMT_RULES.template.md`, rendered into every child `CLAUDE.md`) stays within `rules_size_budget_chars` (default 40000 chars) — small enough to load economically into context on every interaction. Over budget is **always intricate** (trimming needs judgment) → f0-capture pointing at `/trim-rules-file`, never auto-fixed. |
 

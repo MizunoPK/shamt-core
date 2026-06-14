@@ -1,5 +1,5 @@
 ---
-description: Phase 7 (Polish) — apply review feedback to code, log each comment's disposition in addressed_feedback.md, apply any flagged .shamt-core/project-specific-files/ARCHITECTURE.md / .shamt-core/project-specific-files/CODING_STANDARDS.md updates, surface root-cause proposals to the framework-update flow
+description: Phase 7 (Polish) — apply review feedback to code, log each comment's disposition in addressed_feedback.md, apply any flagged .shamt-core/project-specific-files/ARCHITECTURE.md / .shamt-core/project-specific-files/CODING_STANDARDS.md / .shamt-core/project-specific-files/TESTING_STANDARDS.md updates, surface root-cause proposals to the framework-update flow
 ---
 
 # /e7-resolve-feedback
@@ -30,7 +30,7 @@ See [`reference/model_selection.md`](../../../../reference/model_selection.md).
 - Resolve the story folder per `templates/SHAMT_RULES.template.md` §PO-tree resolution (tree-wide glob + legacy-flat fallback); `stories/{slug}/` below denotes that resolved folder. If `stories/{slug}/active_artifacts.md` exists, read it first.
 - The active spec exists with a validation footer.
 - A feedback source exists: a story-mode `review_vN.md` (with a validation footer) under `stories/{slug}/feedback/`, **and/or a Phase-5 bug routed here by `/e5-execute-tests`** (an `agent_test_session.md` scenario that FAILed, or a `test-executor` Story-bug). A Phase-5 bug is logged as a feedback item with the required phase-attributed root-cause (Step 2). If there is no source at all (Quick-path no-issue + Phase 5 green), this command is mostly a TODO-scan no-op — see Step 6.
-- `.shamt-core/project-specific-files/ARCHITECTURE.md` and `.shamt-core/project-specific-files/CODING_STANDARDS.md` paths are known (read the active review's `## Documentation Impact` block to learn whether either needs an update).
+- `.shamt-core/project-specific-files/ARCHITECTURE.md`, `.shamt-core/project-specific-files/CODING_STANDARDS.md`, and `.shamt-core/project-specific-files/TESTING_STANDARDS.md` paths are known (read the active review's `## Documentation Impact` block to learn whether any needs an update).
 
 ## Step-by-step
 
@@ -74,13 +74,13 @@ Per comment:
 
 ### Step 4 — Documentation Impact update
 
-If the active review's `## Documentation Impact` block declared either doc `Required`:
+If the active review's `## Documentation Impact` block declared any doc `Required`:
 
-1. Apply the `Polish action` from that block to `.shamt-core/project-specific-files/ARCHITECTURE.md` and/or `.shamt-core/project-specific-files/CODING_STANDARDS.md`. Update the `Last Updated` field; append a one-line entry to `Update History` referencing this story's slug.
-2. Re-validate the touched doc via `/validate-artifact .shamt-core/project-specific-files/ARCHITECTURE.md` (or `/validate-artifact .shamt-core/project-specific-files/CODING_STANDARDS.md`). Uses the 5 general dimensions. Footer.
+1. Apply the `Polish action` from that block to `.shamt-core/project-specific-files/ARCHITECTURE.md`, `.shamt-core/project-specific-files/CODING_STANDARDS.md`, and/or `.shamt-core/project-specific-files/TESTING_STANDARDS.md`. Update the `Last Updated` field; append a one-line entry to `Update History` referencing this story's slug.
+2. Re-validate the touched doc via `/validate-artifact .shamt-core/project-specific-files/ARCHITECTURE.md` (or `/validate-artifact .shamt-core/project-specific-files/CODING_STANDARDS.md` / `/validate-artifact .shamt-core/project-specific-files/TESTING_STANDARDS.md`). Uses the 5 general dimensions. Footer.
 3. Commit the doc change with the project's commit convention.
 
-If both docs were `Not required`, skip this step.
+If all docs were `Not required`, skip this step.
 
 ### Step 5 — Root-cause / upstream proposals
 

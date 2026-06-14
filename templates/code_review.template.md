@@ -182,6 +182,7 @@ Validated YYYY-MM-DD — N rounds, 1 adversarial sub-agent confirmed
 
 - **.shamt-core/project-specific-files/ARCHITECTURE.md:** Required | Not required — <one-line reason>
 - **.shamt-core/project-specific-files/CODING_STANDARDS.md:** Required | Not required — <one-line reason>
+- **.shamt-core/project-specific-files/TESTING_STANDARDS.md:** Required | Not required — <one-line reason>
 - **Polish action:** <Specific update Polish must apply, or "None.">
 
 ---

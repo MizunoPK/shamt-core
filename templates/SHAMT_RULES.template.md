@@ -179,7 +179,7 @@ Apply across Spec, Plan, Build, Test, Review, and Polish:
 - **TODO gate.** TODO comments are allowed only for team-discussion placeholders or temporary debug logging that must be removed before merge. Polish cannot complete while any TODO remains in the implementation plan or code. If `.shamt-core/project-specific-files/CODING_STANDARDS.md` is stricter, follow it.
 - **Re-baseline rule.** When a post-approval requirement change makes the active spec or plan misleading, stop and create a new baseline instead of patching the old one in place. See the Re-baseline Protocol below.
 - **Story branch baseline rule.** Before creating a story branch in any affected repo, fetch the latest configured development branch and create the feature branch from the fetched remote development branch (e.g., `git fetch origin <development-branch>` then `git checkout -b feature/{slug}/<owner-or-team> origin/<development-branch>`). Do not create story branches from current local HEAD. If the feature branch already exists, halt and report.
-- **Standards check.** `.shamt-core/project-specific-files/ARCHITECTURE.md` and `.shamt-core/project-specific-files/CODING_STANDARDS.md` are governing references for artifacts and reviews. Note absence only if either file does not exist.
+- **Standards check.** The `.shamt-core/project-specific-files/` docs are governing references for artifacts and reviews. Note absence only if a file does not exist.
 
 ---
 
