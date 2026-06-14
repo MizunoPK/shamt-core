@@ -28,6 +28,7 @@ Adapted from v1's SHAMT-27 (`model_selection.md`); trimmed hard for v2.
 | `test-executor` | Cheap (Haiku) | Runs the automated testing plan; interprets test output; diagnoses failures vs. infra flakiness |
 | `user-simulator` | Balanced (Sonnet) | Phase 5 agent-as-user execution — drives the project as a user, supplies inputs, judges observed-vs-expected; interpretive, so not Cheap |
 | `review-executor` | Reasoning (Opus) | Formal-mode code review issue-finding using the 16-category framework |
+| `root-cause-diagnoser` | Reasoning (Opus) | `/f1-propose-update` incident-origin root-cause diagnosis; depth analysis, not a confirmation. Its diagnosis is adversarially confirmed by a Cheap (Haiku) `validation-checker` zero-bias sub-agent, reusing the Pattern 1 Step 7 contract |
 
 Personas declare their tier in the persona body (e.g., a frontmatter `model:` field). The defaults above stand unless a flow explicitly overrides.
 

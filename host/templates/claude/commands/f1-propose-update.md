@@ -81,6 +81,32 @@ The discovering command does the mechanical edit and then **halts for re-validat
 2. Write the Problem section as 1–3 short paragraphs. If the trigger was a story-level incident or a recurring review finding, link the story slug or the [Review Prevention Gates](../../../../reference/pr_review_prevention.md) gate the change is meant to address.
 3. If you cannot yet state the problem precisely — for example, the user has described a symptom but the root canonical-source location is unclear — add the gap to **Open Questions** and surface it via the dialog in Step 5 before proceeding.
 
+### Step 2.5 — Incident-origin root-cause diagnosis (conditional)
+
+This step runs **only when the proposal is incident-originated**; proactive / clean-slate proposals (a new recipe, an unprompted improvement) skip it entirely and go straight to Step 3.
+
+1. **Detect incident origin.** The proposal is incident-originated when its trigger is a **bug, a piece of feedback, or an issue** rather than a clean-slate idea — concretely: a Phase-5 test failure routed here by `/e7-resolve-feedback`, a recurring review finding, a child-submitted issue, or an audit capture (an f0 draft ingested via Input Mode 3). If the origin is genuinely unclear, treat it as incident-originated (the diagnosis is cheap insurance); a clearly proactive idea skips this step.
+2. **Adopt the default stance** (command-local — stated here, not in the rules file): an incident is presumed to indicate a **genuine framework gap requiring a Shamt update**, not a one-off to paper over. The question you are answering is *what canonical change would prevent this class of incident?* — not *what local patch makes this one instance go away?*
+3. **Drive an independent, adversarial, zero-bias root-cause diagnosis.** Do **not** let the agent that drafted the Problem also be the sole judge of what went wrong. Spawn the `root-cause-diagnoser` persona (Reasoning / Opus tier — root-cause analysis is Opus-tier per [`reference/model_selection.md`](../../../../reference/model_selection.md); see [`agents/root-cause-diagnoser.md`](../agents/root-cause-diagnoser.md)) and provide:
+   - `incident` — the triggering bug / review finding / issue / audit capture and its context (e.g., the `/e7` phase-attributed root cause, the f0 Scratch Notes).
+   - `seed_explanation` — your current best guess at the root cause and fix (the conclusion it must distrust, not adopt).
+   - `canonical_root` — `shamt-core/` (master / self-host).
+
+   Example invocation (Claude Code Task tool):
+
+   ```text
+   subagent_type: root-cause-diagnoser
+   description: Root-cause diagnosis — {slug}
+   prompt: |
+     incident: {the bug / review finding / issue / audit capture + context}
+     seed_explanation: {your current best guess at root cause + fix}
+     canonical_root: shamt-core/
+     Determine the true root cause at the canonical-source altitude and the smallest
+     fix that closes the gap for the whole class. Distrust the seed.
+   ```
+4. **Adversarially confirm the diagnosis.** Spawn one **Haiku** zero-bias sub-agent (the `validation-checker` persona, reusing the Pattern 1 Step 7 adversarial contract — no second new persona) to refute the `root-cause-diagnoser`'s conclusion. Any finding means the diagnosis is not yet trustworthy: reconcile (re-run the diagnoser or sharpen) before folding it in.
+5. **Fold the confirmed diagnosis into the proposal** — update the **Problem** section so it states the true root cause (not the first plausible one), and let the diagnosis drive the **Proposed Changes** built in Step 3. If the diagnosis surfaces an open question (e.g., the true cause depends on a product decision), add it to **Open Questions** for the Step 5 dialog rather than guessing.
+
 ### Step 3 — Build the Proposed Changes list
 
 This is the single most load-bearing section. The validator and `/f3-implement-update` both treat it as the authoritative change scope.

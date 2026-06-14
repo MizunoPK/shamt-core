@@ -213,6 +213,7 @@ The status line surfaces PO-flow context by falling back through altitudes — f
 | `test-executor` | Haiku | `/e5-execute-tests` (automated suites) | shipped |
 | `user-simulator` | Sonnet | `/e5-execute-tests` agent-as-user execution | shipped |
 | `review-executor` | Opus | `/e6-review-changes` formal mode | shipped |
+| `root-cause-diagnoser` | Opus | `/f1-propose-update` incident-origin root-cause diagnosis | shipped |
 
 ---
 
