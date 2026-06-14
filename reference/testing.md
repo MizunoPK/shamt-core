@@ -28,7 +28,7 @@ story via `/e5b-write-manual-testing-plan`.
 
 ## Quick vs Standard path
 
-- **Quick path** — a compact agent-as-user run (the scenarios relevant to the small story); automated
+- **Quick path** — a compact agent-as-user run (the scenarios relevant to the Quick-path story); automated
   testing uses the inline checklist in `spec.md` and escalates to a full `testing_plan.md` only if
   scope > 5 steps or a new test file is introduced.
 - **Standard path** — the full `agent_test_session.md` + (when present) the full `testing_plan.md`.

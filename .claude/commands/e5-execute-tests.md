@@ -29,9 +29,9 @@ See [`reference/model_selection.md`](../../../../reference/model_selection.md).
 
 Phase 5 runs on **every** story (per `templates/SHAMT_RULES.template.md` §Testing and
 [`reference/testing.md`](../../../../reference/testing.md)) — there is no `testing` config flag and no
-no-op. It always runs the **agent-as-user execution** (Step 2) and, when
+no-op. It always runs the **agent-as-user execution** (Step 0) and, when
 `.shamt-core/project-specific-files/TESTING_STANDARDS.md` declares **automated suites present**, the
-**automated** execution (Step 3). It **blocks until green**.
+**automated** execution (Step 2). It **blocks until green**.
 
 ## Prerequisites
 
