@@ -67,6 +67,7 @@ Personas declare their tier in the persona body (e.g., a frontmatter `model:` fi
 | Framework update — Phase 6 mechanical sub-checks (D1, D4, D8, D10, D12) | Cheap | Running regen `--check`; walking links, template paths, profile names, persona names; grepping stray `TODO`/`TBD`/placeholders (D8); cross-checking explicit counts against reality (D10); measuring the rules file's size against its budget (D12) |
 | Framework update — Phase 6 adversarial confirmation (`audit-checker`) | Cheap | Zero-bias D1–D12 re-sweep on the clean round; fresh eyes, not depth |
 | Framework update — Phase 7 (`/f6-archive-proposal`) | Cheap | File move + status update |
+| Framework update — `/f-all` driver (spans Phases 2–7) | Balanced | Meta-driver: sequences phases, dispatches one sub-agent per phase, inspects each report, and halts/pauses. The heavy per-phase reasoning lives in the dispatched agents at their own tiers (proposal-validation primary Reasoning; `plan-executor` Cheap; `validation-checker` Cheap; `/f4` / `/f6` Cheap). Mirrors the Phase 4 `/f3-implement-update` orchestration row |
 
 Per-flow overrides live in skill bodies and persona definitions — that is where deviations from this table are declared. The table above is the default; check the individual skill body for the authoritative tier for a given phase.
 
