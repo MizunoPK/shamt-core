@@ -3,8 +3,8 @@ name: e3-plan-implementation
 description: >
   Run Phase 3 (Plan) of the Shamt Engineer flow — Standard path only — turning
   an approved spec into a mechanical, validated implementation plan ready for
-  builder handoff at Gate 3. Chains into /e3b-write-testing-plan when testing is
-  enabled. Invoke when the user wants to plan the implementation, draft the
+  builder handoff at Gate 3. Chains into /e3b-write-testing-plan when TESTING_STANDARDS.md declares
+  automated suites. Invoke when the user wants to plan the implementation, draft the
   implementation plan, run the plan phase, prepare the builder handoff, or
   break the spec into mechanical steps. Skips with a clear notice on Quick-path
   stories (build directly from spec.md).
@@ -34,7 +34,7 @@ Resolve the story folder per `templates/SHAMT_RULES.template.md` §PO-tree resol
 
 3. **Create the mechanical plan** at `stories/{slug}/implementation_plan.md` from [`templates/implementation_plan.template.md`](../../../../../templates/implementation_plan.template.md). Skeleton-first authoring for 5+ steps. Apply the **open-questions iterative dialog** principle. Honor the plan contract — no optional branches, exact locate strings, concrete CREATE content, multi-repo `Step 0-A` / `0-B` branch-prep, Review Prevention Gate Mapping, CODING_STANDARDS compliance mapping.
 4. **Validate** via `/validate-artifact stories/{slug}/implementation_plan.md` — 8 plan dimensions, primary clean + 1 sub-agent confirmation. Footer.
-5. **Chain into `/e3b-write-testing-plan {slug}`** when `.shamt-core/shamt-config.json` sets `testing: "enabled"`. Wait for the testing plan to validate before Gate 3.
+5. **Chain into `/e3b-write-testing-plan {slug}`** when `TESTING_STANDARDS.md` declares automated suites. Wait for the testing plan to validate before Gate 3.
 6. **Gate 3** — present the validated plan (and testing plan when applicable) for user approval. Suggest `/clear` + `/e4-execute-plan {slug}` after approval.
 
 ## Recommended models
@@ -46,7 +46,7 @@ See [`reference/model_selection.md`](../../../../../reference/model_selection.md
 
 ## Exit criteria
 
-Validated `implementation_plan.md` (and `testing_plan.md` when testing is enabled) approved at Gate 3; Open Questions empty or deferred with reason. Builder handoff is unconditional after Gate 3 — the architect plans, the cheap-tier builder executes.
+Validated `implementation_plan.md` (and `testing_plan.md` when TESTING_STANDARDS.md declares automated suites) approved at Gate 3; Open Questions empty or deferred with reason. Builder handoff is unconditional after Gate 3 — the architect plans, the cheap-tier builder executes.
 
 ---
 Validated 2026-05-28 — 2 rounds, 1 adversarial sub-agent confirmed (Phase 5 implementation loop)

@@ -17,8 +17,9 @@
 | Spec | `stories/{slug}/spec_vN.md` |
 | Context | `stories/{slug}/context_vN.md` (or `N/A — Quick path`) |
 | Implementation Plan | `stories/{slug}/implementation_plan_vN.md` (or `N/A — Quick path`) |
-| Testing Plan | `stories/{slug}/testing_plan_vN.md` (or `N/A — testing disabled` / `N/A — Quick path inline checklist`) |
+| Testing Plan | `stories/{slug}/testing_plan_vN.md` (or `N/A — no automated suites` / `N/A — Quick path inline checklist`) |
 | Manual Test Plan | `stories/{slug}/manual_test_plan_vN.md` (or `N/A — not produced`) |
+| Agent Test Session | `stories/{slug}/agent_test_session_vN.md` |
 | Mermaid Diagram | `stories/{slug}/diagram_vN.md` (optional supporting metadata; use `N/A — not generated`) |
 
 ## Superseded Baselines

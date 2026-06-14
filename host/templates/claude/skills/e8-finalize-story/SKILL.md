@@ -27,7 +27,7 @@ Mirrors the `/e8-finalize-story {slug}` slash command. Same canonical body, two 
 Follow the canonical `/e8-finalize-story` command body verbatim — see [`commands/e8-finalize-story.md`](../../commands/e8-finalize-story.md). Summary:
 
 1. **Resolve the story folder** — per `templates/SHAMT_RULES.template.md` §PO-tree resolution (tree-wide glob + legacy-flat fallback); halt on zero or multiple. `stories/{slug}/` below denotes the resolved folder.
-2. **Guard — prior phases complete** — Review ran + `addressed_feedback.md` has no `Pending` rows; Test PASSes when testing is enabled. Halt to the specific remediation command (`/e6` / `/e7` / `/e5`) on any failure.
+2. **Guard — prior phases complete** — Review ran + `addressed_feedback.md` has no `Pending` rows; Test PASSes (required — agent-as-user, plus automated when TESTING_STANDARDS.md declares suites). Halt to the specific remediation command (`/e6` / `/e7` / `/e5`) on any failure.
 3. **Guard — scoped clean-tree commit** — `git status --short`; commit only the story's own files; halt-and-ask on unrelated working-tree changes (mirrors `/e6-review-changes`).
 4. **Guard — explicit confirmation** — show the exact files to commit + the work item to close + the `Status: Done` marker; wait for a yes (the remote close is outward-facing).
 5. **Commit + mark done** — scoped commit on the feature branch; then per the active tracker profile: ado `az boards work-item update --state`, github `gh issue close`, local = the marker itself.

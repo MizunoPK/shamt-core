@@ -3,7 +3,6 @@
   "project_name": "your-project-slug",
   "work_item_tracker": "local",
   "pr_provider": "github",
-  "testing": "disabled",
   "ai_service": "anthropic",
   "master_url": "https://github.com/your-org/shamt-core",
   "doc_staleness_threshold_days": 60,

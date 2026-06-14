@@ -1,10 +1,10 @@
 ---
-description: Plan sub-phase (testing enabled) — produce and validate testing_plan.md from an approved spec; inline checklist on Quick-path stories with small scope
+description: Plan sub-phase (automated suites present) — produce and validate testing_plan.md from an approved spec; inline checklist on Quick-path stories with small scope
 ---
 
 # /e3b-write-testing-plan
 
-**Purpose:** Produce and validate the testing plan for a story whose spec is approved at Gate 2b. Invoked automatically by `/e3-plan-implementation` when `testing: "enabled"` is set in `.shamt-core/shamt-config.json`. Also runnable standalone for re-planning after the Plan phase (e.g., test strategy changes mid-Build).
+**Purpose:** Produce and validate the testing plan for a story whose spec is approved at Gate 2b. Invoked automatically by `/e3-plan-implementation` when `.shamt-core/project-specific-files/TESTING_STANDARDS.md` declares automated suites. Also runnable standalone for re-planning after the Plan phase (e.g., test strategy changes mid-Build).
 
 **Recommended models:**
 
@@ -27,9 +27,9 @@ See [`reference/model_selection.md`](../../../../reference/model_selection.md).
 
 ## Prerequisites
 
-- `.shamt-core/shamt-config.json` exists. Read `testing`. If `disabled`, **this command is a no-op**: print one line — `Testing is disabled in .shamt-core/shamt-config.json — no testing plan needed.` — and exit. Do not create or modify any file.
+- `.shamt-core/project-specific-files/TESTING_STANDARDS.md` exists and is validated. Read its **Automated test infrastructure** section. If it declares **None**, **this command is a no-op**: print one line — `TESTING_STANDARDS.md declares no automated suites — no testing plan needed (Phase 5 runs the agent-as-user execution).` — and exit. Do not create or modify any file.
 - Resolve the story folder per `templates/SHAMT_RULES.template.md` §PO-tree resolution (tree-wide glob + legacy-flat fallback); `stories/{slug}/` below denotes that resolved folder. Apply the active-artifact pointer if `stories/{slug}/active_artifacts.md` exists.
-- The active spec exists with a validation footer and is approved at Gate 2b. The spec must include a `## Test Strategy` section per [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md#when-automated-testing-is-enabled).
+- The active spec exists with a validation footer and is approved at Gate 2b. The spec must include a `## Test Strategy` section per [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md#testing-phase-5--required).
 - If `.shamt-core/project-specific-files/ARCHITECTURE.md` and `.shamt-core/project-specific-files/CODING_STANDARDS.md` exist, read them for test runner / file naming / fixture / assertion conventions.
 
 ## Path selection (Quick vs Standard, inline vs full artifact)
@@ -116,10 +116,10 @@ Report which shape was produced (inline vs full artifact) and link the validated
 
 ## Notes
 
-- **No-op when testing is disabled.** The single-line message above is intentional — the command must remain safe to invoke unconditionally from `/e3-plan-implementation` regardless of project configuration.
+- **No-op when `TESTING_STANDARDS.md` declares no automated suites.** The single-line message above is intentional — the command must remain safe to invoke unconditionally from `/e3-plan-implementation` regardless of the project's testing approach.
 - This command is **fresh-agent runnable**: input lives on disk (config, spec, governing docs). State is determined by artifact presence.
 - The inline-vs-artifact threshold (>5 steps OR any new test file) is the only criterion that escalates a Quick-path story to the full artifact. Do not invent additional escalation rules; if you find yourself wanting to, the test scope is large enough to warrant the full file anyway.
-- Phase 5 (Test) executes this plan via the `test-executor` persona — see [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md#when-automated-testing-is-enabled) and Part 3's Engineer Flow phase narratives. Phase 5 **blocks until all tests pass**.
+- Phase 5 (Test) executes this plan via the `test-executor` persona — see [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md#testing-phase-5--required) and Part 3's Engineer Flow phase narratives. Phase 5 **blocks until all tests pass**.
 
 ---
 Validated 2026-05-28 — 2 rounds, 1 adversarial sub-agent confirmed (Phase 5 implementation loop)

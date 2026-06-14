@@ -29,7 +29,7 @@ See [`reference/model_selection.md`](../../../../reference/model_selection.md).
 
 - Resolve the story folder per `templates/SHAMT_RULES.template.md` §PO-tree resolution (tree-wide glob + legacy-flat fallback); `stories/{slug}/` below denotes that resolved folder. If `stories/{slug}/active_artifacts.md` exists, read it first.
 - The active spec exists with a validation footer.
-- `stories/{slug}/feedback/` contains at least one `review_vN.md` with a validation footer. If `feedback/` is empty (Quick-path no-issue path used the `## Post-Build Review` block in the spec instead), this command is mostly a TODO-scan no-op — see Step 6.
+- A feedback source exists: a story-mode `review_vN.md` (with a validation footer) under `stories/{slug}/feedback/`, **and/or a Phase-5 bug routed here by `/e5-execute-tests`** (an `agent_test_session.md` scenario that FAILed, or a `test-executor` Story-bug). A Phase-5 bug is logged as a feedback item with the required phase-attributed root-cause (Step 2). If there is no source at all (Quick-path no-issue + Phase 5 green), this command is mostly a TODO-scan no-op — see Step 6.
 - `.shamt-core/project-specific-files/ARCHITECTURE.md` and `.shamt-core/project-specific-files/CODING_STANDARDS.md` paths are known (read the active review's `## Documentation Impact` block to learn whether either needs an update).
 
 ## Step-by-step
@@ -51,7 +51,7 @@ Create (or update) `stories/{slug}/feedback/addressed_feedback.md`. Track every 
 - **Source:** `feedback/review_vN.md` (`Blockers` / `Required Changes` / `Suggestions` / `Monitoring Checklist` / `Security Checklist`)
 - **Disposition:** `Pending` | `Resolved` | `Deferred — <reason>` | `Needs user decision`
 - **Action taken:** <commit SHA(s), file(s) changed, or `N/A — deferred / needs decision`>
-- **Root cause:** <one-line summary of why the issue existed — needed for Step 5>
+- **Root cause:** <one-line summary of why the issue existed — needed for Step 5>. **For a Phase-5 test-surfaced bug this is required and must name which phase let it through — Spec (missing requirement) / Plan (missing or wrong step) / Build (execution defect) — plus the prevention (what would have caught it earlier).**
 - **Notes:** <anything else worth carrying forward>
 ```
 

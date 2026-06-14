@@ -1,10 +1,10 @@
 ---
-description: Post-Build optional artifact — produce and validate manual_test_plan.md for scenarios automated tests cannot exercise (UI, cloud infra, external integrations, multi-user flows). Slug-resumable; available regardless of the testing config flag
+description: Post-Build optional artifact — produce and validate manual_test_plan.md for scenarios automated tests cannot exercise (UI, cloud infra, external integrations, multi-user flows). Slug-resumable; available on every story (orthogonal to the required agent-as-user Phase 5 — it covers scenarios the agent cannot simulate)
 ---
 
 # /e5b-write-manual-testing-plan
 
-**Purpose:** Produce and validate `stories/{slug}/manual_test_plan.md` — a human-walkthrough artifact for verification that automated tests cannot cover. Invocable any time after Phase 4 (Build) completes, **orthogonal to the project-level automated-testing opt-in** (no `.shamt-core/shamt-config.json` no-op check — this command is always available).
+**Purpose:** Produce and validate `stories/{slug}/manual_test_plan.md` — a human-walkthrough artifact for verification that automated tests cannot cover. Invocable any time after Phase 4 (Build) completes, **orthogonal to the required Phase-5 agent-as-user execution** — it is the on-demand **human-walkthrough** for scenarios the agent cannot simulate (real UI, cloud infra, multi-user), always available (no no-op check).
 
 Slug-resumable: if the artifact already exists, re-validate or patch on request rather than starting from scratch.
 
@@ -33,7 +33,7 @@ See [`reference/model_selection.md`](../../../../reference/model_selection.md).
 - The active spec exists with a validation footer and is approved at Gate 2b.
 - On the Standard path, the active `implementation_plan.md` exists with a validation footer (preferred but not required — drafting can proceed from the spec alone if the user explicitly wants a manual test plan before Plan validates).
 - Phase 4 (Build) has completed for the story — this artifact walks a tester through verifying *what got built*. Halt and direct the user to `/e4-execute-plan {slug}` if Build has not run.
-- **No `.shamt-core/shamt-config.json` `testing` check.** This command does **not** no-op on `testing: "disabled"` — it is independently available on every story.
+- **Always available.** Unlike the required Phase-5 agent-as-user run, this on-demand human-walkthrough is invocable on every story; it has no no-op gate.
 
 ## Slug-resumable mode
 
@@ -56,7 +56,7 @@ State the chosen mode in one line before drafting.
 2. Read the active `spec.md` completely. Extract `## Scope`, `## Requirements`, `## Review Prevention Gates`, and `## Verification`.
 3. On Standard path, read `context.md` for code shapes and the current end-to-end flow.
 4. On Standard path, read `implementation_plan.md` (when present) — file manifest, verification section, Review Prevention Gate Mapping. These show *what got built*; scenarios should exercise that surface.
-5. If `testing: "enabled"` and `testing_plan.md` exists, read its `## Test Strategy` and `## Test Plan Steps` to know which surfaces automated tests already cover. The `## Coverage Note` will explicitly delineate the boundary later.
+5. If a `testing_plan.md` exists (i.e. `TESTING_STANDARDS.md` declares automated suites), read its `## Test Strategy` and `## Test Plan Steps` to know which surfaces automated tests already cover. The `## Coverage Note` will explicitly delineate the boundary later.
 6. Read `.shamt-core/project-specific-files/ARCHITECTURE.md` and `.shamt-core/project-specific-files/CODING_STANDARDS.md` for any project-level UI / infra / multi-user conventions the walkthrough must respect.
 
 ### Step 2 — Draft `manual_test_plan.md`
@@ -147,7 +147,7 @@ When the user invokes the command on an existing footered artifact with a specif
 ## Notes
 
 - This command is **fresh-agent runnable**: every input lives on disk (active spec, plan, context, testing plan, active-artifact pointer, governing docs). State is determined by artifact presence + footer presence.
-- **No `.shamt-core/shamt-config.json` no-op gate.** Unlike `/e5-execute-tests` and `/e3b-write-testing-plan`, this command does **not** check `testing` and does **not** print a no-op message. It is always available, on every story, per the manual-test-plan rule.
+- **No no-op gate.** Unlike `/e5-execute-tests` (the required Phase-5 run) and `/e3b-write-testing-plan` (gated on `TESTING_STANDARDS.md` declaring suites), this on-demand human-walkthrough does **not** check anything and does **not** print a no-op message.
 - **Recommended model tier: Sonnet** for both authoring and the inline validation-loop primary (per [`reference/model_selection.md`](../../../../reference/model_selection.md) `## Per-phase guidance` — "Manual-test-plan drafting | Balanced | Drafting + validation loop per the manual-test-plan rule"). The sub-agent stays at Haiku. This is a deliberate override of the per-phase default "Opus for primary validation loops" — the 4-dimension manual-test-plan loop is balanced/structural rather than multi-piece synthesis.
 - The inline validation loop runs **here** (not delegated to `/validate-artifact`) so the Author / Patch / Re-validate modes stay cohesive — but it follows `/validate-artifact`'s standard Pattern 1 exit, which is the source of truth for how validations exit (one primary clean round + Standard-path adversarial). Only the **dimension set** is artifact-specific (the 4 dimensions in this command + the template); the exit rule is not bespoke.
 - **Slug-resumable.** A fresh agent reads the artifact + active pointer + footer status, decides Author / Patch / Re-validate / Author-continue, and proceeds. No conversation history required.

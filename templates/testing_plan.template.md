@@ -1,6 +1,6 @@
 # Testing Plan: {slug}
 
-**Note:** Produced during Phase 3 (Plan) when `.shamt-core/shamt-config.json` sets `testing: "enabled"`. On the Quick path, when test scope is small (≤5 steps, no new test file), the inline checklist in `spec.md` replaces this artifact. Executed during Phase 5 (Test) by the `test-executor` persona (see `reference/model_selection.md` — Haiku tier).
+**Note:** Produced during Phase 3 (Plan) when `.shamt-core/project-specific-files/TESTING_STANDARDS.md` declares automated suites. On the Quick path, when test scope is small (≤5 steps, no new test file), the inline checklist in `spec.md` replaces this artifact. Executed during Phase 5 (Test) by the `test-executor` persona (see `reference/model_selection.md` — Haiku tier).
 
 **Created:** [Date]
 **Story:** stories/{slug}/

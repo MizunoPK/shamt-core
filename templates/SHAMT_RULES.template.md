@@ -12,7 +12,7 @@
 Shamt is a quality framework for AI-assisted development under Claude Code. It defines:
 
 - **5 core patterns** — validation loops, severity classification, spec protocol, code review, implementation planning.
-- **Two role flows** — an **Engineer flow** (seven-phase story workflow; eight phases when automated testing is enabled) and a **Product Owner flow** (Epic → Feature → Story decomposition).
+- **Two role flows** — an **Engineer flow** (Quick path 7 phases / Standard path 8 phases — testing is a **required** phase) and a **Product Owner flow** (Epic → Feature → Story decomposition).
 - **The story** as the handoff artifact between the two roles.
 - **A path system inside the Engineer flow** — every story runs the **Quick path** (default, low-ceremony) unless a risk trigger escalates it to the **Standard path**.
 
@@ -27,7 +27,7 @@ Core files:
 - `stories/{ID}-{slug}-{brief-description}/` — per-story artifacts (the `{ID}-` prefix is added to new tickets — see **# Ticket IDs**).
 - `epics/{ID}-{slug}-{brief}/`, `features/{ID}-{slug}-{brief}/` — PO-flow artifacts.
 - `.shamt-core/proposals/` — framework-update proposals.
-- `.shamt-core/shamt-config.json` — per-project configuration (tracker, testing opt-in, etc.).
+- `.shamt-core/shamt-config.json` — per-project configuration (tracker, etc.).
 
 ---
 
@@ -87,18 +87,19 @@ Determine the path after Phase 1 (Intake).
 
 When uncertain, default to Standard.
 
-### Quick path map (no automated testing)
+### Quick path map
 
 | Phase | Artifact | Gate |
 |---|---|---|
 | 1. Intake | `stories/{ID}-{slug}-{brief-description}/ticket.md` | User confirms slug + content |
 | 2. Compact Spec | `stories/{slug}/spec.md` (Evidence, Code Shapes, Build Checklist, Verification inline) | Gate 2b: user approves spec/checklist |
 | 3. Build | code changes | Verification checklist in spec |
-| 4. Review | chat/spec summary; `feedback/review_v1.md` only on findings, risk, or user request | Review completed |
-| 5. Polish | no-op unless feedback exists | TODO scan passes; feedback handled if present |
-| 6. Finalize | scoped commit + work item marked done (`ticket.md` `**Status: Done**`) | `/e8-finalize-story`: prior phases complete, scoped clean-tree commit, explicit confirmation |
+| 4. Test | `stories/{slug}/agent_test_session.md` (+ inline automated checklist when present) | Phase 4 (Test) PASSes (agent-as-user; automated when present) |
+| 5. Review | chat/spec summary; `feedback/review_v1.md` only on findings, risk, or user request | Review completed |
+| 6. Polish | no-op unless feedback exists | TODO scan passes; feedback handled if present |
+| 7. Finalize | scoped commit + work item marked done (`ticket.md` `**Status: Done**`) | `/e8-finalize-story`: prior phases complete, scoped clean-tree commit, explicit confirmation |
 
-### Standard path map (no automated testing)
+### Standard path map
 
 | Phase | Artifact | Gate |
 |---|---|---|
@@ -106,17 +107,22 @@ When uncertain, default to Standard.
 | 2. Spec | `stories/{slug}/spec.md` + `stories/{slug}/context.md` | Gate 2a design approval; Gate 2b validated-spec approval |
 | 3. Plan | `stories/{slug}/implementation_plan.md` | Gate 3 approved |
 | 4. Build | code changes | Verification checklist in plan |
-| 5. Review | `stories/{slug}/feedback/review_v1.md` | Review artifact exists after Build |
-| 6. Polish | `feedback/addressed_feedback.md` + commits | User signals complete |
-| 7. Finalize | scoped commit + work item marked done (`ticket.md` `**Status: Done**`) | `/e8-finalize-story`: prior phases complete, scoped clean-tree commit, explicit confirmation |
+| 5. Test | `stories/{slug}/agent_test_session.md` + `testing_plan.md` (when automated suites present) | Phase 5 (Test) PASSes |
+| 6. Review | `stories/{slug}/feedback/review_v1.md` | Review artifact exists after Test |
+| 7. Polish | `feedback/addressed_feedback.md` + commits | User signals complete |
+| 8. Finalize | scoped commit + work item marked done (`ticket.md` `**Status: Done**`) | `/e8-finalize-story`: prior phases complete, scoped clean-tree commit, explicit confirmation |
 
-### When automated testing is enabled
+### Testing (Phase 5 — required)
 
-When `.shamt-core/shamt-config.json` sets `testing: "enabled"`, a **Phase 5: Test** is inserted between Build and Review. Spec gains a **Test Strategy** section (approval-relevant at Gate 2b). Plan produces a `testing_plan.md` alongside `implementation_plan.md`. The Test phase executes the plan via the `test-executor` persona and blocks until all tests pass. Quick-path testing uses an inline checklist in `spec.md` and escalates to a full `testing_plan.md` artifact if test scope >5 steps or introduces a new test file.
+**Phase 5 (Test)** is **required** on every story and **blocks until green**: the `user-simulator` persona
+drives the project per `TESTING_STANDARDS.md` (source of truth; no `testing` flag), writing
+`agent_test_session.md`, plus the **automated** `testing_plan.md` when that doc declares suites. A failure
+routes to `/e7-resolve-feedback` with a **required root-cause section** (which of Spec/Plan/Build let it
+through + the prevention). Full detail in [`reference/testing.md`](reference/testing.md).
 
 ### Optional post-Build artifact
 
-After Phase 4 (or Phase 5 when testing is enabled), `/e5b-write-manual-testing-plan {slug}` produces `manual_test_plan.md` for scenarios automated tests cannot exercise (UI behavior, cloud infra, external integrations, multi-user flows). Per-story, on demand — no project-level opt-in.
+Manual-test-plan detail: see [`reference/testing.md`](reference/testing.md).
 
 ### Context-clear breakpoints
 
@@ -128,7 +134,7 @@ After Phase 4 (or Phase 5 when testing is enabled), `/e5b-write-manual-testing-p
 
 Both role flows end with a **Finalize** command modelled on `/f6-archive-proposal`, each behind explicit user confirmation (per-tracker and clean-tree mechanics in the command bodies):
 
-- **`/e8-finalize-story {slug}`** — the Engineer flow's terminal phase: commits the story's work as a scoped unit (clean-tree guard), confirms prior phases complete (Review + feedback resolved; Test PASSes when testing is enabled), marks the work item done via the active tracker, and writes `**Status: Done**` into `ticket.md` — the profile-independent signal the status line reads.
+- **`/e8-finalize-story {slug}`** — the Engineer flow's terminal phase: commits the story's work as a scoped unit (clean-tree guard), confirms prior phases complete (Test PASSes — required; Review + feedback resolved), marks the work item done via the active tracker, and writes `**Status: Done**` into `ticket.md` — the profile-independent signal the status line reads.
 - **`/p5-finalize-epic {slug}`** — the PO flow's terminal command at the Epic altitude: after confirming every child feature/story is finalized, marks the epic done and **moves the epic folder into `epics/archive/`** as a **whole-subtree move** (features/stories ride along — parentage is the path, nothing dangles). There is no per-feature finalize command (features close implicitly when their stories are done); `epics/archive/` is excluded from active-epic status-line resolution.
 
 ### §PO-tree resolution
@@ -166,7 +172,7 @@ The standing **Tech Stories** epic (introduced above) is the home for one-off wo
 
 # Global Story Invariants
 
-Apply across Spec, Plan, Build, Test (when enabled), Review, and Polish:
+Apply across Spec, Plan, Build, Test, Review, and Polish:
 
 - **Story folder resolution.** Resolve the story folder per §PO-tree resolution (globs are **work-root-relative** — `.shamt-core/` in a child), anchored on `ticket.md`: ID → `stories/{ID}-*/ticket.md`; slug → `stories/{slug}/ticket.md` ∪ `stories/{slug}-*/ticket.md` ∪ `stories/*-{slug}-*/ticket.md`. Multiple → halt and ask; none → halt and report.
 - **Active artifact pointer.** When `stories/{slug}/active_artifacts.md` exists, read it first and use files listed under "Active Files" instead of assuming unversioned names.
@@ -408,6 +414,7 @@ Core naming rules:
 - `active_artifacts.md` is the authoritative pointer once multiple baselines exist;
 - `review_vN.md` files are append-only versioned review artifacts;
 - `manual_test_plan.md` is single-baseline; if re-baselined, follow the same `_vN.md` convention.
+- `agent_test_session.md` is the required Phase-5 agent-as-user run log; single-baseline (`_vN.md` if re-baselined).
 
 ---
 

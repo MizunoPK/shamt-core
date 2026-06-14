@@ -1,13 +1,13 @@
 ---
 name: e3b-write-testing-plan
 description: >
-  Plan sub-phase invoked when .shamt-core/shamt-config.json sets testing: "enabled".
+  Plan sub-phase invoked when .shamt-core/project-specific-files/TESTING_STANDARDS.md declares automated suites.
   Produces and validates either the inline test checklist in spec.md (Quick
   path, ≤5 steps, no new test file) or the full testing_plan.md artifact
   (Standard path, or Quick path with larger scope). Invoke when the user wants
   to draft or update the testing plan for a story, write a test plan, plan
   Phase 5 testing, or escalate an inline checklist to a full artifact. No-op
-  with a clear message when testing is disabled.
+  with a clear message when TESTING_STANDARDS.md declares no automated suites.
 triggers:
   - "write the testing plan"
   - "draft the testing plan"
@@ -20,13 +20,13 @@ triggers:
 
 ## Overview
 
-Mirrors the `/e3b-write-testing-plan {slug}` slash command. Same canonical body, two host wirings. Invoked by `/e3-plan-implementation` when testing is enabled; also runnable standalone for re-planning.
+Mirrors the `/e3b-write-testing-plan {slug}` slash command. Same canonical body, two host wirings. Invoked by `/e3-plan-implementation` when `TESTING_STANDARDS.md` declares automated suites; also runnable standalone for re-planning.
 
 ## Protocol
 
 Follow the canonical `/e3b-write-testing-plan` command body verbatim — see [`commands/e3b-write-testing-plan.md`](../../commands/e3b-write-testing-plan.md). Summary:
 
-1. **No-op gate** — if `.shamt-core/shamt-config.json` sets `testing: "disabled"`, print one line and exit. Do not touch any file.
+1. **No-op gate** — if `.shamt-core/project-specific-files/TESTING_STANDARDS.md` declares no automated suites, print one line and exit. Do not touch any file.
 2. **Read the spec's `## Test Strategy`** — extract test kinds, existing files, new files, conventions.
 
 Resolve the story folder per `templates/SHAMT_RULES.template.md` §PO-tree resolution (tree-wide glob + legacy-flat fallback); `stories/{slug}/` below denotes that resolved folder.
@@ -47,7 +47,7 @@ See [`reference/model_selection.md`](../../../../../reference/model_selection.md
 
 ## Exit criteria
 
-Either the spec's inline checklist is populated, or `testing_plan.md` exists with a validation footer; Open Questions empty or deferred with reason. Phase 5 (Test) executes this plan and **blocks until all tests pass** — see [`SHAMT_RULES.template.md`](../../../../../templates/SHAMT_RULES.template.md#when-automated-testing-is-enabled).
+Either the spec's inline checklist is populated, or `testing_plan.md` exists with a validation footer; Open Questions empty or deferred with reason. Phase 5 (Test) executes this plan and **blocks until all tests pass** — see [`SHAMT_RULES.template.md`](../../../../../templates/SHAMT_RULES.template.md#testing-phase-5--required).
 
 ---
 Validated 2026-05-28 — 2 rounds, 1 adversarial sub-agent confirmed (Phase 5 implementation loop)

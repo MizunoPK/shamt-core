@@ -43,7 +43,7 @@ Optional in both modes:
 ## Prerequisites
 
 - `.shamt-core/project-specific-files/ARCHITECTURE.md` and `.shamt-core/project-specific-files/CODING_STANDARDS.md` exist at the project root (note their absence inline if missing — `## Standards check` invariant — and continue).
-- **Story mode:** story folder resolves; the active spec is present; Build (and Test, when enabled) has completed.
+- **Story mode:** story folder resolves; the active spec is present; Build and Test (Phase 5, required) have completed.
 - **Formal mode:** `git` is available; the configured remote is reachable for the fetch. If the current local branch is the feature branch being reviewed, run `git status --short` first — if there are uncommitted changes, halt and ask whether to include, stash, commit, or ignore them.
 
 ## Mode selection
@@ -59,7 +59,7 @@ State the chosen mode in one line before the first action.
 
 ### Step 1 — Resolve story artifacts
 
-1. Apply the active-artifact pointer; resolve `spec`, `context` (Standard only), `implementation_plan` (Standard only), and `testing_plan` (when testing is enabled **and** the story uses a full artifact rather than the Quick-path inline checklist in `spec.md`) paths.
+1. Apply the active-artifact pointer; resolve `spec`, `context` (Standard only), `implementation_plan` (Standard only), `agent_test_session` (the required Phase-5 run), and `testing_plan` (when `TESTING_STANDARDS.md` declares automated suites **and** the story uses a full artifact rather than the Quick-path inline checklist in `spec.md`) paths.
 2. Confirm each resolved artifact has a validation footer. If any is missing, halt — review starts after approved gates. (Quick-path inline test checklists live under the spec's footered surface and don't need a separate footer check.)
 3. Resolve the story folder per `templates/SHAMT_RULES.template.md` §PO-tree resolution (tree-wide glob + legacy-flat fallback); `stories/{slug}/` below denotes that resolved folder. Walk `stories/{slug}/feedback/` (when present) for existing `review_v*.md` files; the next review version is `vN+1`.
 

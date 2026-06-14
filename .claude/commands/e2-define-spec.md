@@ -99,7 +99,7 @@ Required elements:
 
 - **`Review Prevention Gates`** (after Requirements or Interfaces) — for each applicable surface (regulated/sensitive data; tenant; auth/route; DB; infra; frontend; testing; removed/weakened checks), state the approval-facing prevention requirement. Standard path stores detailed evidence in `context.md`; Quick path stores compact evidence inline. If a prevention surface is itself a risk trigger, **escalate to Standard path**.
 - **`Database Schema Changes`** (after `Interfaces and Boundaries`) — required when schema is added or modified, or when candidate persistence designs need approval. For any schema change, trace the end-to-end cross-service read/write data lineage across service boundaries (ensure data is not written but ignored or dropped at runtime). New tables list columns; modified tables list deltas. Candidate options must be reviewable when undecided. Explicitly defer schema changes when out of scope.
-- **`Test Strategy`** (when `.shamt-core/shamt-config.json` sets `testing: "enabled"`) — see [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md#when-automated-testing-is-enabled). Approval-relevant at Gate 2b. List test kinds in scope, existing test files relevant, new test files needed, and project conventions to follow. Quick path with ≤5 test steps and no new file may use the spec's inline `Quick path inline test checklist`; otherwise the full `testing_plan.md` is produced in Phase 3.
+- **`Test Strategy`** (testing is a **required** phase — see [`reference/testing.md`](../../../../reference/testing.md)). Approval-relevant at Gate 2b. Describe how this story is verified in Phase 5: the agent-as-user scenarios always, and (when `TESTING_STANDARDS.md` declares automated suites) the automated test kinds in scope, existing test files relevant, new test files needed, and project conventions to follow. Quick path with ≤5 test steps and no new file may use the spec's inline `Quick path inline test checklist`; otherwise the full `testing_plan.md` is produced in Phase 3.
 - **`Key Design Decisions`** table — assign `D1`, `D2`, … IDs. Same IDs appear in both `spec.md` and `context.md` (Standard path) without contradiction.
 - **`Open Questions`** — only unresolved product / platform / team decisions remain. Code-answerable questions must have been resolved by research, not surfaced.
 
@@ -121,7 +121,7 @@ Present the validated `spec.md` as the approval artifact. On Standard path, link
 - The agreed design (with Key Design Decision IDs).
 - The Requirements list.
 - The Review Prevention Gates row by row.
-- The Test Strategy (when testing is enabled).
+- The Test Strategy (always — testing is required).
 - Any Database Schema Changes.
 
 If a new service is in scope, standard monitoring requirements must appear in Requirements or be explicitly Deferred with reason.
@@ -140,7 +140,7 @@ Wait for explicit user approval. Once approved, suggest a context-clear breakpoi
 - This command is **fresh-agent runnable**: every input lives on disk (config, ticket, governing docs). State is determined by artifact presence; no conversation history required.
 - **Single-session sizing constraint:** if the spec would compact within a session, split the work — invoke an architect-style sub-agent for the heaviest research and have the primary agent integrate findings. See [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md) Principle 1.
 - The open-questions iterative dialog is mandatory — one question at a time, via `AskUserQuestion`, updating the artifact with each answer. No bulk question-bombing. No proceeding on assumptions.
-- The Test Strategy section is approval-relevant at Gate 2b only when testing is enabled. Omit it entirely when `testing: "disabled"`.
+- The Test Strategy section is always approval-relevant at Gate 2b (testing is required); it always covers the agent-as-user scenarios and adds automated detail when `TESTING_STANDARDS.md` declares suites.
 - Mermaid diagrams are not authored here. Use the dedicated diagram workflow after Spec — see [`reference/mermaid_diagram_standards.md`](../../../../reference/mermaid_diagram_standards.md) and [`reference/mermaid_recipes.md`](../../../../reference/mermaid_recipes.md).
 - Standard path next: `/e3-plan-implementation {slug}`. Quick path next: build from the spec's Build Checklist directly (no `/e3-plan-implementation` required).
 

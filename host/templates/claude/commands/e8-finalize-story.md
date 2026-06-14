@@ -34,7 +34,7 @@ Finalize is the terminal phase; it refuses to run on a story still mid-flow.
 
 1. Confirm **Review** ran: a `feedback/review_vN.md` exists (or the story is Quick-path with no findings and the user has signalled Polish complete). If Review never ran, halt and direct the user to `/e6-review-changes {slug}`.
 2. Confirm **feedback is resolved**: if `feedback/addressed_feedback.md` exists, every row is `Resolved` / `Deferred — <reason>` / `Needs user decision` with an active follow-up — **no `Pending` rows**. If unresolved rows remain, halt and direct the user to `/e7-resolve-feedback {slug}`.
-3. When testing is enabled (`.shamt-core/shamt-config.json` `testing: "enabled"`), confirm **Test passed**: the active `testing_plan.md` (or the Quick-path inline checklist) shows every step `PASS`. If any step is unrun or failing, halt and direct the user to `/e5-execute-tests {slug}`.
+3. Confirm **Test passed** (Phase 5 is required): `stories/{slug}/agent_test_session.md` shows the session verdict `PASS`, and — when `TESTING_STANDARDS.md` declares automated suites — the active `testing_plan.md` (or the Quick-path inline checklist) shows every step `PASS`. If any is unrun or failing, halt and direct the user to `/e5-execute-tests {slug}`.
 
 If any guard fails, halt with the specific remediation command — do not proceed.
 
@@ -90,7 +90,7 @@ No next-phase suggestion. The Engineer flow ends at Phase 8 (Finalize).
 ## Notes
 
 - **Not an epic archive.** `/e8-finalize-story` finalizes a single story; it does **not** move the story folder. Epic-level archiving (moving a done epic into `epics/archive/`) is `/p5-finalize-epic`'s job.
-- **Terminal phase.** Finalize is the last Engineer phase. The status line renders `P{N} Finalize` once `ticket.md` carries `**Status: Done**` (N = 7 normally, 8 when automated testing is enabled).
+- **Terminal phase.** Finalize is the last Engineer phase. The status line renders `P{N} Finalize` once `ticket.md` carries `**Status: Done**` (N = 7 on the Quick path, 8 on the Standard path — testing is a required phase).
 - **Fresh-agent runnable** — story folder, config, and working-tree state are sufficient. No conversation history required.
 - **No squash-merge.** Unlike `/f6-archive-proposal`, the story is not on a proposal branch; finalize commits the story's work on its feature branch and stops. PR creation / merge is the `pr_provider`'s concern, out of scope here.
 

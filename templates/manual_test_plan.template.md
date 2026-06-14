@@ -1,13 +1,13 @@
 # Manual Test Plan: {slug}
 
-**Note:** Optional per-story artifact. Produced by `/e5b-write-manual-testing-plan {slug}` after Phase 4 (Build) — or after Phase 5 (Test) when automated testing is enabled. Orthogonal to the project-level automated testing opt-in: this artifact is available regardless of `testing` in `.shamt-core/shamt-config.json`. The agent runs an inline validation loop using `reference/severity_classification.md` (Pattern 2) with the four dimensions listed at the bottom of this file before considering the plan drafted.
+**Note:** Optional per-story artifact. Produced by `/e5b-write-manual-testing-plan {slug}` after Phase 4 (Build) or Phase 5 (Test). It is the on-demand **human-walkthrough** for scenarios the agent cannot simulate (real UI, cloud infra, multi-user) — **not** part of the required Phase-5 pass (which is the agent-as-user execution). Available on every story. The agent runs an inline validation loop using `reference/severity_classification.md` (Pattern 2) with the four dimensions listed at the bottom of this file before considering the plan drafted.
 
 **Created:** [Date]
 **Story:** stories/{slug}/
 <!-- Paths are relative to the resolved story folder (located per templates/SHAMT_RULES.template.md §PO-tree resolution; the folder nests under epics/.../features/.../). -->
 **Spec:** stories/{slug}/spec.md (or `spec_vN.md` for re-baselined stories)
 **Implementation Plan:** stories/{slug}/implementation_plan.md (or N/A on Quick path)
-**Testing Plan:** stories/{slug}/testing_plan.md (or N/A when testing is disabled)
+**Testing Plan:** stories/{slug}/testing_plan.md (or N/A when TESTING_STANDARDS.md declares no automated suites)
 **Path:** Quick path | Standard path
 **Baseline:** v1
 **Baseline status:** Active

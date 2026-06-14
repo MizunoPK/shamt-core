@@ -95,12 +95,13 @@ After the builder reports completion:
 
 ### Step 5 — Exit
 
-Suggest the next phase based on the project's `.shamt-core/shamt-config.json`:
+Suggest the next phase:
 
-- `testing: "enabled"` → `/clear`, then `/e5-execute-tests {slug}` (Phase 5).
-- `testing: "disabled"` → `/clear`, then `/e6-review-changes {slug}` (Phase 6).
+- Always → `/clear`, then `/e5-execute-tests {slug}` (Phase 5 — **required**). Phase 5 runs the
+  agent-as-user execution (and automated suites when `TESTING_STANDARDS.md` declares them), then suggests
+  `/e6-review-changes {slug}`.
 
-Suggest `/e5b-write-manual-testing-plan {slug}` (orthogonal to the testing flag) when the story touched UI behavior, cloud infra, external integrations, or multi-user flows — per [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md#optional-post-build-artifact).
+Suggest `/e5b-write-manual-testing-plan {slug}` (orthogonal to the required Phase-5 agent-as-user execution) when the story touched UI behavior, cloud infra, external integrations, or multi-user flows — per [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md#optional-post-build-artifact).
 
 ## Quick build (direct execution)
 

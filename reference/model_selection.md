@@ -25,7 +25,8 @@ Adapted from v1's SHAMT-27 (`model_selection.md`); trimmed hard for v2.
 | `plan-executor` | Cheap (Haiku) | Mechanical implementation-plan execution; no synthesis required |
 | `validation-checker` | Cheap (Haiku) | Adversarial sub-agent re-read of a single artifact; fresh eyes, not depth |
 | `audit-checker` | Cheap (Haiku) | Adversarial framework-sweep sub-agent for `/f5-audit-framework`'s clean round; zero-bias D1–D12 re-sweep, not depth |
-| `test-executor` | Cheap (Haiku) | Runs the testing plan; interprets test output; diagnoses failures vs. infra flakiness |
+| `test-executor` | Cheap (Haiku) | Runs the automated testing plan; interprets test output; diagnoses failures vs. infra flakiness |
+| `user-simulator` | Balanced (Sonnet) | Phase 5 agent-as-user execution — drives the project as a user, supplies inputs, judges observed-vs-expected; interpretive, so not Cheap |
 | `review-executor` | Reasoning (Opus) | Formal-mode code review issue-finding using the 16-category framework |
 
 Personas declare their tier in the persona body (e.g., a frontmatter `model:` field). The defaults above stand unless a flow explicitly overrides.
@@ -45,7 +46,8 @@ Personas declare their tier in the persona body (e.g., a frontmatter `model:` fi
 | 3. Plan — `testing_plan.md` drafting | Balanced | Same shape as the main plan |
 | 4. Build (Quick path) | Balanced | Primary agent executes inline |
 | 4. Build (Standard path) | Cheap (`plan-executor`) | Mechanical plan execution by the builder persona; the architect's planning happened in Phase 3 and the architect only re-engages on builder-reported failure / ambiguity |
-| 5. Test | Cheap (`test-executor`) | Runs the suite and interprets output |
+| 5. Test — agent-as-user | Balanced (`user-simulator`) | Required; drives the project as a user per TESTING_STANDARDS.md |
+| 5. Test — automated suites | Cheap (`test-executor`) | When TESTING_STANDARDS.md declares automated tests |
 | 6. Review (story-mode) | Balanced | 16-category sweep at the story altitude |
 | 6. Review (formal-mode issue-finding) | Reasoning (`review-executor`) | Dedicated Opus persona for branch / PR review |
 | 6. Review (formal-mode git metadata) | Cheap | Fetch branch commits, diff stats, file inventory; mechanical |

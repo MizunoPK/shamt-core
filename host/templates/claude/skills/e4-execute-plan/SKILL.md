@@ -32,7 +32,7 @@ Follow the canonical `/e4-execute-plan` command body verbatim — see [`commands
 3. **Quick path** — primary agent executes the spec's `## Build Checklist` directly. Escalate to a full plan if the checklist exceeds ~10 steps, exact locate/replace detail is needed, a builder sub-agent becomes necessary, or the user requests Gate 3.
 4. **Monitor and route** — `All steps completed. Verification passed.` → continue. `Step N failed / ambiguous / plan defect` → diagnose, patch the plan via `/e3-plan-implementation`, re-hand off (Standard) or fix inline (Quick). Substantial changes trigger the **Re-baseline Protocol**.
 5. **Post-build verification** — walk the plan's `## Verification`, `## Review Prevention Gate Mapping`, and `## CODING_STANDARDS Compliance` rows. Every item must pass.
-6. **Exit** — suggest `/clear` + `/e5-execute-tests {slug}` (when `testing: "enabled"`), `/e6-review-changes {slug}` (when testing is disabled), and optionally `/e5b-write-manual-testing-plan {slug}` for UI / cloud-infra / external-integration / multi-user scope.
+6. **Exit** — suggest `/clear` + `/e5-execute-tests {slug}` (Phase 5 — **required**), then `/e6-review-changes {slug}`, and optionally `/e5b-write-manual-testing-plan {slug}` for UI / cloud-infra / external-integration / multi-user scope.
 
 ## Recommended models
 

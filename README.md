@@ -33,7 +33,8 @@ A child project that has installed Shamt looks like this:
 │   ├── host/templates/claude/
 │   ├── project-specific-files/
 │   │   ├── ARCHITECTURE.md         #   required at init (template provided)
-│   │   └── CODING_STANDARDS.md     #   required at init (template provided)
+│   │   ├── CODING_STANDARDS.md     #   required at init (template provided)
+│   │   └── TESTING_STANDARDS.md    #   required at init (template provided)
 │   ├── proposals/                  # framework-update proposals (locally authored)
 │   │   ├── _template.md            #   (master-owned — resynced by /sync-import-shamt; do not edit locally)
 │   │   ├── submitted/              # submitted to master, awaiting decision
@@ -85,9 +86,9 @@ No bidirectional guide-editing sync. No `export.sh`. The child's project work (s
 | `/e1-start-story {slug}` | 1. Intake | shipped |
 | `/e2-define-spec {slug}` | 2. Spec | shipped |
 | `/e3-plan-implementation {slug}` | 3. Plan (Standard only) | shipped |
-| `/e3b-write-testing-plan {slug}` | 3 sub-phase (testing enabled) | shipped |
+| `/e3b-write-testing-plan {slug}` | 3 sub-phase (automated suites present) | shipped |
 | `/e4-execute-plan {slug}` | 4. Build | shipped |
-| `/e5-execute-tests {slug}` | 5. Test (testing enabled) | shipped |
+| `/e5-execute-tests {slug}` | 5. Test (required) | shipped |
 | `/e6-review-changes [{slug}\|--branch=<name>\|--pr=<id>]` | 6. Review | shipped |
 | `/e7-resolve-feedback {slug}` | 7. Polish | shipped |
 | `/e8-finalize-story {slug}` | 8. Finalize | shipped |
@@ -206,7 +207,8 @@ The status line surfaces PO-flow context by falling back through altitudes — f
 | `plan-executor` | Haiku | `/e4-execute-plan` (Standard) and `/f3-implement-update` (architect/builder path) | shipped |
 | `validation-checker` | Haiku | Pattern 1 adversarial sub-agent | shipped |
 | `audit-checker` | Haiku | `/f5-audit-framework` clean-round adversarial sweep | shipped |
-| `test-executor` | Haiku | `/e5-execute-tests` | shipped |
+| `test-executor` | Haiku | `/e5-execute-tests` (automated suites) | shipped |
+| `user-simulator` | Sonnet | `/e5-execute-tests` agent-as-user execution | shipped |
 | `review-executor` | Opus | `/e6-review-changes` formal mode | shipped |
 
 ---
@@ -228,11 +230,12 @@ Per-project settings live in `.shamt-core/shamt-config.json`. Initialize from `.
 | `project_name` | string (`^[A-Za-z0-9._-]+$`) | Used by `/sync-submit-proposal` to namespace upstream submissions (`proposals/incoming/{project_name}-{slug}.md` on master) |
 | `work_item_tracker` | `"ado"` / `"github"` / `"local"` / `"none"` | Which tracker `/e1-start-story` (etc.) fetches from |
 | `pr_provider` | `"ado"` / `"github"` / `"none"` | Which PR provider `/e6-review-changes` formal mode uses |
-| `testing` | `"enabled"` / `"disabled"` | Whether Phase 5 (Test) is part of the Engineer flow |
 | `ai_service` | `"anthropic"` | Reserved for future multi-host |
 | `master_url` | string | Where `import-shamt` pulls from. Git URL (`https://…` / `git@…` / `ssh://…`) → cloned `--depth 1`; absolute local path → used directly |
-| `doc_staleness_threshold_days` | integer (default 60) | `/f5-audit-framework` D6: how stale `.shamt-core/project-specific-files/ARCHITECTURE.md` / `.shamt-core/project-specific-files/CODING_STANDARDS.md` can be |
+| `doc_staleness_threshold_days` | integer (default 60) | `/f5-audit-framework` D6: how stale the three project-specific docs (`.shamt-core/project-specific-files/ARCHITECTURE.md` / `.shamt-core/project-specific-files/CODING_STANDARDS.md` / `.shamt-core/project-specific-files/TESTING_STANDARDS.md`) can be |
 | `rules_size_budget_chars` | integer (default 40000, optional) | `/f5-audit-framework` D12: max chars for `templates/SHAMT_RULES.template.md` (the rules file rendered into each child `CLAUDE.md`) before a size finding fires |
+
+Testing is governed by `.shamt-core/project-specific-files/TESTING_STANDARDS.md` (a project doc), not a config key — see [`reference/testing.md`](reference/testing.md).
 
 ---
 
@@ -252,8 +255,8 @@ Behavior:
 - Halts if the install config already exists (`<target>/shamt-config.json` on self-host, `<target>/.shamt-core/shamt-config.json` otherwise). Re-init is not supported; use `import-shamt.sh` for updates.
 - Prompts interactively for every `.shamt-core/shamt-config.json` field (no flag-based unattended mode).
 - Copies canonical sources from `<source>/shamt-core/` into `<target>/.shamt-core/` (skipped on self-host).
-- Seeds the child's `CLAUDE.md` at `<target>/` (from `templates/SHAMT_RULES.template.md`), and the two project-specific docs `ARCHITECTURE.md` + `CODING_STANDARDS.md` (with `Last Updated` set to today) under `<target>/.shamt-core/project-specific-files/`. `README.md` and `proposals/_template.md` travel inside the `.shamt-core/` canonical-source copy — they are not separately seeded. Skipped on self-host.
-- Writes the install config (`<target>/shamt-config.json` on self-host, `<target>/.shamt-core/shamt-config.json` otherwise) from the prompted answers. Ends with a copy/pastable completion prompt that drives an agent to fill in and `/validate-artifact` both project-specific docs.
+- Seeds the child's `CLAUDE.md` at `<target>/` (from `templates/SHAMT_RULES.template.md`), and the three project-specific docs `ARCHITECTURE.md` + `CODING_STANDARDS.md` + `TESTING_STANDARDS.md` (with `Last Updated` set to today) under `<target>/.shamt-core/project-specific-files/`. `README.md` and `proposals/_template.md` travel inside the `.shamt-core/` canonical-source copy — they are not separately seeded. Skipped on self-host.
+- Writes the install config (`<target>/shamt-config.json` on self-host, `<target>/.shamt-core/shamt-config.json` otherwise) from the prompted answers. Ends with a copy/pastable completion prompt that drives an agent to fill in and `/validate-artifact` all three project-specific docs.
 - Appends a managed `# >>> Shamt (managed)` block to the child's `.gitignore` (create-if-absent, idempotent — skipped if already present) that ignores `/.shamt-core/` + `/.claude/`, plus `/CLAUDE.md` **only when init seeded it** (a pre-existing child `CLAUDE.md` stays tracked). Skipped on self-host.
 - Runs `regenerate-framework.sh --target <target>` to produce `<target>/.claude/`.
 
@@ -315,15 +318,15 @@ Status-line output formats (live, computed cheaply from filesystem state — no 
 
 The `.active` override file works the same way at every altitude: a single line containing the active folder's name; if the pinned folder exists, it wins; otherwise the renderer falls back to the most-recently-modified subdirectory. Useful when mtime is misleading (e.g., after a sweeping `git restore`).
 
-Phase detection (story altitude only) cascades from latest-stage artifact. Numbers depend on `.shamt-core/shamt-config.json` `testing`:
+Phase detection (story altitude only) cascades from latest-stage artifact. Numbers depend on the **path** — Standard (an implementation plan is present) is 8 phases; Quick (no plan) is 7. Test is a required phase on both:
 
-| Artifact present | `testing: "enabled"` (8 phases) | `testing: "disabled"` (7 phases) |
+| Artifact present | Standard path (8 phases) | Quick path (7 phases) |
 |---|---|---|
 | `ticket.md` carries `**Status: Done**` | P8 Finalize | P7 Finalize |
 | `feedback/addressed_feedback.md` | P7 Polish | P6 Polish |
 | `feedback/review_v*.md` | P6 Review | P5 Review |
-| `testing_plan.md` | P5 Test | *(ignored — no Test phase)* |
-| `implementation_plan.md` | P3 Plan | P3 Plan |
+| `agent_test_session.md` or `testing_plan.md` | P5 Test | P4 Test |
+| `implementation_plan.md` | P3 Plan | *(n/a — Quick has no Plan)* |
 | `spec.md` | P2 Spec | P2 Spec |
 | `ticket.md` | P1 Intake | P1 Intake |
 

@@ -4,8 +4,8 @@ description: >
   Produce and validate stories/{slug}/manual_test_plan.md — a human-walkthrough
   artifact for verification automated tests cannot cover (UI behavior, cloud
   infra, external integrations, multi-user flows). Slug-resumable: Author /
-  Patch / Re-validate / Author-continue modes depending on existing state.
-  Orthogonal to .shamt-core/shamt-config.json testing — always available, every story. The
+  Patch / Re-validate / Author-continue modes depending on existing state. The
+  on-demand human-walkthrough for scenarios the agent cannot simulate — always available, every story, orthogonal to the required Phase-5 agent-as-user execution. The
   inline validation loop uses the 4 dimensions in templates/manual_test_plan.template.md.
   Invoke when the user wants to write a manual test plan, document manual test
   scenarios, draft a tester walkthrough, or capture UI / infra / multi-user
@@ -23,7 +23,7 @@ triggers:
 
 ## Overview
 
-Mirrors the `/e5b-write-manual-testing-plan {slug}` slash command. Same canonical body, two host wirings. **Always available** regardless of `.shamt-core/shamt-config.json` `testing` — no no-op gate (this is the manual-test-plan rule that distinguishes it from `/e3b-write-testing-plan` and `/e5-execute-tests`).
+Mirrors the `/e5b-write-manual-testing-plan {slug}` slash command. Same canonical body, two host wirings. **Always available** on every story — no no-op gate; this on-demand human-walkthrough is orthogonal to the required Phase-5 agent-as-user run, which distinguishes it from `/e3b-write-testing-plan` and `/e5-execute-tests`.
 
 ## Protocol
 

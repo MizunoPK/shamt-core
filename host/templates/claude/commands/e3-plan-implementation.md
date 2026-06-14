@@ -1,10 +1,10 @@
 ---
-description: Phase 3 (Plan, Standard path) — turn an approved spec into a mechanical, validated implementation plan; chains to /e3b-write-testing-plan when testing is enabled
+description: Phase 3 (Plan, Standard path) — turn an approved spec into a mechanical, validated implementation plan; chains to /e3b-write-testing-plan when TESTING_STANDARDS.md declares automated suites
 ---
 
 # /e3-plan-implementation
 
-**Purpose:** Run the Pattern 5 Implementation Planning protocol on a story whose spec has been approved at Gate 2b. Produce a mechanical, validated `implementation_plan.md` ready for builder handoff. When `.shamt-core/shamt-config.json` sets `testing: "enabled"`, this command also invokes `/e3b-write-testing-plan {slug}` as a sub-phase before exit.
+**Purpose:** Run the Pattern 5 Implementation Planning protocol on a story whose spec has been approved at Gate 2b. Produce a mechanical, validated `implementation_plan.md` ready for builder handoff. When `TESTING_STANDARDS.md` declares automated suites, this command also invokes `/e3b-write-testing-plan {slug}` as a sub-phase before exit.
 
 **Recommended models:**
 
@@ -98,11 +98,11 @@ Invoke `/validate-artifact stories/{slug}/implementation_plan.md`. Uses the 8 pl
 
 If validation finds CRITICAL / HIGH issues that originate in the spec, halt and either re-baseline (per the Re-baseline Protocol in [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md)) or patch the spec via `/e2-define-spec` and re-validate.
 
-### Step 4 — Write the testing plan (when enabled)
+### Step 4 — Write the testing plan (when automated suites present)
 
-Read `.shamt-core/shamt-config.json` → `testing`. If `enabled`, invoke `/e3b-write-testing-plan {slug}` as a sub-phase. It produces `stories/{slug}/testing_plan.md` (or escalates the Quick-path inline checklist when scope is small) and runs its own validation loop before returning. Do not advance to Gate 3 until the testing plan is validated.
+Read `TESTING_STANDARDS.md`'s Automated section. If it declares suites present, invoke `/e3b-write-testing-plan {slug}` as a sub-phase. It produces `stories/{slug}/testing_plan.md` (or escalates the Quick-path inline checklist when scope is small) and runs its own validation loop before returning. Do not advance to Gate 3 until the testing plan is validated.
 
-If `testing: "disabled"`, skip this step. `/e3b-write-testing-plan` would be a no-op anyway, but skipping the invocation keeps the chat output clean.
+If `TESTING_STANDARDS.md` declares no automated suites, skip this step. `/e3b-write-testing-plan` would be a no-op anyway, but skipping the invocation keeps the chat output clean.
 
 ### Step 5 — Gate 3 (user approval)
 
@@ -120,7 +120,7 @@ On approval, suggest a context-clear breakpoint: `/clear`, then `/e4-execute-pla
 ## Exit criteria
 
 - `stories/{slug}/implementation_plan.md` exists, fully populated, with the validation footer.
-- When testing is enabled, `stories/{slug}/testing_plan.md` (or the spec's inline checklist on Quick escalations) exists with its validation footer.
+- When `TESTING_STANDARDS.md` declares automated suites, `stories/{slug}/testing_plan.md` (or the spec's inline checklist on Quick escalations) exists with its validation footer.
 - Open Questions in the plan is empty (or contains only explicitly deferred items with reasons).
 - User has approved at Gate 3.
 

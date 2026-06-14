@@ -26,8 +26,8 @@
 #   6. Seed the child's CLAUDE.md (from templates/SHAMT_RULES.template.md) at
 #      <target>/, then append a managed .gitignore block ignoring Shamt's
 #      generated footprint (/.shamt-core/, /.claude/, and /CLAUDE.md when seeded);
-#      and seed the two project-specific docs (ARCHITECTURE.md,
-#      CODING_STANDARDS.md, Last Updated = today) under
+#      and seed the three project-specific docs (ARCHITECTURE.md,
+#      CODING_STANDARDS.md, TESTING_STANDARDS.md, Last Updated = today) under
 #      <target>/.shamt-core/project-specific-files/. Skipped on self-host.
 #   7. Write shamt-config.json (root on self-host, <target>/.shamt-core/
 #      otherwise) from the prompted answers.
@@ -237,7 +237,6 @@ log ""
 PROJECT_NAME=""
 WORK_ITEM_TRACKER=""
 PR_PROVIDER=""
-TESTING=""
 AI_SERVICE="anthropic"
 MASTER_URL=""
 DOC_STALENESS=""
@@ -257,11 +256,6 @@ prompt_choice PR_PROVIDER \
   "github" \
   "ado" "github" "none"
 
-prompt_choice TESTING \
-  "Automated testing infrastructure present in this project?" \
-  "disabled" \
-  "enabled" "disabled"
-
 # master_url default: the path we were invoked from (works for both local-clone
 # and self-host cases). User can override with a git URL after init.
 default_master_url="$SHAMT_CORE_SRC"
@@ -270,7 +264,7 @@ prompt_value MASTER_URL \
   "$default_master_url"
 
 prompt_value DOC_STALENESS \
-  "ARCHITECTURE.md / CODING_STANDARDS.md staleness threshold (days, integer)" \
+  "ARCHITECTURE.md / CODING_STANDARDS.md / TESTING_STANDARDS.md staleness threshold (days, integer)" \
   "60" \
   '^[0-9]+$'
 
@@ -439,6 +433,16 @@ if [ "$SELF_HOST" -eq 0 ]; then
   else
     warn "coding_standards.template.md not found — CODING_STANDARDS.md not seeded."
   fi
+
+  ts_src="$SHAMT_CORE_SRC/templates/testing_standards.template.md"
+  if [ -f "$psf_dir/TESTING_STANDARDS.md" ]; then
+    warn "TESTING_STANDARDS.md already exists — preserving."
+  elif [ -f "$ts_src" ]; then
+    seed_doc_with_today "$ts_src" "$psf_dir/TESTING_STANDARDS.md"
+    log "  seeded  .shamt-core/project-specific-files/TESTING_STANDARDS.md (Last Updated set to today)"
+  else
+    warn "testing_standards.template.md not found — TESTING_STANDARDS.md not seeded."
+  fi
 fi
 
 # ---- Step: write shamt-config.json ------------------------------------------
@@ -458,7 +462,6 @@ json_escape() {
 JSON_PROJECT_NAME="$(json_escape "$PROJECT_NAME")"
 JSON_WORK_ITEM_TRACKER="$(json_escape "$WORK_ITEM_TRACKER")"
 JSON_PR_PROVIDER="$(json_escape "$PR_PROVIDER")"
-JSON_TESTING="$(json_escape "$TESTING")"
 JSON_AI_SERVICE="$(json_escape "$AI_SERVICE")"
 JSON_MASTER_URL="$(json_escape "$MASTER_URL")"
 
@@ -475,7 +478,6 @@ cat > "$config_dest" <<EOF
   "project_name": "$JSON_PROJECT_NAME",
   "work_item_tracker": "$JSON_WORK_ITEM_TRACKER",
   "pr_provider": "$JSON_PR_PROVIDER",
-  "testing": "$JSON_TESTING",
   "ai_service": "$JSON_AI_SERVICE",
   "master_url": "$JSON_MASTER_URL",
   "doc_staleness_threshold_days": $DOC_STALENESS
@@ -559,7 +561,6 @@ log "  Target:        $TARGET_DIR"
 log "  Project name:  $PROJECT_NAME"
 log "  Tracker:       $WORK_ITEM_TRACKER"
 log "  PR provider:   $PR_PROVIDER"
-log "  Testing:       $TESTING"
 log "  master_url:    $MASTER_URL"
 log ""
 if [ "$SELF_HOST" -eq 1 ]; then
@@ -578,21 +579,27 @@ if [ "$SELF_HOST" -eq 0 ]; then
   log ""
   cat <<'PROMPT'
 ────────────────────────────────────────────────────────────────────────
-Research this codebase and complete the two Shamt project-specific
+Research this codebase and complete the three Shamt project-specific
 documents, then validate each.
 
-1. Read .shamt-core/project-specific-files/ARCHITECTURE.md and
-   .shamt-core/project-specific-files/CODING_STANDARDS.md — both are
+1. Read .shamt-core/project-specific-files/ARCHITECTURE.md,
+   .shamt-core/project-specific-files/CODING_STANDARDS.md, and
+   .shamt-core/project-specific-files/TESTING_STANDARDS.md — all three are
    templates full of placeholders.
 2. Explore the repository (entry points, services, data stores, build and
-   test tooling, naming and structure conventions) and replace every
-   placeholder with content true to THIS project. Keep an explicit "Open
-   Questions" list as you draft; ask me each question one at a time and
-   fold the answer in before continuing (Shamt Principle 2).
-3. When ARCHITECTURE.md is complete, run:
+   test tooling, how the project is run/driven as a user, naming and
+   structure conventions) and replace every placeholder with content true
+   to THIS project. For TESTING_STANDARDS.md specifically: declare whether
+   automated tests are Present or None (and the runner/command), and write
+   the manual-as-user driving procedures (how to run the project, the
+   inputs a real user supplies, what correct behavior looks like) so a
+   fresh agent can drive it during the required Phase 5. Keep an explicit
+   "Open Questions" list as you draft; ask me each question one at a time
+   and fold the answer in before continuing (Shamt Principle 2).
+3. When each document is complete, run:
      /validate-artifact .shamt-core/project-specific-files/ARCHITECTURE.md
-   When CODING_STANDARDS.md is complete, run:
      /validate-artifact .shamt-core/project-specific-files/CODING_STANDARDS.md
+     /validate-artifact .shamt-core/project-specific-files/TESTING_STANDARDS.md
    Resolve every finding until each document carries a validation footer.
 ────────────────────────────────────────────────────────────────────────
 PROMPT

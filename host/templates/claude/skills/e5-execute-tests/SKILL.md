@@ -1,11 +1,12 @@
 ---
 name: e5-execute-tests
 description: >
-  Run Phase 5 (Test) of the Shamt Engineer flow when .shamt-core/shamt-config.json sets
-  testing: "enabled". Hands off the validated testing plan to the test-executor
+  Run the required Phase 5 (Test) of the Shamt Engineer flow. Hands off the validated testing plan to the test-executor
   Haiku persona, watches for failures, routes Story-bug / Test-bug / Spec-gap
-  diagnoses, and blocks until every step PASSes. No-op with a clear message
-  when testing is disabled. Invoke when the user wants to run the tests, execute
+  diagnoses, and blocks until every scenario / step PASSes. Phase 5 is required —
+  it always runs the agent-as-user execution via the user-simulator persona and the
+  automated suites via test-executor when TESTING_STANDARDS.md declares them; a failure
+  routes to /e7 with a required root-cause section. Invoke when the user wants to run the tests, execute
   the test plan, run phase 5, or verify the build via automated tests.
 triggers:
   - "execute the tests"
@@ -25,11 +26,12 @@ Mirrors the `/e5-execute-tests {slug}` slash command. Same canonical body, two h
 
 Follow the canonical `/e5-execute-tests` command body verbatim — see [`commands/e5-execute-tests.md`](../../commands/e5-execute-tests.md). Summary:
 
-1. **No-op gate** — if `.shamt-core/shamt-config.json` sets `testing: "disabled"`, print the one-line skip message and exit. Do not touch any file.
+1. **Agent-as-user execution (always)** — hand off to the `user-simulator` persona ([`agents/user-simulator.md`](../../agents/user-simulator.md)); it drives the project as a user per `.shamt-core/project-specific-files/TESTING_STANDARDS.md`, writes `stories/{slug}/agent_test_session.md`, and reports `Session PASS` / `Session BLOCKED: …`. On `Session BLOCKED`, route the failing scenario through `/e7-resolve-feedback {slug}` as a feedback item (required phase-attributed root-cause), fix, and re-invoke `/e5-execute-tests {slug}`. If `TESTING_STANDARDS.md` declares no automated suites, this is the whole required pass.
 2. **Resolve** — apply the active-artifact pointer; confirm the active spec, plan, and testing artifact (full `testing_plan.md` or the spec's `### Quick path inline test checklist`) have validation footers. Halt if Build has not run.
-3. **Hand off to the `test-executor`** — Haiku persona ([`agents/test-executor.md`](../../agents/test-executor.md)). The executor runs each step's exact invocation, logs `PASS / FAIL / BLOCKED / PENDING` into the artifact's `## Results Log`, and fills `## Failure Diagnosis` on the first failure.
+3. **Automated suites (when `TESTING_STANDARDS.md` declares them) — hand off to the `test-executor`** — Haiku persona ([`agents/test-executor.md`](../../agents/test-executor.md)). The executor runs each step's exact invocation, logs `PASS / FAIL / BLOCKED / PENDING` into the artifact's `## Results Log`, and fills `## Failure Diagnosis` on the first failure.
 4. **Monitor and route** —
    - `All steps passed. Results logged.` → continue.
+   - `Session BLOCKED` (agent-as-user FAIL) → route through `/e7-resolve-feedback {slug}` (required phase-attributed root-cause); fix; re-invoke this command.
    - `Step N failed: Story bug` → re-engage the architect/builder loop via `/e4-execute-plan` or an inline Quick-path fix; re-invoke this command.
    - `Step N failed: Test bug` → patch via `/e3b-write-testing-plan`; re-validate; re-invoke.
    - `Step N failed: Spec gap` → invoke the **Re-baseline Protocol**; do not patch the spec in place.

@@ -34,25 +34,21 @@ cd "$PROJECT_DIR" 2>/dev/null || { printf 'Shamt | idle'; exit 0; }
 
 idle() { printf 'Shamt | idle'; exit 0; }
 
-# ---- Numbering scheme (testing enabled = 8 phases, disabled = 7 phases) -----
+# ---- Numbering scheme (Quick path = 7 phases, Standard path = 8 phases) -----
 #
-# Engineer flow expands when `testing: "enabled"`:
-#   enabled : Intake(1) Spec(2) Plan(3) Build(4) Test(5)  Review(6) Polish(7) Finalize(8)
-#   disabled: Intake(1) Spec(2) Plan(3) Build(4)          Review(5) Polish(6) Finalize(7)
+# Testing is a REQUIRED phase (Test) on every story past Build. The phase count is
+# determined by PATH, not a config flag:
+#   Standard: Intake(1) Spec(2) Plan(3) Build(4) Test(5) Review(6) Polish(7) Finalize(8)
+#   Quick   : Intake(1) Spec(2)         Build(3) Test(4) Review(5) Polish(6) Finalize(7)
 #
-# Default to the 7-phase scheme so projects without .shamt-core/shamt-config.json (or with
-# testing absent / disabled) get the correct numbering shown by default.
+# Standard adds Phase 3 (Plan); Quick has no Plan. Detect Standard by the presence
+# of an implementation plan in the resolved story folder (`has_any_artifact
+# implementation_plan`); otherwise Quick. Default to Quick so projects without a
+# plan artifact get the correct numbering shown by default.
 
-TESTING_ENABLED=0
-# Require the key to be preceded by a JSON object boundary (`{`, `,`, or
-# whitespace including a newline). This handles both pretty-printed and compact
-# JSON shapes while still rejecting incidental occurrences inside string values
-# (JSON forbids unescaped quotes inside strings, so the boundary check is
-# sufficient in practice).
-if [ -f .shamt-core/shamt-config.json ] \
-   && grep -qzE '[{,[:space:]]"testing"[[:space:]]*:[[:space:]]*"enabled"' .shamt-core/shamt-config.json 2>/dev/null; then
-  TESTING_ENABLED=1
-fi
+# Phase numbering is determined by PATH, not a config flag. The path flag
+# (STANDARD_PATH) is computed inside the story-rendering block below, where the
+# `has_any_artifact` helper that detects the implementation plan is in scope.
 
 # ---- Resolve the active folder under a given parent directory ---------------
 #
@@ -122,23 +118,29 @@ if [ -n "$ACTIVE_STORY_DIR" ]; then
   PHASE_NUM=""
   PHASE_NAME=""
 
+  # Path detection: Standard iff an implementation plan exists in this story folder
+  # (Standard adds Phase 3 Plan → 8 phases; Quick has no Plan → 7).
+  STANDARD_PATH=0
+  if has_any_artifact implementation_plan; then STANDARD_PATH=1; fi
+
   if [ -f "$ACTIVE_STORY_DIR/ticket.md" ] && grep -qE '\*\*Status:.*Done' "$ACTIVE_STORY_DIR/ticket.md" 2>/dev/null; then
     # Finalize is terminal: /e8-finalize-story writes **Status: Done** into
     # ticket.md (profile-independent signal). Checked first — it outranks every
     # earlier-phase artifact a finalized story still carries on disk.
     PHASE_NAME=Finalize
-    PHASE_NUM=$([ "$TESTING_ENABLED" -eq 1 ] && echo 8 || echo 7)
+    PHASE_NUM=$([ "$STANDARD_PATH" -eq 1 ] && echo 8 || echo 7)
   elif [ -f "$ACTIVE_STORY_DIR/feedback/addressed_feedback.md" ]; then
     PHASE_NAME=Polish
-    PHASE_NUM=$([ "$TESTING_ENABLED" -eq 1 ] && echo 7 || echo 6)
+    PHASE_NUM=$([ "$STANDARD_PATH" -eq 1 ] && echo 7 || echo 6)
   elif compgen -G "$ACTIVE_STORY_DIR/feedback/review_v*.md" >/dev/null 2>&1; then
     PHASE_NAME=Review
-    PHASE_NUM=$([ "$TESTING_ENABLED" -eq 1 ] && echo 6 || echo 5)
-  elif [ "$TESTING_ENABLED" -eq 1 ] && has_any_artifact testing_plan; then
-    # testing_plan only signals Test phase when testing is opted in. When
-    # testing is disabled, no Test phase exists and any stray testing_plan.md
-    # is treated as Plan-phase scaffolding.
-    PHASE_NUM=5; PHASE_NAME=Test
+    PHASE_NUM=$([ "$STANDARD_PATH" -eq 1 ] && echo 6 || echo 5)
+  elif has_any_artifact agent_test_session || has_any_artifact testing_plan; then
+    # Test is a REQUIRED phase on every story past Build. The agent-as-user run
+    # log (agent_test_session.md) signals it always; testing_plan.md is a
+    # secondary automated signal. Numbered 5 on Standard, 4 on Quick.
+    PHASE_NAME=Test
+    PHASE_NUM=$([ "$STANDARD_PATH" -eq 1 ] && echo 5 || echo 4)
   elif has_any_artifact implementation_plan; then
     PHASE_NUM=3; PHASE_NAME=Plan
   elif has_any_artifact spec; then

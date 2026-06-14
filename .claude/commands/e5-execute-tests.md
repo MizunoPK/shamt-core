@@ -1,12 +1,10 @@
 ---
-description: Phase 5 (Test) — execute the validated testing_plan.md (or the spec's inline checklist) via the test-executor persona; blocks until every step passes; no-op when testing is disabled
+description: Phase 5 (Test, required) — drive the project as a user via the user-simulator persona (always) plus the automated testing_plan.md via test-executor (when TESTING_STANDARDS.md declares suites); a failure routes to /e7 with a required root-cause section; blocks until green
 ---
 
 # /e5-execute-tests
 
-**Purpose:** Run Phase 5 of the Engineer flow when `.shamt-core/shamt-config.json` sets `testing: "enabled"`. Hand off the validated testing plan to the `test-executor` persona, watch for failures, route Story-bug / Test-bug / Spec-gap diagnoses appropriately, and **block until every step in the plan reports `PASS`**.
-
-When `testing: "disabled"`, this command is a no-op with a single-line message — see the no-op gate below.
+**Purpose:** Run the **required** Phase 5 (Test). Always perform the **agent-as-user execution** — hand off to the `user-simulator` persona, which drives the project as a user per `TESTING_STANDARDS.md` and writes `agent_test_session.md`. When `TESTING_STANDARDS.md` declares automated suites, also run them via the `test-executor` persona. **Block until every scenario / step reports `PASS`.** A failure is a post-implementation bug → route to `/e7-resolve-feedback` (see Step 3).
 
 **Recommended models:**
 
@@ -27,24 +25,21 @@ See [`reference/model_selection.md`](../../../../reference/model_selection.md).
 
 - `{id-or-slug}` (required) — story ticket ID (`T{N}`) or slug. Resolved via the global story-folder rules (ID glob `stories/{ID}-*/`, else the both-positions slug glob; halt on multiple or zero matches).
 
-## No-op gate
+## Required phase
 
-Read `.shamt-core/shamt-config.json` → `testing`.
+Phase 5 runs on **every** story (per `templates/SHAMT_RULES.template.md` §Testing and
+[`reference/testing.md`](../../../../reference/testing.md)) — there is no `testing` config flag and no
+no-op. It always runs the **agent-as-user execution** (Step 2) and, when
+`.shamt-core/project-specific-files/TESTING_STANDARDS.md` declares **automated suites present**, the
+**automated** execution (Step 3). It **blocks until green**.
 
-- `"disabled"` → print one line and exit. Do not touch any file, do not invoke the test-executor.
-  ```
-  Testing is disabled in .shamt-core/shamt-config.json — Phase 5 is not part of this project's flow. Run /e6-review-changes {slug} next.
-  ```
-- `"enabled"` → continue.
-
-Per [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md#when-automated-testing-is-enabled), this command is safe to invoke unconditionally — the no-op keeps automation simple.
-
-## Prerequisites (testing enabled)
+## Prerequisites
 
 - Resolve the story folder per `templates/SHAMT_RULES.template.md` §PO-tree resolution (tree-wide glob + legacy-flat fallback); `stories/{slug}/` below denotes that resolved folder. If `stories/{slug}/active_artifacts.md` exists, read it first and use the artifact paths listed under **Active Files**.
 - The active spec exists with a validation footer.
 - The active plan exists with a validation footer **and Phase 4 (Build) has completed** — code-under-test is in the working tree. If Build has not run yet, halt and direct the user to `/e4-execute-plan {slug}` first.
-- One of the following is true (per the path):
+- `.shamt-core/project-specific-files/TESTING_STANDARDS.md` exists and is validated (the agent-as-user run reads it; if all-placeholder, halt and direct the user to complete it via the init completion prompt).
+- **When `TESTING_STANDARDS.md` declares automated suites,** one of the following is true (per the path):
   - **Standard path:** `stories/{slug}/testing_plan.md` (or `testing_plan_vN.md`) exists with a validation footer.
   - **Quick path with full artifact:** same as Standard — the artifact was produced via `/e3b-write-testing-plan {slug}` because test scope exceeded the Quick-path inline threshold (>5 steps or any new test file) — the testing-plan escalation threshold (`/e3b`). Quick path itself still skips Phase 3 (Plan); the escalation only adds a `testing_plan.md` without escalating the whole story to Standard.
   - **Quick path with inline checklist:** the active `spec.md` has a populated `### Quick path inline test checklist` under `## Test Strategy`.
@@ -53,7 +48,16 @@ If the active testing artifact is not validated, halt and direct the user to `/e
 
 ## Step-by-step
 
-### Step 1 — Resolve the active testing artifact
+### Step 0 — Agent-as-user execution (always)
+
+Hand off to the `user-simulator` persona (see [`agents/user-simulator.md`](../agents/user-simulator.md)).
+Provide `slug` and `testing_standards_path = .shamt-core/project-specific-files/TESTING_STANDARDS.md`. It
+drives the project as a user, writes `stories/{slug}/agent_test_session.md`, and reports
+`Session PASS` / `Session BLOCKED: …`. On `BLOCKED`, route the failing scenario(s) per Step 3 (bug →
+`/e7`). If `TESTING_STANDARDS.md` declares **no automated suites**, Step 0 is the whole required pass —
+on `Session PASS`, skip to Step 4.
+
+### Step 1 — Resolve the active testing artifact (automated suites only)
 
 1. Apply the active-artifact pointer.
 2. Read the spec's `Path:` header and the spec's `## Test Strategy`.
@@ -89,12 +93,13 @@ The persona logs every step's `PASS / FAIL / BLOCKED / PENDING` row into the art
 Watch the executor's report. Route per the message form (see [`agents/test-executor.md`](../agents/test-executor.md)):
 
 - **`All steps passed. Results logged.`** — proceed to Step 4.
+- **`Session BLOCKED:` (agent-as-user FAIL)** — a scenario's observed behavior did not match expected. This is a **post-implementation bug**: route it through `/e7-resolve-feedback {slug}` as a feedback item (it requires the phase-attributed root-cause section — see `/e7`), apply the fix, and **re-invoke `/e5-execute-tests {slug}`** to re-run Phase 5 to green. (`HALT` results are not passes — resolve the ambiguity, do not proceed to Review.)
 - **`Step [N] failed: Story bug — …`** — the implementation is wrong. Re-engage the architect/builder loop: read the failing step's `Failure Diagnosis`, decide whether the fix is a plan amendment (rare for a test failure — only when the plan missed a step) or an implementation correction the builder can re-execute. For Standard path, route the fix through `/e4-execute-plan` (the orchestrator may patch the plan or hand a corrective step to the builder); for Quick path, the primary agent applies the fix inline. After fixing, re-invoke `/e5-execute-tests {slug}` — the executor will read existing `Results Log` rows and walk the plan per its persona contract (see [`agents/test-executor.md`](../agents/test-executor.md)).
 - **`Step [N] failed: Test bug — …`** — the test itself is wrong. The testing plan needs to change. Halt and invoke `/e3b-write-testing-plan {slug}` to patch and re-validate, then re-invoke `/e5-execute-tests {slug}`.
 - **`Step [N] failed: Spec gap — …`** — the test correctly proved that the spec is incomplete. Invoke the **Re-baseline Protocol** per [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md#requirement-re-baseline-protocol) — create new `spec_vN.md` (and `context_vN.md` + `implementation_plan_vN.md` on Standard path only — Quick path has neither artifact), update `active_artifacts.md`, re-validate, re-approve at Gate 2b (and Gate 3 on Standard path only), redo any affected Build steps, then re-invoke `/e5-execute-tests`. Do **not** patch the existing spec in place.
 - **`Step [N] is ambiguous: …`** — clarify with the user via `AskUserQuestion` (open-questions iterative dialog, Principle 2). Update the testing plan if the answer is design-level; re-validate; re-hand off.
 - **`Plan defect at Step [N]: …`** — the testing plan itself is broken. Patch via `/e3b-write-testing-plan`, re-validate, re-hand off.
-- **`Environment blocked at Step [N]: …`** — the executor tried and failed to resolve the environment. Surface the failure to the user with a one-question dialog: which infrastructure piece is missing (credentials? service? dependency?). After the user resolves it externally, re-invoke `/e5-execute-tests`. **Do not** allow "document and skip" — Phase 5 blocks until every step passes (per [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md#when-automated-testing-is-enabled)).
+- **`Environment blocked at Step [N]: …`** — the executor tried and failed to resolve the environment. Surface the failure to the user with a one-question dialog: which infrastructure piece is missing (credentials? service? dependency?). After the user resolves it externally, re-invoke `/e5-execute-tests`. **Do not** allow "document and skip" — Phase 5 blocks until every step passes (per [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md#testing-phase-5--required)).
 
 ### Step 4 — Post-execution
 

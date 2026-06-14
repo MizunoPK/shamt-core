@@ -68,7 +68,7 @@ TBD - awaiting user alignment (Gate 2a)
 
 ## Test Strategy
 
-[Required when `.shamt-core/shamt-config.json` sets `testing: "enabled"`. Omit when testing is disabled.]
+[Required (testing is a required phase). Always describe the Phase-5 agent-as-user scenarios; add automated detail when `TESTING_STANDARDS.md` declares suites.]
 
 - **Test kinds in scope:** [e2e / integration / unit — what coverage shape this story needs]
 - **Existing test files relevant:** [`path/to/test.ext` - reason]
