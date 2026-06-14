@@ -1,7 +1,7 @@
 # Proposal: f-all-include-audit-in-chain
 
 **Created:** 2026-06-14
-**Status:** Draft
+**Status:** Implemented
 **Number:** 28
 **Proposed by:**
 **Project context:**
@@ -74,3 +74,5 @@ _All open questions resolved — see the Resolved Questions log below._
 - ~~OQ4: How does `/f-all` dispatch the audit without violating the one-nesting-level rule?~~ → A: The audit spawns **exactly one** sub-agent — the `audit-checker` on its clean round (verified against `host/templates/claude/commands/f5-audit-framework.md` Step 5); its sweep / auto-fix / f0-capture are all inline primary work, **not** fan-out (the old exclusion's "sub-agent fan-out" phrasing was imprecise). **On the f0-capture topology specifically:** f5 Step 3 phrases intricate-finding capture as "via `/f0-draft-proposal`", but `/f0-draft-proposal` is a pure stub-writer that **spawns no sub-agent** (verified against `host/templates/claude/commands/f0-draft-proposal.md` — it has no Agent/dispatch). The audit primary captures an f0 draft by performing that **stub-write inline** — it applies `/f0-draft-proposal`'s stub-writing *logic* directly (writes `proposals/{slug}.md` with the f0 status banner) — **not** by dispatching a `/f0-draft-proposal` sub-agent. So f0-capture adds **no** nesting level; the `audit-checker` confirmation remains the audit phase's only sub-agent. The audit therefore slots into `/f-all`'s **existing driver-lifted-inner-persona topology**, identical in shape to Phase 2 inline-validation: the dispatched audit phase agent runs the audit's inline loop (Steps 1–4) to a clean round and **halts before Step 5** — **without** invoking `/f5-audit-framework` (which would auto-spawn `audit-checker`, a forbidden 2nd nesting level); the **driver** then dispatches `audit-checker` itself; on any resettable finding the driver re-dispatches the primary to handle it (auto-fix / capture) and re-converge, then re-runs `audit-checker`, until `CONFIRMED`. **No persona edit** — `audit-checker` is reused. **Resumability:** the audit leaves no disk artifact, but it is **idempotent** (a re-run on an already-clean framework converges immediately with no new fix / capture), so the Step-1 start discriminator `regen --check zero drift + branch exists` now routes to **Phase 6 (audit)** instead of Phase 7, and a resumed run **re-runs the entire harmless audit phase — the primary's inline Steps 1–4 loop AND the driver-lifted `audit-checker` confirmation, not just the loop** (resume does not skip the checker; without a disk marker the driver re-derives Phase 6) before `/f6`. Both converge cleanly on the already-clean framework. The audit never prompts the user (it captures rather than halting), so it needs **no** open-question pause sentinel.
 
 ---
+
+Validated 2026-06-14 — 6 rounds, 1 adversarial sub-agent confirmed (via /f-all Phase 2)
