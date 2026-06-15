@@ -382,7 +382,7 @@ if [ ! -f "$ts/epic.md" ]; then
 
 The permanent home for one-off work that does not belong to any real initiative —
 bug fixes and small standalone improvements. File work under it with
-`/p6-draft-tech-story [bugs|quick-wins]`. A local-only organizational container.
+`/ps0-draft [bugs|quick-wins]`. A local-only organizational container.
 EOF
   log "Seeded standing Tech Stories epic (was absent)."
 fi
@@ -394,7 +394,7 @@ for _f in bugs quick-wins; do
 
 **Status:** Standing
 
-Standing Tech Stories feature. Tickets are filed via \`/p6-draft-tech-story $_f\`
+Standing Tech Stories feature. Tickets are filed via \`/ps0-draft $_f\`
 and archived into \`archive/\` on finalize.
 EOF
   fi

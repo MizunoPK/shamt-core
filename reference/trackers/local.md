@@ -1,6 +1,6 @@
 # Tracker Profile — Local
 
-**Conforms to** [`_contract.md`](_contract.md) in shape but is a no-fetch profile: the ticket file is already a local Markdown artifact — authored by the user, or written as a stub by the PO flow's `/p4-decompose-feature` and then fleshed out by `/e1-start-story` (Engineer flow, Phase 1). Set `work_item_tracker: "local"` in [`.shamt-core/shamt-config.json`](../../shamt-config.example.json) to make this the active profile. For a one-off override — e.g., a project configured for `ado` or `github` that wants to skip the external fetch for a single command — pass `--tracker=local` to any slug-taking command (`/e1-start-story`, `/p1-start-epic`, `/p3-start-feature`).
+**Conforms to** [`_contract.md`](_contract.md) in shape but is a no-fetch profile: the ticket file is already a local Markdown artifact — authored by the user, or written as a stub by the PO flow's `/pf2-decompose` and then fleshed out by `/e1-start-story` (Engineer flow, Phase 1). Set `work_item_tracker: "local"` in [`.shamt-core/shamt-config.json`](../../shamt-config.example.json) to make this the active profile. For a one-off override — e.g., a project configured for `ado` or `github` that wants to skip the external fetch for a single command — pass `--tracker=local` to any slug-taking command (`/e1-start-story`, `/pe1-define`, `/pf1-define`).
 
 Use this mode when story content lives in-repo as a hand-written `ticket.md` — for example, when the PO flow produced the story locally and no external tracker is involved, or when a project tracks work outside any supported issue tracker (Notion, a wiki, a shared doc, voice memos transcribed into Markdown) and the canonical version is the file on disk.
 
@@ -24,7 +24,7 @@ The slug passed to `/e1-start-story {slug}` resolves to a story folder via glob,
 
 The numeric-prefix convention used by `ado` and `github` profiles is **optional** in `local` mode — any slug is legal as long as exactly one matching story folder exists. The folder must already contain a `ticket.md` file; `/e1-start-story` does not create one in this mode (it treats the local file as the source of truth).
 
-For the PO-flow commands (`/p1-start-epic` / `/p3-start-feature`), folders resolve per `templates/SHAMT_RULES.template.md` §PO-tree resolution: epics are top-level (`epics/{ID}-{slug}-{brief}/epic.md`), features nest under their epic (`epics/*/features/{ID}-{slug}-{brief}/feature.md`), located by **ticket ID or slug** (with the legacy-flat fallback). Globally unique slugs; new folders are named `{ID}-{slug}-{brief}` (pre-ID folders stay `{slug}-{brief}`). Same rule as stories: the file must already exist or be created by the PO-flow command itself.
+For the PO-flow commands (`/pe1-define` / `/pf1-define`), folders resolve per `templates/SHAMT_RULES.template.md` §PO-tree resolution: epics are top-level (`epics/{ID}-{slug}-{brief}/epic.md`), features nest under their epic (`epics/*/features/{ID}-{slug}-{brief}/feature.md`), located by **ticket ID or slug** (with the legacy-flat fallback). Globally unique slugs; new folders are named `{ID}-{slug}-{brief}` (pre-ID folders stay `{slug}-{brief}`). Same rule as stories: the file must already exist or be created by the PO-flow command itself.
 
 ---
 
@@ -68,7 +68,7 @@ None. Not applicable.
 
 ## Supported work-item types
 
-- **Any** — `local` mode imposes no constraint on work-item type. `/e1-start-story`, `/p3-start-feature`, and `/p1-start-epic` all work, each reading the corresponding local file (`stories/{ID}-{slug}-{brief}/ticket.md`, `epics/*/features/{ID}-{slug}-{brief}/feature.md`, `epics/{ID}-{slug}-{brief}/epic.md`), located by ticket ID or slug per §PO-tree resolution.
+- **Any** — `local` mode imposes no constraint on work-item type. `/e1-start-story`, `/pf1-define`, and `/pe1-define` all work, each reading the corresponding local file (`stories/{ID}-{slug}-{brief}/ticket.md`, `epics/*/features/{ID}-{slug}-{brief}/feature.md`, `epics/{ID}-{slug}-{brief}/epic.md`), located by ticket ID or slug per §PO-tree resolution.
 
 Because the `Any` value covers every possible request, the freeform-fallback rule never fires for this profile — every command takes the file-read path.
 

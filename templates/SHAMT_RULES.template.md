@@ -16,7 +16,7 @@ Shamt is a quality framework for AI-assisted development under Claude Code. It d
 - **The story** as the handoff artifact between the two roles.
 - **A path system inside the Engineer flow** — every story runs the **Quick path** (default, low-ceremony) unless a risk trigger escalates it to the **Standard path**.
 
-The Engineer flow is the load-bearing surface. The PO flow exists for initiatives large enough to warrant top-down decomposition. There are no top-level orphans: every feature nests under an epic and every story under a feature (see §PO-tree resolution). One-off / standalone work (bugs, quick wins, tech stories) lives under the standing **Tech Stories** epic and runs the Engineer flow from there. Within the PO flow, **decomposition catalogs breadth-context** (a bounded `## Decomposition Context` plus each child's breadth boundary — `## Scope / Non-Scope` for a feature, a scope one-liner for a story) and **start-\* deepens depth** from that seed before its terminal gate — see the `/p2`/`/p4` decompose and `/p3`/`/e1` start command bodies for per-altitude detail.
+The Engineer flow is the load-bearing surface. The PO flow exists for initiatives large enough to warrant top-down decomposition. There are no top-level orphans: every feature nests under an epic and every story under a feature (see §PO-tree resolution). One-off / standalone work (bugs, quick wins, tech stories) lives under the standing **Tech Stories** epic and runs the Engineer flow from there. Within the PO flow, **decomposition catalogs breadth-context** (a bounded `## Decomposition Context` plus each child's breadth boundary — `## Scope / Non-Scope` for a feature, a scope one-liner for a story) and **define-\* deepens depth** from that seed before its terminal gate — see the `/pe2-decompose`/`/pf2-decompose` decompose and `/pf1-define`/`/e1` define command bodies for per-altitude detail.
 
 Core files:
 
@@ -135,7 +135,7 @@ Manual-test-plan detail: see [`reference/testing.md`](reference/testing.md).
 Both role flows end with a **Finalize** command modelled on `/f6-archive-proposal`, each behind explicit user confirmation (per-tracker and clean-tree mechanics in the command bodies):
 
 - **`/e8-finalize-story {slug}`** — the Engineer flow's terminal phase: commits the story's work as a scoped unit (clean-tree guard), confirms prior phases complete (Test PASSes — required; Review + feedback resolved), marks the work item done via the active tracker, and writes `**Status: Done**` into `ticket.md` — the profile-independent signal the status line reads.
-- **`/p5-finalize-epic {slug}`** — the PO flow's terminal command at the Epic altitude: after confirming every child feature/story is finalized, marks the epic done and **moves the epic folder into `epics/archive/`** as a **whole-subtree move** (features/stories ride along — parentage is the path, nothing dangles). There is no per-feature finalize command (features close implicitly when their stories are done); `epics/archive/` is excluded from active-epic status-line resolution.
+- **`/pe3-finalize {slug}`** — the PO flow's terminal command at the Epic altitude: after confirming every child feature/story is finalized, marks the epic done and **moves the epic folder into `epics/archive/`** as a **whole-subtree move** (features/stories ride along — parentage is the path, nothing dangles). There is no per-feature finalize command (features close implicitly when their stories are done); `epics/archive/` is excluded from active-epic status-line resolution.
 
 ### §PO-tree resolution
 
@@ -164,9 +164,9 @@ New work is **written nested**; pre-existing flat folders stay and resolve via t
 
 The standing **Tech Stories** epic (introduced above) is the home for one-off work — bug fixes and small standalone improvements — that strict nesting has no top-level place for.
 
-- **Standing fixtures, fixed reserved names.** `epics/{tech-stories-folder}/` holds two standing features, **Bugs** and **Quick Wins**, under fixed reserved folder names (`tech-stories`, `bugs`, `quick-wins`) — *not* the `{ID}-{slug}-{brief}` convention, since they carry no ticket ID. Seeded once (create-if-absent) by the install/sync flow (`init-shamt.sh` / `import-shamt.sh`), never per-initiative by `/p1-start-epic`; their globally-unique reserved slugs make the existing collision checks refuse any reuse.
+- **Standing fixtures, fixed reserved names.** `epics/{tech-stories-folder}/` holds two standing features, **Bugs** and **Quick Wins**, under fixed reserved folder names (`tech-stories`, `bugs`, `quick-wins`) — *not* the `{ID}-{slug}-{brief}` convention, since they carry no ticket ID. Seeded once (create-if-absent) by the install/sync flow (`init-shamt.sh` / `import-shamt.sh`), never per-initiative by `/pe1-define`; their globally-unique reserved slugs make the existing collision checks refuse any reuse.
 - **Local-only, tracker-agnostic.** The standing epic + features never map to tracker work items — only the tickets filed under them do, per the active profile (a bug = a GitHub issue / ADO bug).
-- **Entry + archive.** `/p6-draft-tech-story [bugs|quick-wins]` seeds a ticket stub under the chosen feature and hands to `/e1-start-story` (bypassing the `/p1`→`/p4` cascade); on finalize, `/e8-finalize-story` moves the folder into the feature's `archive/`. See those command bodies for the mechanics.
+- **Entry + archive.** `/ps0-draft [bugs|quick-wins]` seeds a ticket stub under the chosen feature and hands to `/e1-start-story` (bypassing the `/pe1-define`→`/pf2-decompose` cascade); on finalize, `/e8-finalize-story` moves the folder into the feature's `archive/`. See those command bodies for the mechanics.
 
 ---
 
@@ -401,7 +401,7 @@ Every epic, feature, and story is a **ticket** with a short, globally-unique **t
 - **Allocation.** A new ticket's ID is `max(existing T-number across the whole epic/feature/story tree) + 1` — **scanned from disk** (parse a leading `^T([0-9]+)-` run on each epic/feature/story folder name, walking the nested tree under `epics/` plus any legacy flat folders), **no counter file**, never reused. The sequence is **global** (one space across all ticket types — an epic might be `T1`, its feature `T2`, a story `T3`) and **flat** (an ID does not encode its parent). A project with only slug-only folders allocates `T1` first.
 - **Addressing.** Commands accept either the ID or the slug, resolved per §PO-tree resolution (tree-wide glob matching the ID or slug at the appropriate altitude anywhere in the nested tree, with the legacy-flat fallback).
 - **New-tickets-only.** Existing slug-only folders are **not** renamed; they keep resolving via the slug glob. IDs accrue as new tickets are created.
-- **Stub IDs are preserved.** `/p2-decompose-epic` and `/p4-decompose-feature` allocate each child's ID at stub time; `/p3-start-feature` (fleshing a feature stub) and `/e1-start-story` (fleshing a story stub) **preserve** that ID — they do not re-allocate.
+- **Stub IDs are preserved.** `/pe2-decompose` and `/pf2-decompose` allocate each child's ID at stub time; `/pf1-define` (fleshing a feature stub) and `/e1-start-story` (fleshing a story stub) **preserve** that ID — they do not re-allocate.
 
 ---
 

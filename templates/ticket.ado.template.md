@@ -23,7 +23,7 @@ The sections below populate automatically when `/e1-start-story {slug}` resolves
 
 ## Decomposition Context
 
-<!-- Cataloged at decomposition (/p2-decompose-epic for features, /p4-decompose-feature for stories) — bounded breadth context discovered by researching the whole sibling set. NOT a depth dump (design/acceptance/implementation detail belongs in the depth sections, filled at start-*). /p3-start-feature and /e1-start-story consume this as a research seed. Leave the placeholder bullets if nothing was cataloged. -->
+<!-- Cataloged at decomposition (/pe2-decompose for features, /pf2-decompose for stories) — bounded breadth context discovered by researching the whole sibling set. NOT a depth dump (design/acceptance/implementation detail belongs in the depth sections, filled at start-*). /pf1-define and /e1-start-story consume this as a research seed. Leave the placeholder bullets if nothing was cataloged. -->
 
 - **Dependencies on siblings:** [which sibling features/stories this one depends on or blocks — "none" if independent]
 - **Shared context:** [context spanning the set this child needs — shared modules, data, infra, conventions]
@@ -68,6 +68,12 @@ When an auxiliary fetch (relations, comments, or updates) fails after the primar
   "note": "<one-line implication, e.g., 'Update history not captured. Issue is at revision N — prior revisions exist but were not retrieved.'>"
 }
 ```
+
+---
+
+## Stage-0 Story Draft (incremental capture)
+
+[`/ps0-draft` seeds the story-ticket stub (incremental / tech-story fast path). Omit entirely for non-draft stories.]
 
 ## All Remaining Fields
 

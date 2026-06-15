@@ -512,7 +512,7 @@ else
 fi
 
 # ---- Seed the standing Tech Stories epic (project work tree) -----------------
-# The home for one-off bugs / quick wins filed via /p6-draft-tech-story. Fixed
+# The home for one-off bugs / quick wins filed via /ps0-draft. Fixed
 # reserved folder names (no ticket ID). Create-if-absent, idempotent. This is the
 # first init step that writes project-work-tree content (.shamt-core/epics/...),
 # so it is SKIPPED on self-host — the shamt-core repo itself does no PO work. In a
@@ -528,7 +528,7 @@ seed_tech_stories_epic() {
 
 The permanent home for one-off work that does not belong to any real initiative —
 bug fixes and small standalone improvements. Not created per-initiative; seeded
-once at install. File work under it with `/p6-draft-tech-story [bugs|quick-wins]`.
+once at install. File work under it with `/ps0-draft [bugs|quick-wins]`.
 A local-only organizational container (no tracker work item).
 EOF
   }
@@ -541,7 +541,7 @@ EOF
 **Status:** Standing
 
 Standing Tech Stories feature. $( [ "$f" = bugs ] && echo "Catches one-off bug fixes." || echo "Catches small standalone improvements (quick wins)." )
-Tickets are filed here via \`/p6-draft-tech-story $f\` and archived into \`archive/\` on finalize.
+Tickets are filed here via \`/ps0-draft $f\` and archived into \`archive/\` on finalize.
 EOF
     }
   done

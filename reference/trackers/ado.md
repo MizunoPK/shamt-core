@@ -1,8 +1,8 @@
 # Tracker Profile — Azure DevOps (ADO)
 
-**Conforms to** [`_contract.md`](_contract.md). Set `work_item_tracker: "ado"` (and/or `pr_provider: "ado"`) in [`.shamt-core/shamt-config.json`](../../shamt-config.example.json) to make this the active profile. For a one-off override, pass `--tracker=ado` to any slug-taking command (`/e1-start-story`, `/p1-start-epic`, `/p3-start-feature`).
+**Conforms to** [`_contract.md`](_contract.md). Set `work_item_tracker: "ado"` (and/or `pr_provider: "ado"`) in [`.shamt-core/shamt-config.json`](../../shamt-config.example.json) to make this the active profile. For a one-off override, pass `--tracker=ado` to any slug-taking command (`/e1-start-story`, `/pe1-define`, `/pf1-define`).
 
-This profile fetches Azure DevOps work items via the official `az` CLI and the `azure-devops` extension, then maps them into the unified output sections that [`templates/ticket.ado.template.md`](../../templates/ticket.ado.template.md) populates. The same field mapping will be reused by future PO-flow `epic.md` / `feature.md` artifacts when `/p1-start-epic` and `/p3-start-feature` land — see the [Field mapping](#field-mapping) section below for the cross-altitude notes.
+This profile fetches Azure DevOps work items via the official `az` CLI and the `azure-devops` extension, then maps them into the unified output sections that [`templates/ticket.ado.template.md`](../../templates/ticket.ado.template.md) populates. The same field mapping will be reused by future PO-flow `epic.md` / `feature.md` artifacts when `/pe1-define` and `/pf1-define` land — see the [Field mapping](#field-mapping) section below for the cross-altitude notes.
 
 ---
 
@@ -53,7 +53,7 @@ If the slug does not begin with a numeric segment, the command treats it as free
 az boards work-item show --id {id} --expand all --output json
 ```
 
-`--expand all` returns the work item with `fields`, `relations`, and `_links` populated in a single call. The consuming command writes the verbatim JSON to `stories/{ID}-{slug}-{brief}/raw/issue.json` (or `epics/{ID}-{slug}-{brief}/raw/issue.json` / `features/{ID}-{slug}-{brief}/raw/issue.json` for the PO-flow variants once `/p1-start-epic` and `/p3-start-feature` ship — the folder located by ticket ID or slug per §PO-tree resolution; the feature variant nests under its epic (`epics/*/features/{ID}-{slug}-{brief}/raw/issue.json`)).
+`--expand all` returns the work item with `fields`, `relations`, and `_links` populated in a single call. The consuming command writes the verbatim JSON to `stories/{ID}-{slug}-{brief}/raw/issue.json` (or `epics/{ID}-{slug}-{brief}/raw/issue.json` / `features/{ID}-{slug}-{brief}/raw/issue.json` for the PO-flow variants once `/pe1-define` and `/pf1-define` ship — the folder located by ticket ID or slug per §PO-tree resolution; the feature variant nests under its epic (`epics/*/features/{ID}-{slug}-{brief}/raw/issue.json`)).
 
 ---
 
@@ -72,7 +72,7 @@ A failed auxiliary fetch must not abort the command. Per the contract, record th
 
 ## Field mapping
 
-Unified target sections follow the field-mapping contract (Title, Type, State, Assignee, Project, Iteration/Milestone, Description, Acceptance Criteria, URL — defined in `_contract.md`). The same mapping will populate the corresponding sections of `epic.md` / `feature.md` once `/p1-start-epic` / `/p3-start-feature` land — the cross-altitude notes below describe that future reuse, but those commands and their artifact templates are not yet shipped.
+Unified target sections follow the field-mapping contract (Title, Type, State, Assignee, Project, Iteration/Milestone, Description, Acceptance Criteria, URL — defined in `_contract.md`). The same mapping will populate the corresponding sections of `epic.md` / `feature.md` once `/pe1-define` / `/pf1-define` land — the cross-altitude notes below describe that future reuse, but those commands and their artifact templates are not yet shipped.
 
 | ADO raw field | Target section in unified artifact |
 |---------------|------------------------------------|
@@ -90,7 +90,7 @@ Unified target sections follow the field-mapping contract (Title, Type, State, A
 | (comments fetch) | **Comments** |
 | (updates fetch) | **Update History** |
 
-**Cross-altitude reuse (forward-looking — `/p1-start-epic` and `/p3-start-feature` not yet shipped):** when those commands land, the `Description` and `Acceptance Criteria` mappings feed the `Goal` and `Success Criteria` sections of `epic.md` / `feature.md` respectively; `Title`, `State`, `Assignee`, `Iteration/Milestone`, and `URL` populate the header metadata block.
+**Cross-altitude reuse (forward-looking — `/pe1-define` and `/pf1-define` not yet shipped):** when those commands land, the `Description` and `Acceptance Criteria` mappings feed the `Goal` and `Success Criteria` sections of `epic.md` / `feature.md` respectively; `Title`, `State`, `Assignee`, `Iteration/Milestone`, and `URL` populate the header metadata block.
 
 ---
 
@@ -145,7 +145,7 @@ Detection happens by matching the error string against the patterns above; the c
 - **Feature** — `System.WorkItemType = "Feature"`.
 - **Epic** — `System.WorkItemType = "Epic"`.
 
-ADO supports all three natively, so `/e1-start-story`, `/p3-start-feature`, and `/p1-start-epic` all fetch from this profile without falling through to freeform mode.
+ADO supports all three natively, so `/e1-start-story`, `/pf1-define`, and `/pe1-define` all fetch from this profile without falling through to freeform mode.
 
 Other native types (`Bug`, `Task`, `Test Case`, etc.) are not driven by any current v2 command but fetch correctly when referenced — the consuming command's freeform-fallback path simply takes whatever `Type` field comes back and writes it through.
 

@@ -55,7 +55,15 @@ Personas declare their tier in the persona body (e.g., a frontmatter `model:` fi
 | 7. Polish — code edits | Balanced | Apply reviewer feedback; mechanical fixes |
 | 7. Polish — root cause / upstream proposals | Reasoning | Generalize recurring feedback into framework-update proposals; multi-piece synthesis |
 | 8. Finalize (`/e8-finalize-story`) | Cheap | Mechanical: evaluate three guards, scoped commit, one tracker-close command, status flip — mirrors `/f6-archive-proposal` |
-| PO — Epic finalize (`/p5-finalize-epic`) | Cheap | Mechanical: children-done guard, tracker close, `epic.md` status flip, folder move into `epics/archive/`, commit |
+| PO — Epic finalize (`/pe3-finalize`) | Cheap | Mechanical: children-done guard, tracker close, `epic.md` status flip, folder move into `epics/archive/`, commit |
+| PO — Epic draft (`/pe0-draft`) | Cheap | f0-style bare idea capture: seed `epic.md` with Scratch Notes + draft status; no design judgment, no open-questions dialog (mirrors `/f0-draft-proposal`) |
+| PO — Epic define (`/pe1-define`) | Balanced | Open-questions iterative dialog over Goal / Success Criteria / Scope; consults ARCHITECTURE.md; ingests a `/pe0-draft` stub when present |
+| PO — Epic decompose (`/pe2-decompose`) | Balanced | Stub-list-then-drill-in batch decomposition into feature stubs; parallelization analysis; re-decomposition partition |
+| PO — Feature draft (`/pf0-draft`) | Cheap | f0-style single-stub capture under an existing epic; no dialog (mirrors `/f0-draft-proposal`) |
+| PO — Feature define (`/pf1-define`) | Balanced | Open-questions iterative dialog over Success Criteria + Scope; consults ARCHITECTURE.md; ingests a `/pf0-draft` stub when present |
+| PO — Feature decompose (`/pf2-decompose`) | Balanced | Stub-list-then-drill-in batch decomposition into story stubs; individually-testable rubric; parallelization analysis |
+| PO — Story draft (`/ps0-draft`) | Cheap | f0-style single-stub capture under an existing feature (absorbs the old tech-story fast path); no dialog |
+| PO — Story define (`/ps1-define`) | Reasoning | Open-questions dialog **plus** an inline Pattern-1 validation loop producing the engineer-ready planning ticket (mirrors the story-altitude design+validation tiers) |
 | Manual-test-plan drafting (`/e5b-write-manual-testing-plan`) | Balanced | Drafting + validation loop per the manual-test-plan rule |
 | Framework update — Phase 0 (`/f0-draft-proposal`) | Cheap | Quick-capture an unrefined DRAFT proposal from a blurb: resolve a slug, seed a bare file, drop the blurb into Scratch Notes; no design judgment, no open-questions dialog |
 | Framework update — Phase 1 (`/f1-propose-update`) | Balanced | Drafting a proposal: structural reading of canonical sources, naming files precisely, applying the open-questions iterative dialog |

@@ -1,10 +1,10 @@
 # Tracker Profile — GitHub (CLI)
 
-**Conforms to** [`_contract.md`](_contract.md). Set `work_item_tracker: "github"` (and/or `pr_provider: "github"`) in [`.shamt-core/shamt-config.json`](../../shamt-config.example.json) to make this the active profile. For a one-off override, pass `--tracker=github` to any slug-taking command (`/e1-start-story`, `/p1-start-epic`, `/p3-start-feature`).
+**Conforms to** [`_contract.md`](_contract.md). Set `work_item_tracker: "github"` (and/or `pr_provider: "github"`) in [`.shamt-core/shamt-config.json`](../../shamt-config.example.json) to make this the active profile. For a one-off override, pass `--tracker=github` to any slug-taking command (`/e1-start-story`, `/pe1-define`, `/pf1-define`).
 
-This profile fetches GitHub Issues and Pull Requests via the official `gh` CLI, then maps them into the unified output sections that [`templates/ticket.github.template.md`](../../templates/ticket.github.template.md) populates. The same field mapping would extend to PO-flow `epic.md` / `feature.md` artifacts once `/p1-start-epic` and `/p3-start-feature` land — but per [Supported work-item types](#supported-work-item-types) below, those commands fall through to freeform mode on this profile anyway.
+This profile fetches GitHub Issues and Pull Requests via the official `gh` CLI, then maps them into the unified output sections that [`templates/ticket.github.template.md`](../../templates/ticket.github.template.md) populates. The same field mapping would extend to PO-flow `epic.md` / `feature.md` artifacts once `/pe1-define` and `/pf1-define` land — but per [Supported work-item types](#supported-work-item-types) below, those commands fall through to freeform mode on this profile anyway.
 
-GitHub Issues has a **single native work-item type** (`Issue`). It has no first-class `Feature` or `Epic` type, so `/p3-start-feature` and `/p1-start-epic` against this profile fall through to freeform mode per the freeform-fallback rule in [`_contract.md`](_contract.md#freeform-fallback-rule). `/e1-start-story` is fully supported.
+GitHub Issues has a **single native work-item type** (`Issue`). It has no first-class `Feature` or `Epic` type, so `/pf1-define` and `/pe1-define` against this profile fall through to freeform mode per the freeform-fallback rule in [`_contract.md`](_contract.md#freeform-fallback-rule). `/e1-start-story` is fully supported.
 
 ---
 
@@ -47,7 +47,7 @@ gh issue view {id} --repo <org>/<repo> \
   --json number,title,body,state,stateReason,labels,milestone,assignees,author,url,createdAt,updatedAt,closedAt,projectItems,reactionGroups
 ```
 
-The consuming command writes the verbatim JSON to `stories/{ID}-{slug}-{brief}/raw/issue.json` (the folder located by ticket ID or slug per §PO-tree resolution). PO-flow variants (`epics/{ID}-{slug}-{brief}/raw/issue.json`, `features/{ID}-{slug}-{brief}/raw/issue.json` — under the nested layout) do not apply here, because `/p1-start-epic` and `/p3-start-feature` against this profile fall through to freeform mode (see [Supported work-item types](#supported-work-item-types) below).
+The consuming command writes the verbatim JSON to `stories/{ID}-{slug}-{brief}/raw/issue.json` (the folder located by ticket ID or slug per §PO-tree resolution). PO-flow variants (`epics/{ID}-{slug}-{brief}/raw/issue.json`, `features/{ID}-{slug}-{brief}/raw/issue.json` — under the nested layout) do not apply here, because `/pe1-define` and `/pf1-define` against this profile fall through to freeform mode (see [Supported work-item types](#supported-work-item-types) below).
 
 Custom issue types (the repo-level GraphQL `IssueType` field, in repos that have opted into the feature) are not exposed by `gh issue view --json` as of this writing; if a project depends on them, augment with the GraphQL form:
 
@@ -73,7 +73,7 @@ A failed auxiliary fetch must not abort the command. Per the contract, record th
 
 ## Field mapping
 
-Unified target sections follow the field-mapping contract (Title, Type, State, Assignee, Project, Iteration/Milestone, Description, Acceptance Criteria, URL — defined in `_contract.md`). The mapping populates the `ticket.md` sections that [`templates/ticket.github.template.md`](../../templates/ticket.github.template.md) defines. (Forward-looking: when `/p1-start-epic` / `/p3-start-feature` land, the same mapping would feed `epic.md` / `feature.md` for profiles that support those types — which on GitHub does not apply, since both fall through to freeform per the rule below.)
+Unified target sections follow the field-mapping contract (Title, Type, State, Assignee, Project, Iteration/Milestone, Description, Acceptance Criteria, URL — defined in `_contract.md`). The mapping populates the `ticket.md` sections that [`templates/ticket.github.template.md`](../../templates/ticket.github.template.md) defines. (Forward-looking: when `/pe1-define` / `/pf1-define` land, the same mapping would feed `epic.md` / `feature.md` for profiles that support those types — which on GitHub does not apply, since both fall through to freeform per the rule below.)
 
 | GitHub raw field | Target section in unified artifact |
 |------------------|------------------------------------|
@@ -91,7 +91,7 @@ Unified target sections follow the field-mapping contract (Title, Type, State, A
 | (comments fetch) | **Comments** |
 | (timeline fetch) | **Update History** |
 
-If a project tags issues with `type:epic` / `type:feature` labels and wants those treated as such by a future `/p1-start-epic` / `/p3-start-feature` invocation, the resulting `Type` field is just a string, not a native GitHub work-item type — the freeform-fallback rule still fires because the profile does not declare the type as supported.
+If a project tags issues with `type:epic` / `type:feature` labels and wants those treated as such by a future `/pe1-define` / `/pf1-define` invocation, the resulting `Type` field is just a string, not a native GitHub work-item type — the freeform-fallback rule still fires because the profile does not declare the type as supported.
 
 ---
 
@@ -149,7 +149,7 @@ Detection happens by matching the error string against the patterns above; the c
 
 - **Story** — GitHub Issues are the only native item type; this profile treats any GitHub issue as a `Story` for `/e1-start-story` purposes. Repo-level `type:story` labels (when used) further confirm intent but are not required.
 
-GitHub has **no** native `Feature` or `Epic` work-item types. `/p3-start-feature` and `/p1-start-epic` invoked against this profile fall through to freeform mode per the [freeform-fallback rule](_contract.md#freeform-fallback-rule) — the agent surfaces a one-line notice (`tracker profile github has no Feature work-item type — proceeding freeform` or the Epic equivalent) and the user captures content manually via the open-questions iterative dialog.
+GitHub has **no** native `Feature` or `Epic` work-item types. `/pf1-define` and `/pe1-define` invoked against this profile fall through to freeform mode per the [freeform-fallback rule](_contract.md#freeform-fallback-rule) — the agent surfaces a one-line notice (`tracker profile github has no Feature work-item type — proceeding freeform` or the Epic equivalent) and the user captures content manually via the open-questions iterative dialog.
 
 GitHub's repo-level `IssueType` field (org-defined custom types) can carry strings like `Feature` or `Epic` when a project chooses to use them, but the values are repo-/org-configured rather than first-class agile concepts and `gh issue view --json` does not expose them. If a project standardizes on `IssueType` for Feature/Epic semantics, update this section and add the corresponding GraphQL augmentation to [Primary fetch](#primary-fetch).
 

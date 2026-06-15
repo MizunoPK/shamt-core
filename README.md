@@ -99,26 +99,29 @@ No bidirectional guide-editing sync. No `export.sh`. The child's project work (s
 
 ### Product Owner flow (Part 2)
 
-Six commands across two altitudes — Epic (top) and Feature (one level down). Each `start-*` command defines an artifact; each `decompose-*` command breaks it into stubs at the next altitude; `/p5-finalize-epic` is the terminal Epic-altitude command, and `/p6-draft-tech-story` is a fast path for one-off work. The story is the handoff into the Engineer flow.
+Commands form an **altitude × stage grid** — prefix by altitude (`pe` = epic, `pf` = feature, `ps` = story), number by stage (`0-draft`, `1-define`, `2-decompose`, `3-finalize`). `draft` is an f0-style single-stub / idea capture runnable any time (the incremental-add path); `define` fleshes it out via the open-questions dialog; `decompose` (epic + feature only) batch-creates the next altitude's stubs; `finalize` (epic only) is the terminal Epic-altitude command.
 
 ```text
-            Epic                       <-- /p1-start-epic, /p2-decompose-epic
+            Epic                       <-- /pe0-draft, /pe1-define, /pe2-decompose, /pe3-finalize
              |
              v   (N features per epic, stub-list pattern)
-          Feature                      <-- /p3-start-feature, /p4-decompose-feature
+          Feature                      <-- /pf0-draft, /pf1-define, /pf2-decompose
              |
              v   (N stories per feature, stub-list pattern)
-           Story                       <-- /e1-start-story (stub-aware), then Engineer flow
+           Story                       <-- /ps0-draft, /ps1-define, then /e1-start-story (stub-aware) → Engineer flow
 ```
 
 | Command | Phase | Status |
 |---------|-------|--------|
-| `/p1-start-epic {slug}` | Epic intake/define | shipped |
-| `/p2-decompose-epic {slug}` | Epic → feature stubs | shipped |
-| `/p3-start-feature {slug}` | Feature intake/define | shipped |
-| `/p4-decompose-feature {slug}` | Feature → story stubs | shipped |
-| `/p5-finalize-epic {slug}` | Epic finalize → `epics/archive/` | shipped |
-| `/p6-draft-tech-story [bugs\|quick-wins] [slug]` | Fast-path: one-off bug/quick-win → Tech Stories epic | shipped |
+| `/pe0-draft` | Epic stage-0 draft (idea capture) | shipped |
+| `/pe1-define {slug}` | Epic stage-1 define (intake/flesh-out) | shipped |
+| `/pe2-decompose {slug}` | Epic stage-2 → feature stubs | shipped |
+| `/pe3-finalize {slug}` | Epic stage-3 finalize → `epics/archive/` | shipped |
+| `/pf0-draft {epic-slug}` | Feature stage-0 draft (one stub under an epic) | shipped |
+| `/pf1-define {slug}` | Feature stage-1 define (intake/flesh-out) | shipped |
+| `/pf2-decompose {slug}` | Feature stage-2 → story stubs | shipped |
+| `/ps0-draft {feature-slug \| bugs \| quick-wins}` | Story stage-0 draft (one stub; absorbs the old tech-story fast path) | shipped |
+| `/ps1-define {slug}` | Story stage-1 define (flesh-out **+ inline Pattern-1 validation** → engineer-ready ticket) | shipped |
 
 Every command above is **ID-or-slug-first** and **fresh-agent runnable** per Principle 1: pass a **ticket ID or slug** (`{id-or-slug}` — the tables show the common `{slug}` form, but a ticket ID like `T5` works equally, resolved per §PO-tree resolution / # Ticket IDs), the command resolves the folder, reads on-disk state, executes its phase. Each one mirrors `/e1-start-story`'s tracker plumbing: when the active profile (read from `.shamt-core/shamt-config.json`) declares the matching work-item type (e.g., ADO supports Epic + Feature + Story; GitHub supports Issue only), the slug-to-ID parse and payload fetch happen — otherwise the command falls through to freeform mode with a one-line notice (`tracker profile {name} has no {Type} work-item type — proceeding freeform`).
 
@@ -138,9 +141,9 @@ Every command above is **ID-or-slug-first** and **fresh-agent runnable** per Pri
     │                   ├── raw/                 # tracker payloads
     │                   ├── spec.md, implementation_plan.md, ...
     │                   └── feedback/, ...
-    └── archive/{ID}-{epic-slug}-{brief}/        # finalized epics (/p5-finalize-epic); excluded from active-epic resolution
+    └── archive/{ID}-{epic-slug}-{brief}/        # finalized epics (/pe3-finalize); excluded from active-epic resolution
 
-> A permanent **Tech Stories** epic (`epics/tech-stories/` with standing `features/bugs/` + `features/quick-wins/`, fixed reserved names, seeded at install) is the home for one-off bugs / quick wins filed via `/p6-draft-tech-story`. Finished tech-stories archive into their feature's `archive/`. See `templates/SHAMT_RULES.template.md` §Standing Tech Stories epic.
+> A permanent **Tech Stories** epic (`epics/tech-stories/` with standing `features/bugs/` + `features/quick-wins/`, fixed reserved names, seeded at install) is the home for one-off bugs / quick wins filed via `/ps0-draft`. Finished tech-stories archive into their feature's `archive/`. See `templates/SHAMT_RULES.template.md` §Standing Tech Stories epic.
 ```
 
 Epic and feature folders carry their own artifact (`epic.md` / `feature.md`) plus their nested children. Slugs are **globally unique at each altitude**; the global uniqueness is what lets the `{slug}-*` tail resolve unambiguously by tree-wide glob (see `templates/SHAMT_RULES.template.md` §PO-tree resolution). Pre-existing flat layouts resolve via the legacy fallback — new work is written nested.
@@ -151,17 +154,17 @@ Linking is encoded by the folder path — `feature.md` lives inside its epic, `t
 
 #### Individually-testable rubric (the hard PO-flow constraint)
 
-`/p4-decompose-feature` enforces this on every story stub it writes:
+`/pf2-decompose` enforces this on every story stub it writes:
 
 > A story is **individually testable** when it carries a self-contained verification path (automated or manual) that exercises its own contribution without re-verifying any sibling story's success criterion.
 >
 > **Rubric exception:** development-order dependencies between siblings are allowed. They live in the parallelization analysis (`Recommended order`), not as a testability violation.
 
-The rubric is the contract between PO flow and Engineer flow. The Engineer flow can refuse a story that violates it; the decomposition exit gate catches violations before stubs land on disk. See the `/p4-decompose-feature` command body for the full rubric and inline enforcement details.
+The rubric is the contract between PO flow and Engineer flow. The Engineer flow can refuse a story that violates it; the decomposition exit gate catches violations before stubs land on disk. See the `/pf2-decompose` command body for the full rubric and inline enforcement details.
 
 #### Architecture-impact flag
 
-Both `/p1-start-epic` and `/p3-start-feature` consult `.shamt-core/project-specific-files/ARCHITECTURE.md` while drafting. If the epic/feature implies architectural change (new service, new boundary, new data store, new external integration, auth/tenant boundary shift, etc.), the agent flags it **inline** in `Scope / Non-Scope` as `**Architecture impact:** {one-line description}`. Omitted entirely otherwise. **Neither command consults `.shamt-core/project-specific-files/CODING_STANDARDS.md`** — coding style is irrelevant at these altitudes; the story-level Phase 6 / Phase 7 cycle handles coding-standards alignment for any eventual code changes.
+Both `/pe1-define` and `/pf1-define` consult `.shamt-core/project-specific-files/ARCHITECTURE.md` while drafting. If the epic/feature implies architectural change (new service, new boundary, new data store, new external integration, auth/tenant boundary shift, etc.), the agent flags it **inline** in `Scope / Non-Scope` as `**Architecture impact:** {one-line description}`. Omitted entirely otherwise. **Neither command consults `.shamt-core/project-specific-files/CODING_STANDARDS.md`** — coding style is irrelevant at these altitudes; the story-level Phase 6 / Phase 7 cycle handles coding-standards alignment for any eventual code changes.
 
 #### Status-line PO modes (STORY > FEATURE > EPIC > idle)
 

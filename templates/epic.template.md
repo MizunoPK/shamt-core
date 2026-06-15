@@ -23,7 +23,7 @@
 
 ## Scope / Non-Scope
 
-[Optional `**Architecture impact:** …` inline flag — present only when `/p1-start-epic` consulted `.shamt-core/project-specific-files/ARCHITECTURE.md` (architecture-impact) and identified an architectural change implied by this epic. Omit entirely otherwise.]
+[Optional `**Architecture impact:** …` inline flag — present only when `/pe1-define` consulted `.shamt-core/project-specific-files/ARCHITECTURE.md` (architecture-impact) and identified an architectural change implied by this epic. Omit entirely otherwise.]
 
 ### In Scope
 
@@ -37,7 +37,7 @@
 
 ## Target Features
 
-[Populated by `/p2-decompose-epic`. Left empty on `/p1-start-epic` exit. Each line: feature slug + one-line goal.]
+[Populated by `/pe2-decompose`. Left empty on `/pe1-define` exit. Each line: feature slug + one-line goal.]
 
 - `{feature-slug}` — [one-line goal]
 
@@ -45,7 +45,7 @@
 
 ## Sequencing & Parallelization
 
-[Populated by `/p2-decompose-epic`. Left empty on `/p1-start-epic` exit.]
+[Populated by `/pe2-decompose`. Left empty on `/pe1-define` exit.]
 
 **Recommended order:**
 
@@ -54,6 +54,14 @@
 **Parallelizable:**
 
 - [Which features can be worked concurrently and why; or "None — strictly sequential."]
+
+---
+
+## Scratch Notes (stage-0 capture)
+
+[`/pe0-draft` writes this section with raw idea notes + draft status; `/pe1-define` ingests and refines. Omit entirely for non-draft epics.]
+
+---
 
 ## All Remaining Fields
 

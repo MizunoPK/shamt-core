@@ -1,6 +1,6 @@
 # Tracker Profile Contract
 
-**Purpose:** Defines what every tracker profile in this directory must declare. Used by `/e1-start-story`, `/p1-start-epic`, `/p3-start-feature`, and `/e6-review-changes` to fetch work-item content from an external tracker, map it into the unified artifact shape, and degrade gracefully when the active tracker can't cover a requested work-item type.
+**Purpose:** Defines what every tracker profile in this directory must declare. Used by `/e1-start-story`, `/pe1-define`, `/pf1-define`, and `/e6-review-changes` to fetch work-item content from an external tracker, map it into the unified artifact shape, and degrade gracefully when the active tracker can't cover a requested work-item type.
 
 A profile is a single Markdown file at `reference/trackers/{name}.md`. The active profile is selected by `work_item_tracker` in `.shamt-core/shamt-config.json` (see [`shamt-config.example.json`](../../shamt-config.example.json)). Day-one profiles: [`ado.md`](ado.md), [`github.md`](github.md), [`local.md`](local.md). Future trackers (Jira, Linear, etc.) are added by writing a new file that conforms to this contract — no framework change required.
 
@@ -28,11 +28,11 @@ A profile may add further sections (examples, troubleshooting notes, cross-refer
 
 ## Freeform-fallback rule
 
-When a command (`/e1-start-story`, `/p1-start-epic`, `/p3-start-feature`) is invoked against an active profile that does **not** declare support for the requested work-item type in its `## Supported work-item types` section, the command **falls through to freeform mode** — identical behavior to when the slug doesn't resolve to a tracker ID at all.
+When a command (`/e1-start-story`, `/pe1-define`, `/pf1-define`) is invoked against an active profile that does **not** declare support for the requested work-item type in its `## Supported work-item types` section, the command **falls through to freeform mode** — identical behavior to when the slug doesn't resolve to a tracker ID at all.
 
 The agent surfaces a one-line notice (template: `tracker profile <name> has no <Type> work-item type — proceeding freeform`) and continues. No error. No halt. The user then captures the artifact content manually via the open-questions iterative dialog, exactly as if `work_item_tracker = "none"`.
 
-This rule is the integration point that lets future trackers be added without modifying any command. GitHub, for instance, supports only `Issue` natively, so `/p3-start-feature` and `/p1-start-epic` against the `github` profile fall through automatically — but `/e1-start-story` still benefits from the GitHub profile's fetch wiring.
+This rule is the integration point that lets future trackers be added without modifying any command. GitHub, for instance, supports only `Issue` natively, so `/pf1-define` and `/pe1-define` against the `github` profile fall through automatically — but `/e1-start-story` still benefits from the GitHub profile's fetch wiring.
 
 ---
 
@@ -51,8 +51,8 @@ Each profile file should document the `--tracker={name}` form near the top of it
 | Consumer | Reads | When |
 |----------|-------|------|
 | `/e1-start-story {slug}` | `## Slug resolution`, `## Primary fetch`, `## Auxiliary fetches`, `## Field mapping`, `## Auth failure modes`, `## Supported work-item types` (filter on `Story`) | Phase 1 (Intake) |
-| `/p1-start-epic {slug}` | Same as above, filtered on `Epic` | PO flow |
-| `/p3-start-feature {slug}` | Same as above, filtered on `Feature` | PO flow |
+| `/pe1-define {slug}` | Same as above, filtered on `Epic` | PO flow |
+| `/pf1-define {slug}` | Same as above, filtered on `Feature` | PO flow |
 | `/e6-review-changes {slug}` | `## PR fetch`, `## Auth failure modes`. Driven by `pr_provider` (which may differ from `work_item_tracker`). | Phase 6 (Review) |
 
 `## PR comment posting` is declared but not invoked by any v2 consumer. It is present so the contract is complete for downstream automation that may want to post review summaries upstream.
