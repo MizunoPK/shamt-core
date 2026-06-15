@@ -6,7 +6,7 @@ Update Triggers: |
   Update this document when:
   - The way the project is run/driven as a user changes (new entry point, new CLI, new flow)
   - Automated test infrastructure is added, removed, or its runner/command changes
-  - A new class of behavior needs a documented manual-as-user procedure
+  - A new class of behavior needs a documented agent-as-user procedure
   - A recurring test-surfaced bug reveals a missing standard scenario worth codifying
 How to Update: |
   Open a story (or a framework-update proposal if this is a shamt-core change), follow the
@@ -36,7 +36,7 @@ agent-as-user execution only.]
 - **How to run a single test / suite:** [Targeted invocation for a focused run.]
 - **CI:** [Where automated tests run in CI, if applicable.]
 
-## Manual-as-user testing (always applicable)
+## Agent-as-user testing (always applicable)
 
 How the `user-simulator` persona drives this project **as a user** during Phase 5. Be concrete
 enough that a fresh agent can run the project and supply realistic inputs without guessing.

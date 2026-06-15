@@ -8,7 +8,7 @@ Mirrors `reference/implementation_plan_reference.md` / `reference/spec_protocol_
 
 Each child project carries `.shamt-core/project-specific-files/TESTING_STANDARDS.md` (seeded at init,
 completed via the project-doc completion prompt). It **replaces** the old `testing: enabled/disabled`
-config flag: it declares the **manual-as-user** driving procedures (always applicable) and whether
+config flag: it declares the **agent-as-user** driving procedures (always applicable) and whether
 **automated suites** are **Present** or **None**. `/e5-execute-tests` and `/e3b-write-testing-plan`
 key off this doc, not a config flag.
 

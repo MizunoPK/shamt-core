@@ -591,7 +591,7 @@ documents, then validate each.
    structure conventions) and replace every placeholder with content true
    to THIS project. For TESTING_STANDARDS.md specifically: declare whether
    automated tests are Present or None (and the runner/command), and write
-   the manual-as-user driving procedures (how to run the project, the
+   the agent-as-user driving procedures (how to run the project, the
    inputs a real user supplies, what correct behavior looks like) so a
    fresh agent can drive it during the required Phase 5. Keep an explicit
    "Open Questions" list as you draft; ask me each question one at a time

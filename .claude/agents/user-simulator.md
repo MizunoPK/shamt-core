@@ -33,7 +33,7 @@ the reason and stop; you do **not** guess a pass.
 
 1. Resolve the story folder; read `spec.md` (or the active baseline) for the story's acceptance
    criteria and `active_artifacts.md` when present.
-2. Read `TESTING_STANDARDS.md` — the "Manual-as-user testing" section (how to drive the project,
+2. Read `TESTING_STANDARDS.md` — the "Agent-as-user testing" section (how to drive the project,
    representative inputs, what to observe, standard scenarios, human-only out-of-scope).
 3. Select scenarios: the project's "Standard scenarios" that this story touches, plus any
    story-specific journeys from the spec's acceptance criteria. Seed `agent_test_session.md` from

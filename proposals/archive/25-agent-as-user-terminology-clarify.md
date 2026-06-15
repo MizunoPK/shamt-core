@@ -1,7 +1,7 @@
 # Proposal: agent-as-user-terminology-clarify
 
 **Created:** 2026-06-14
-**Status:** Draft
+**Status:** Implemented
 **Number:** 25
 **Proposed by:**
 **Project context:**
