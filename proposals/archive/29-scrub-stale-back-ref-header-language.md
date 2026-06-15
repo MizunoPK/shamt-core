@@ -1,7 +1,7 @@
 # Proposal: scrub-stale-back-ref-header-language
 
 **Created:** 2026-06-14
-**Status:** Draft
+**Status:** Implemented
 **Number:** 29
 **Proposed by:** [master-local]
 **Project context:** [master-local]
@@ -74,3 +74,6 @@ The authoritative sources (`templates/SHAMT_RULES.template.md:159`, `README.md:1
 ## Resolved Questions
 
 - ~~Q: Should this proposal also close the systemic class (sharpen the f5 D7/D8/D11 dimension verbs + the `audit_dimensions.md` mirror so managed shell-script comments/footers are explicitly in audit scope), or stay scoped to the 8-site prose scrub?~~ → A: **Close the class.** Include rows 5–6 (f5-audit-framework.md + audit_dimensions.md) alongside the prose scrub. Matches the incident-origin default stance — fix the gap that let the term leak into a script, not just the instance — so the next retired-term leak into a non-`.md` canonical surface is caught by the audit.
+
+---
+Validated 2026-06-15 — 1 round, 1 adversarial sub-agent confirmed

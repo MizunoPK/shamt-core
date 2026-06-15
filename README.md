@@ -318,8 +318,8 @@ Status-line output formats (live, computed cheaply from filesystem state — no 
 
 | Priority | Condition | Output |
 |----------|-----------|--------|
-| 1 | Active story (folder pinned via `stories/.active` or most-recently-modified `stories/*/`) with a phase artifact | `STORY {slug} \| P{N} {phase-name}` (plus ` \| feat: …` / ` \| epic: …` when ticket.md carries `Parent Feature` / `Parent Epic` headers) |
-| 2 | No active story; active feature (`features/.active` or mtime fallback) | `FEATURE {feature-slug}` (plus ` \| epic: {parent-epic-slug}` when feature.md carries `**Parent Epic:**` — omitted for standalone features) |
+| 1 | Active story (folder pinned via `stories/.active` or most-recently-modified `stories/*/`) with a phase artifact | `STORY {slug} \| P{N} {phase-name}` (plus ` \| feat: …` / ` \| epic: …` when the active-story pointer's path has a parent feature / epic segment) |
+| 2 | No active story; active feature (`features/.active` or mtime fallback) | `FEATURE {feature-slug}` (plus ` \| epic: {parent-epic-slug}` when the feature's path has a parent-epic segment — omitted for standalone features) |
 | 3 | No active story, no active feature; active epic (`epics/.active` or mtime fallback) | `EPIC {epic-slug}` |
 | 4 | None of the above | `Shamt \| idle` |
 

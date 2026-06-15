@@ -4,7 +4,7 @@ description: Phase 4 of the PO flow — break a validated feature into N story-t
 
 # /pf2-decompose
 
-**Purpose:** Run Phase 4 of the PO flow. Read a validated `feature.md`, propose a list of stories (title + one-line scope each), enforce the **individually-testable rubric**, gate the whole list with the user once, derive story slugs, run the decomposition exit gate, then write N story-ticket-stub folders nested under `epics/{epic-folder}/features/{feature-folder}/stories/` (each carrying back-ref headers for parent feature + scope one-liner + a `## Decomposition Context` breadth section; parentage is the folder path) and append `Target Stories` + `Sequencing & Parallelization` back onto the parent feature. Per-story deep dialog is deferred to `/e1-start-story` (stub-aware).
+**Purpose:** Run Phase 4 of the PO flow. Read a validated `feature.md`, propose a list of stories (title + one-line scope each), enforce the **individually-testable rubric**, gate the whole list with the user once, derive story slugs, run the decomposition exit gate, then write N story-ticket-stub folders nested under `epics/{epic-folder}/features/{feature-folder}/stories/` (each carrying the scope one-liner + a `## Decomposition Context` breadth section; parentage is the folder path) and append `Target Stories` + `Sequencing & Parallelization` back onto the parent feature. Per-story deep dialog is deferred to `/e1-start-story` (stub-aware).
 
 **Recommended model:** Reasoning (Opus). Decomposition involves the individually-testable rubric, dependency analysis, parallelization callout, and global-slug discipline — all benefit from Opus's reasoning depth. Same justification as `/pe2-decompose`. See [`reference/model_selection.md`](../../../../reference/model_selection.md).
 
@@ -196,7 +196,7 @@ Surface, but do **not** auto-invoke:
 /ps1-define {story-slug-2}     # ...and so on
 ```
 
-Each story stub is **independently resumable**. The engineer can drive `/e1-start-story` on each stub in sequence, or run them in parallel by opening additional terminal tabs (the framework provides no runtime coordination machinery per the decomposition / parallelization step). Order is suggested by the `Recommended order` line just written to the feature. `/e1-start-story` is **stub-aware** — it detects the back-ref headers in `ticket.md` and preserves them when fleshing out the rest of the Intake content (see `commands/e1-start-story.md`).
+Each story stub is **independently resumable**. The engineer can drive `/e1-start-story` on each stub in sequence, or run them in parallel by opening additional terminal tabs (the framework provides no runtime coordination machinery per the decomposition / parallelization step). Order is suggested by the `Recommended order` line just written to the feature. `/e1-start-story` is **stub-aware** — it detects the stub by its nested folder path and preserves the scope one-liner when fleshing out the rest of the Intake content (see `commands/e1-start-story.md`).
 
 ## Exit criteria
 

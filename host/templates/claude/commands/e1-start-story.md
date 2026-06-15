@@ -46,7 +46,7 @@ Apply the global slug resolution rule from [`SHAMT_RULES.template.md`](../../../
    - **Ready-ticket pickup (PO-flow handoff, validated).** If the resolved nested `ticket.md` carries a Pattern-1 `Validated …` footer, this is a `/ps1-define`-validated planning ticket. Mark the invocation as **ready-ticket pickup**: do the tracker fetch/reconcile + confirm of Step 4, then **skip re-authoring intake** — proceed straight to the Intake gate (Step 6) without re-running the open-questions dialog (the ticket is already authored and validated). The scope one-liner and `## Decomposition Context` are preserved verbatim.
    - **Bare-stub merge (PO-flow handoff, unvalidated).** If the resolved nested `ticket.md` carries **no** `Validated …` footer, this is a bare stub written by `/pf2-decompose` (or `/ps0-draft`). Mark the invocation as **stub-aware**: the scope one-liner in the body is preserved verbatim throughout the rest of this command. The stub's `## Decomposition Context` (when present — pre-#12 / freeform stubs lack it) seeds the intake deepening as the research starting point; fall back to the scope one-liner alone when absent. Proceed to Step 4 (the rest of the Intake flow — tracker fetch when the active profile supports Story, else freeform open-questions dialog — merges its output into the existing template sections without rewriting the scope one-liner). The Engineer-flow Intake gate (Step 6) still applies. Stub-derived stories are individually testable per `/pf2-decompose`'s exit gate — no rubric re-check at Intake.
    - **Detection is flagless.** The three-way split keys solely on the resolved folder's nested parentage plus the presence/absence of the `Validated …` footer (stamped by `/ps1-define`'s inline validation loop): **no new command flag, no new template, no new status marker** — consistent with e1's existing flagless stub detection.
-   - **Pre-existing freeform case.** If `ticket.md` is populated but carries **no** back-ref headers, this is a pre-existing freeform story. Confirm with the user whether to refetch / overwrite, append, or exit, the same as before.
+   - **Pre-existing freeform case.** A populated `ticket.md` resolving to a flat/non-nested folder is a pre-existing freeform story. Confirm with the user whether to refetch / overwrite, append, or exit, the same as before.
 5. **Zero matches** → continue to Step 3 (new story).
 
 ### Step 3 — Derive the brief description and propose the folder name
@@ -135,6 +135,6 @@ Suggest a context-clear before Phase 2 — `/clear`, then `/e2-define-spec {slug
 - Phase 2 (Spec) is the next step. Resume with `/e2-define-spec {slug}` after `/clear`.
 
 ---
-Validated 2026-05-28 — Phase 12 implementation loop. Touched by Phase 12: stub-aware Intake detection in Step 2 + stub-aware merge clauses in Step 4 sub-step B and sub-step C + Notes-section documentation of the back-ref-header signal; original Phase 5 flow preserved for freeform stories.
+Validated 2026-05-28 — Phase 12 implementation loop. Touched by Phase 12: stub-aware Intake detection in Step 2 + stub-aware merge clauses in Step 4 sub-step B and sub-step C + Notes-section documentation of the path-nesting signal; original Phase 5 flow preserved for freeform stories.
 
 <!-- Managed by Shamt — do not edit. Regenerate from shamt-core/host/templates/claude/commands/e1-start-story.md. -->

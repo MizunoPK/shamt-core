@@ -193,5 +193,5 @@ fi
 
 idle
 
-# Validated 2026-05-28 — Phase 12 implementation loop. Touched by Phase 12: PO-flow fallback chain (FEATURE / EPIC) + `resolve_active_dir` helper + `.active` override at every altitude; story rendering + back-ref reader preserved from Phase 7.
+# Validated 2026-05-28 — Phase 12 implementation loop. Touched by Phase 12: PO-flow fallback chain (FEATURE / EPIC) + `resolve_active_dir` helper + `.active` override at every altitude; story rendering + path-walk parentage preserved from Phase 7.
 # <!-- Managed by Shamt — do not edit. Regenerate from shamt-core/host/templates/claude/statusline.sh. -->

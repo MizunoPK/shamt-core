@@ -72,7 +72,7 @@ A flat list of canonical files the proposal will touch.
 
 ## Open Questions
 
-- [ ] [Resolved in dialog — see Resolved Questions.]
+_(none — all resolved; see Resolved Questions.)_
 
 ---
 
@@ -82,5 +82,6 @@ A flat list of canonical files the proposal will touch.
 
 - ~~Q: How should the corrected story write-path be spelled?~~ → A: **Form A — expand the full nested path** (`epics/{epic-folder}/features/{feature-folder}/stories/{ID}-…`) using the canonical `{epic-folder}`/`{feature-folder}` placeholders. Makes the nested shape visible at every read site (the property whose absence let the collapse slip past review); matches `/pf2-decompose` and `/pf0-draft`. Rejected Form B (redefine `{parent-feature-folder}` once) — it hides the structure behind the same placeholder vocabulary that enabled the collapse.
 - ~~Q: How broad should the fix scope be?~~ → A: **Full class-closing fix** (rows 1–8): fix the 9 live-bug ps0/ps1 sites (Form A) + normalize pf1's `{parent-epic-folder}` and pf2's `{e}` to canonical `{epic-folder}`/`{feature-folder}` + add the write-vocabulary statement to §PO-tree resolution. Unifies all PO producers on one vocabulary so a future reorg can't re-collapse. Rejected the narrower options — they leave the divergent vocabulary (and thus the re-collapse risk) in place.
+- ~~Q: Where should the f5-audit process gap (D2/D9/D7 don't check path-composition consistency) be addressed?~~ → A: **Separate f0 capture** — keep #30 scoped to the path correction; capture the audit-detection improvement as its own f0 draft (`f5-audit-add-path-composition-check`). The audit's own logic is a different surface and merits a focused proposal.
 
 ---

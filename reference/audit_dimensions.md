@@ -19,7 +19,7 @@ The audit exists to keep the framework **complete** (it covers what it should, w
 | D3 | Bidirectional coverage | Every documented pattern/rule has a host implementation; every host body cites a pattern/rule it implements. Nothing documented is unimplemented; nothing implemented is undocumented. |
 | D5 | Template-protocol alignment | Each template carries every section its producing/consuming protocol writes or reads — and no orphan sections the protocol abandoned. |
 | D6 | Project-doc currency | The required project docs (`ARCHITECTURE.md`, `CODING_STANDARDS.md`, `TESTING_STANDARDS.md`) exist and are within the staleness threshold — the inputs the Engineer flow depends on are present and fresh. |
-| D8 | Content completeness | No half-finished content — no stray `TODO` / `TBD` / `FIXME` / unfilled `[placeholder]` left in a canonical body. |
+| D8 | Content completeness | No half-finished content — no stray `TODO` / `TBD` / `FIXME` / unfilled `[placeholder]` left in a canonical body (including the managed shell-script comments / validation-footer lines under `host/templates/claude/` and `scripts/`). |
 | D12 | Rules-file size budget | The canonical rules file (`templates/SHAMT_RULES.template.md`, rendered into every child `CLAUDE.md`) stays within `rules_size_budget_chars` (default 40000 chars) — small enough to load economically into context on every interaction. Over budget is **always intricate** (trimming needs judgment) → f0-capture pointing at `/trim-rules-file`, never auto-fixed. |
 
 ### Correctness
@@ -35,9 +35,9 @@ The audit exists to keep the framework **complete** (it covers what it should, w
 | Dim | Name | What "consistent" means here |
 |-----|------|------------------------------|
 | D2 | Cross-doc consistency | The rules file and the host body that implements it agree on steps, exit criteria, and naming. (Rules ↔ host.) |
-| D7 | Terminology consistency | One canonical term per concept across all canonical docs. |
+| D7 | Terminology consistency | One canonical term per concept across all canonical docs (including the managed shell-script comments / validation-footer lines under `host/templates/claude/` and `scripts/`). |
 | D9 | Duplication / contradiction | No two canonical files give conflicting instructions for the same protocol. (Host ↔ host, reference ↔ reference — the contradiction neither side of which is the rules file; that case is D2's.) |
-| D11 | Scope-clarity | Each command/skill states its scope unambiguously near its heading; no leftover migration notes or stale "(was X)" parentheticals inline in the instruction path. |
+| D11 | Scope-clarity | Each command/skill states its scope unambiguously near its heading; no leftover migration notes or stale "(was X)" parentheticals inline in the instruction path (including the managed shell-script comments / validation-footer lines under `host/templates/claude/` and `scripts/`). |
 
 **D2 vs D7/D9 — the clean boundary.** D2 is vertical: does the *host body* faithfully implement the *rules-file pattern*? D7 is lexical: is each concept *named* one way everywhere? D9 is horizontal: do two *non-rules* files contradict each other? A command body that says "2 consecutive clean rounds" while the rules file's Pattern 1 says "1 primary clean + sub-agent" is **D2**. Two command bodies that disagree with *each other* about whether the audit needs a sub-agent is **D9**. The word "Implement" used where the canonical phase name is "Build" is **D7**. No finding should be counted under more than one dimension — classify by the relationship it breaks.
 
