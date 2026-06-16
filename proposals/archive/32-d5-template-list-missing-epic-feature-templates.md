@@ -2,7 +2,7 @@
 
 **Number:** 32
 Created: 2026-06-15
-Status: Draft
+Status: Implemented
 Proposed by:
 Project context:
 
@@ -15,8 +15,8 @@ names 14 templates (`spec`, `implementation_plan`, `testing_plan`, `manual_test_
 `agent_test_session`, `context`, `code_review`, `active_artifacts`, `ticket.ado`, `ticket.github`,
 `architecture`, `coding_standards`, `testing_standards`, `proposals/_template.md`) but omits two
 real, actively-consumed templates that exist under `templates/`: `epic.template.md` and
-`feature.template.md`. Both are written by PO-flow producers (`/pe0-draft`, `/pe1-define`,
-`/pe2-decompose` write `epic.md` from `epic.template.md`; `/pf0-draft`, `/pf2-decompose` write
+`feature.template.md`. Both are written by PO-flow producers (`/pe0-draft` and `/pe1-define`
+write `epic.md` from `epic.template.md`; `/pf0-draft`, `/pf1-define`, and `/pe2-decompose` write
 `feature.md` from `feature.template.md`). So the audit's own template-alignment enumeration fails
 to cover two templates whose producing/consuming protocols D5 exists to check.
 
@@ -96,3 +96,6 @@ way). No data migration, no state change.
 - **Propagation:** regen `.claude/` + `--check`. No child import needed for correctness.
 - **D10 guard explicitly out of scope** — validator should confirm no count-claim was added (its
   absence is intentional per the diagnosis, not an omission).
+
+---
+Validated 2026-06-16 — 2 rounds (primary clean + adversarial validation-checker confirmed: zero issues)
