@@ -57,7 +57,7 @@ ps0 supports **two parent modes**, both writing the **same story-ticket stub sha
    - **github** → [`templates/ticket.github.template.md`](../../../../templates/ticket.github.template.md)
    - **local** or **none** → [`templates/ticket.github.template.md`](../../../../templates/ticket.github.template.md) as the **generic baseline**. **Replace the template's `**Tracker profile:** GitHub (see …)` metadata line with `**Tracker profile:** {local|none}` to match the active config.**
 3. Ask the user for a 2–4-word **brief description** of the story, or derive it from the blurb if supplied.
-4. Create the folder `epics/{parent-feature-folder}/stories/{ID}-{story-slug}-{brief}/` and write `ticket.md` with the **same core stub shape `/pf2-decompose` emits** (per its Step 8 stub-section contract):
+4. Create the folder `epics/{epic-folder}/features/{feature-folder}/stories/{ID}-{story-slug}-{brief}/` and write `ticket.md` with the **same core stub shape `/pf2-decompose` emits** (per its Step 8 stub-section contract):
    - **Ticket metadata block** — unchanged from the template.
    - **Body intake area** (the paragraph immediately after the metadata block, marked "Paste ticket content here — any format accepted"): write the story's scope one-liner verbatim (from the blurb or prompt).
    - **`## Decomposition Context` section:** "none" (to be refined later) or initial breadth bullets (dependencies on siblings, shared context, boundary rationale) if known. **NOT a depth dump** — acceptance / spec detail is the Engineer flow's job.
@@ -79,7 +79,7 @@ ps0 supports **two parent modes**, both writing the **same story-ticket stub sha
 State the exit clearly:
 
 ```text
-ps0 draft story captured at epics/{parent-feature-folder}/stories/{ID}-{story-slug}-{brief}/ticket.md (Status: Draft (f0 — story-idea capture, unrefined)).
+ps0 draft story captured at epics/{epic-folder}/features/{feature-folder}/stories/{ID}-{story-slug}-{brief}/ticket.md (Status: Draft (f0 — story-idea capture, unrefined)).
 {If feature-parent mode: Appended to parent feature's Target Stories list.}
 Unrefined — no open-questions dialog ran and no Acceptance Criteria were drafted.
 Next: /ps1-define {story-slug} to flesh it out and define the story.
@@ -87,7 +87,7 @@ Next: /ps1-define {story-slug} to flesh it out and define the story.
 
 ## Exit criteria
 
-- `epics/{parent-feature-folder}/stories/{ID}-{story-slug}-{brief}/ticket.md` exists with the ticket template shape (metadata block, body intake area populated with scope one-liner, Decomposition Context placeholder or populated, all other sections empty), the Status draft marker, and a Scratch Notes section.
+- `epics/{epic-folder}/features/{feature-folder}/stories/{ID}-{story-slug}-{brief}/ticket.md` exists with the ticket template shape (metadata block, body intake area populated with scope one-liner, Decomposition Context placeholder or populated, all other sections empty), the Status draft marker, and a Scratch Notes section.
 - **Feature-parent mode:** Parent feature's `## Target Stories` section has the story appended (one line; no wholesale rewrite).
 - **Tech-story mode:** No `## Target Stories` append (standing features have no decomposition list).
 - No formal open-questions dialog run.

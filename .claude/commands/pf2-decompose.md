@@ -42,7 +42,7 @@ Apply the global slug-resolution rule from [`SHAMT_RULES.template.md`](../../../
 
 1. Read the last non-blank line of `feature.md`.
 2. If it matches `Validated YYYY-MM-DD — …`, proceed to Step 3.
-3. Otherwise, **halt** with: `feature.md is not validated — run /validate-artifact features/{ID}-{slug}-{brief}/feature.md first, or re-invoke with --allow-unvalidated to proceed against the draft.`
+3. Otherwise, **halt** with: `feature.md is not validated — run /validate-artifact epics/{epic-folder}/features/{ID}-{slug}-{brief}/feature.md first, or re-invoke with --allow-unvalidated to proceed against the draft.`
 4. If `--allow-unvalidated` was passed, surface a one-line notice (`proceeding against an unvalidated feature — re-run /validate-artifact after decomposition`) and continue.
 
 ### Step 3 — Re-entry detection
@@ -128,7 +128,7 @@ Story slug uniqueness is **global** (tree-wide). Before writing:
 
 For each approved story entry:
 
-- **New partition (per Step 3) — and every story on first decomposition:** allocate a ticket ID `T{N}` for the story (= `max` of the `^T([0-9]+)-` prefixes across `epics/`, `features/`, `stories/`, + 1 — per **# Ticket IDs**) and create `epics/{e}/features/{feature-folder}/stories/{ID}-{story-slug}-{brief}/ticket.md` from the active tracker's per-provider ticket template (nested under the resolved parent feature). **Template selection rule:** read `work_item_tracker` from `.shamt-core/shamt-config.json`:
+- **New partition (per Step 3) — and every story on first decomposition:** allocate a ticket ID `T{N}` for the story (= `max` of the `^T([0-9]+)-` prefixes across `epics/`, `features/`, `stories/`, + 1 — per **# Ticket IDs**) and create `epics/{epic-folder}/features/{feature-folder}/stories/{ID}-{story-slug}-{brief}/ticket.md` from the active tracker's per-provider ticket template (nested under the resolved parent feature). **Template selection rule:** read `work_item_tracker` from `.shamt-core/shamt-config.json`:
   - `ado` → [`templates/ticket.ado.template.md`](../../../../templates/ticket.ado.template.md)
   - `github` → [`templates/ticket.github.template.md`](../../../../templates/ticket.github.template.md)
   - `local` or `none` → [`templates/ticket.github.template.md`](../../../../templates/ticket.github.template.md) as the **generic baseline** (GitHub-flavored sections are closer to the generic structural shape). **Replace the template's `**Tracker profile:** GitHub (see …)` metadata line with `**Tracker profile:** {local|none}` to match the active config** — leaving the static GitHub text would mislead a fresh agent reading the stub. The rest of the template body (Summary, Description, etc.) is generic-enough to carry over unchanged.

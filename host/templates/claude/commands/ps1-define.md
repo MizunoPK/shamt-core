@@ -4,7 +4,7 @@ description: Story stage-1 define (story altitude analogue of /pf1-define) — f
 
 # /ps1-define
 
-**Purpose:** Run Stage 1 of the PO flow at the **Story** altitude (the story-specific define + validation stage). Resolve a slug, branch on three input modes (ingest an existing `/ps0-draft` stub when present, create a standalone story from scratch, or seed from a tracker work-item payload when the active profile supports Story), drive an open-questions iterative dialog over the scope one-liner + spec structure, and produce the story-ticket stub under its parent feature — `epics/{parent-feature-folder}/stories/{ID}-{slug}-{brief}/ticket.md`. Unlike `/pe1-define` and `/pf1-define` (which defer validation to `/validate-artifact`), `/ps1-define` runs an **inline Pattern-1 validation loop** so the command **stamps the `Validated …` footer itself**. This footer is the readiness signal `/e1-start-story` keys on.
+**Purpose:** Run Stage 1 of the PO flow at the **Story** altitude (the story-specific define + validation stage). Resolve a slug, branch on three input modes (ingest an existing `/ps0-draft` stub when present, create a standalone story from scratch, or seed from a tracker work-item payload when the active profile supports Story), drive an open-questions iterative dialog over the scope one-liner + spec structure, and produce the story-ticket stub under its parent feature — `epics/{epic-folder}/features/{feature-folder}/stories/{ID}-{slug}-{brief}/ticket.md`. Unlike `/pe1-define` and `/pf1-define` (which defer validation to `/validate-artifact`), `/ps1-define` runs an **inline Pattern-1 validation loop** so the command **stamps the `Validated …` footer itself**. This footer is the readiness signal `/e1-start-story` keys on.
 
 **Recommended model:** Reasoning (Opus) — design/dialog task + inline validation loop; cite [`reference/model_selection.md`](../../../../reference/model_selection.md).
 
@@ -89,7 +89,7 @@ The folder exists; `ticket.md` carries the `**Status:**` marker + `## Scratch No
 
 The folder did not exist before Step 3. There is no explicit parent feature input from the user in the current altitude.
 
-1. Read the active tracker's per-provider ticket template and write `epics/{parent-feature-folder}/stories/{ID}-{slug}-{brief}/ticket.md` from it. After writing `ticket.md`, write its path to `shamt-state/active-story` and `shamt-state/active-feature` pointers (per `/e1-start-story` baseline).
+1. Read the active tracker's per-provider ticket template and write `epics/{epic-folder}/features/{feature-folder}/stories/{ID}-{slug}-{brief}/ticket.md` from it. After writing `ticket.md`, write its path to `shamt-state/active-story` and `shamt-state/active-feature` pointers (per `/e1-start-story` baseline).
 2. **Mode B nests under the parent feature** determined by the resolved or proposed folder path (user-selected parent feature when ambient, or default to Tech Stories epic's standing feature when creating a standalone).
 3. Proceed to Step 5 (architecture consult), then Step 6 (open-questions dialog) to populate the spec structure from scratch.
 4. Leave other template sections empty (Summary, Description, Acceptance Criteria, etc.).

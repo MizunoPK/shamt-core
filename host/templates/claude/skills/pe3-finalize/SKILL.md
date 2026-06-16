@@ -25,7 +25,7 @@ Mirrors the `/pe3-finalize {slug}` slash command. Same canonical body, two host 
 Follow the canonical `/pe3-finalize` command body verbatim — see [`commands/pe3-finalize.md`](../../commands/pe3-finalize.md). Summary:
 
 1. **Resolve the epic folder** — per §PO-tree resolution (epics are top-level: `epics/{slug}-*/` etc.), excluding `epics/archive/`; halt on zero/multiple or if `epics/archive/{name}` already exists.
-2. **Guard — children finalized** — every child feature/story (found by walking the nested tree *inside* the epic folder — `epics/{epic}/features/*/feature.md`, `epics/{epic}/features/*/stories/*/ticket.md`; parentage is the path) carries `**Status: Done**`. Halt and list unfinished children (`/e8-finalize-story` each) on any gap.
+2. **Guard — children finalized** — every child feature/story (found by walking the nested tree *inside* the epic folder — `epics/{epic-folder}/features/*/feature.md`, `epics/{epic-folder}/features/*/stories/*/ticket.md`; parentage is the path) carries `**Status: Done**`. Halt and list unfinished children (`/e8-finalize-story` each) on any gap.
 3. **Guard — explicit confirmation** — show the epic + finalized children, the mark-done method, the `epics/{slug}/ → epics/archive/{slug}/` move, and the `epic.md` `Status: Done` marker; wait for a yes.
 4. **Mark done + local marker** — per profile (ado `az boards work-item update --state`; github has no Epic type → skip remote; local = marker); write `**Status: Done**` into `epic.md` for all profiles.
 5. **Move to archive** — `epics/{slug}/ → epics/archive/{slug}/`, a **whole-subtree move** (the nested features/stories ride along inside the epic folder; parentage is the path, nothing dangles).

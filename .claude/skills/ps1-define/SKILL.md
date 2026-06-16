@@ -35,7 +35,7 @@ Follow the canonical `/ps1-define` command body verbatim — see [`commands/ps1-
 2. **Resolve `{slug}`** — resolve per `templates/SHAMT_RULES.template.md` §PO-tree resolution (tree-wide story glob) and legacy-flat fallback. Halt on multiple matches. On a one-match resolution, **inspect `ticket.md`** to decide Mode A vs. re-entry:
    - Draft marker present (`**Status:** Draft (f0 — story-idea capture, unrefined)` + `## Scratch Notes (stage-0 capture)` section) → Mode A (ingest; seed from Scratch Notes).
    - Depth sections drafted (a prior `/ps1-define` deep-dive ran) → re-entry. Confirm refetch / overwrite / extend / exit. **Preserve `**Ticket ID:**` header verbatim** regardless of branch; strip any prior `Validated …` footer when extending.
-3. **For new stories** (zero matches): ask the user for a 2–4-word brief description; propose and create `epics/{parent-feature-folder}/stories/{ID}-{slug}-{brief}/`. Mode B nests under the parent feature; Mode C nests under matched or parent feature per tracker + slug shape.
+3. **For new stories** (zero matches): ask the user for a 2–4-word brief description; propose and create `epics/{epic-folder}/features/{feature-folder}/stories/{ID}-{slug}-{brief}/`. Mode B nests under the parent feature; Mode C nests under matched or parent feature per tracker + slug shape.
 4. **Mode disambiguation order** (filesystem-first):
    - **Mode A** — draft marker + Scratch Notes present. Seed from Scratch Notes. Deepen via open-questions dialog. On completion, **strip the marker + Scratch Notes** (f1-style ingestion).
    - **Mode C** — no draft marker, but active profile supports Story AND slug parses to a tracker ID. Fetch the payload, apply field mapping, nest under matched epic (or default per tracker). **No `raw/` subfolder** — preserve fidelity inline in `## All Remaining Fields` appendix (above the eventual validation footer). Write `shamt-state/active-story` and `shamt-state/active-feature` pointers.
@@ -59,7 +59,7 @@ Reasoning (Opus) — design/dialog task + inline validation loop; see [`referenc
 
 ## Exit criteria
 
-Non-empty `epics/{parent-feature-folder}/stories/{ID}-{slug}-{brief}/ticket.md` with ticket metadata + body intake area populated (scope one-liner, draft-mode seeds, deepened by dialog) + spec structure drafted; `## Open Questions` empty; other template sections (Summary, Description, Acceptance Criteria, etc.) left as template placeholders (Engineer flow's responsibility); nesting reflects the input mode (draft's parent in Mode A, resolved or default parent in Mode B/C); `shamt-state/active-story` and `shamt-state/active-feature` pointers written (Mode B/C only); **two-line footer block stamped** (`---` + `Validated {YYYY-MM-DD} — N rounds, 1 adversarial sub-agent confirmed`); user has confirmed scope + content.
+Non-empty `epics/{epic-folder}/features/{feature-folder}/stories/{ID}-{slug}-{brief}/ticket.md` with ticket metadata + body intake area populated (scope one-liner, draft-mode seeds, deepened by dialog) + spec structure drafted; `## Open Questions` empty; other template sections (Summary, Description, Acceptance Criteria, etc.) left as template placeholders (Engineer flow's responsibility); nesting reflects the input mode (draft's parent in Mode A, resolved or default parent in Mode B/C); `shamt-state/active-story` and `shamt-state/active-feature` pointers written (Mode B/C only); **two-line footer block stamped** (`---` + `Validated {YYYY-MM-DD} — N rounds, 1 adversarial sub-agent confirmed`); user has confirmed scope + content.
 
 ---
 

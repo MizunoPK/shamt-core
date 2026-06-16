@@ -4,7 +4,7 @@ description: Phase 3 of the PO flow — flesh out a feature (stub from /pe2-deco
 
 # /pf1-define
 
-**Purpose:** Run Phase 3 of the PO flow at the **Feature** altitude. Resolve a slug, branch on three input modes (flesh out an existing stub written by `/pe2-decompose`, create a standalone feature from scratch, or seed from a tracker work-item payload), drive an open-questions iterative dialog over `Goal`, `Success Criteria`, and `Scope / Non-Scope`, and produce the feature under its parent epic — `epics/{parent-epic-folder}/features/{ID}-{slug}-{brief}/feature.md` (the parent epic is the stub's epic, or the Tech Stories epic for standalone work). Leaves `Target Stories` and `Sequencing & Parallelization` empty — `/pf2-decompose` fills them later.
+**Purpose:** Run Phase 3 of the PO flow at the **Feature** altitude. Resolve a slug, branch on three input modes (flesh out an existing stub written by `/pe2-decompose`, create a standalone feature from scratch, or seed from a tracker work-item payload), drive an open-questions iterative dialog over `Goal`, `Success Criteria`, and `Scope / Non-Scope`, and produce the feature under its parent epic — `epics/{epic-folder}/features/{ID}-{slug}-{brief}/feature.md` (the parent epic is the stub's epic, or the Tech Stories epic for standalone work). Leaves `Target Stories` and `Sequencing & Parallelization` empty — `/pf2-decompose` fills them later.
 
 **Recommended model:** Reasoning (Opus). Feature drafting is a design / multi-dimensional scoping task — same justification as `/pe1-define`. See [`reference/model_selection.md`](../../../../reference/model_selection.md).
 
@@ -66,7 +66,7 @@ Apply the global slug-resolution rule from [`SHAMT_RULES.template.md`](../../../
 Applies only when the slug does not yet resolve to a folder (i.e., Mode A is ruled out and we are heading into Mode B or Mode C):
 
 1. Ask the user for a 2–4-word **brief description** of the feature, or derive it from the tracker payload's title once fetched (re-propose after Step 4 Mode C).
-2. **For a new (non-stub) feature, allocate a ticket ID** `T{N}` (= `max` of the `^T([0-9]+)-` prefixes across `epics/`, `features/`, `stories/`, + 1 — per **# Ticket IDs**) and propose `features/{ID}-{slug}-{brief-description-kebab}/`, populating the `**Ticket ID:** T{N}` header. **Mode A (stub):** the folder + its ID already exist — reuse them, do **not** allocate or re-propose. Ask the user to confirm before creating directories. Lowercase, hyphen-separated.
+2. **For a new (non-stub) feature, allocate a ticket ID** `T{N}` (= `max` of the `^T([0-9]+)-` prefixes across `epics/`, `features/`, `stories/`, + 1 — per **# Ticket IDs**) and propose `epics/{epic-folder}/features/{ID}-{slug}-{brief-description-kebab}/`, populating the `**Ticket ID:** T{N}` header. **Mode A (stub):** the folder + its ID already exist — reuse them, do **not** allocate or re-propose. Ask the user to confirm before creating directories. Lowercase, hyphen-separated.
 3. On confirmation, create the folder.
 
 ### Step 4 — Branch on input mode
@@ -93,8 +93,8 @@ The folder exists; `feature.md` already carries a populated `## Goal` from `/pe2
 
 The folder did not exist before Step 3. There is no explicit parent epic input from the user.
 
-1. Write `epics/{parent-epic-folder}/features/{ID}-{slug}-{brief}/feature.md` from [`templates/feature.template.md`](../../../../templates/feature.template.md). After writing feature.md, write its path to `shamt-state/active-feature` (and `shamt-state/active-epic` for its parent epic when nested).
-2. **Mode B has no top-level home** — a standalone feature is created under the standing Tech Stories epic (`epics/{parent-epic-folder}/features/{ID}-{slug}-{brief}/feature.md` (here `{parent-epic-folder}` = the Tech Stories epic), per #15). There is no blank-parent / top-level feature. (If #15 has not landed alongside, the executor halts per the index's sequencing precondition.)
+1. Write `epics/{epic-folder}/features/{ID}-{slug}-{brief}/feature.md` from [`templates/feature.template.md`](../../../../templates/feature.template.md). After writing feature.md, write its path to `shamt-state/active-feature` (and `shamt-state/active-epic` for its parent epic when nested).
+2. **Mode B has no top-level home** — a standalone feature is created under the standing Tech Stories epic (`epics/{epic-folder}/features/{ID}-{slug}-{brief}/feature.md` (here `{epic-folder}` = the Tech Stories epic), per #15). There is no blank-parent / top-level feature. (If #15 has not landed alongside, the executor halts per the index's sequencing precondition.)
 3. Proceed to Step 5 (architecture consult), then Step 6 (open-questions dialog) to populate `Goal`, `Success Criteria`, and `Scope / Non-Scope` from scratch.
 4. Leave `Target Stories` and `Sequencing & Parallelization` empty.
 5. **No `## All Remaining Fields` appendix** — there was no tracker fetch in this mode.
@@ -153,7 +153,7 @@ After writing the folder and feature:
 
 Verify before exiting:
 
-- [ ] `epics/{parent-epic-folder}/features/{ID}-{slug}-{brief}/feature.md` exists and is non-empty (nested).
+- [ ] `epics/{epic-folder}/features/{ID}-{slug}-{brief}/feature.md` exists and is non-empty (nested).
 - [ ] `## Open Questions` is empty (every question resolved, with answers folded into the artifact).
 - [ ] `Goal`, `Success Criteria`, and `Scope / Non-Scope` are drafted.
 - [ ] `Target Stories` and `Sequencing & Parallelization` are **left empty** (owned by `/pf2-decompose`).
@@ -172,7 +172,7 @@ Surface — but do **not** auto-invoke — the next command:
 
 ```
 /clear
-/validate-artifact epics/{parent-epic-folder}/features/{ID}-{slug}-{brief}/feature.md
+/validate-artifact epics/{epic-folder}/features/{ID}-{slug}-{brief}/feature.md
 ```
 
 After validation appends the footer, `/pf2-decompose {slug}` can run. This command stays independently runnable by a fresh agent off on-disk state per Principle 1 — chaining validation here would couple the two phases.
@@ -185,7 +185,7 @@ When the fetch succeeds, raw payload data is preserved inline in `feature.md`'s 
 
 ## Exit criteria
 
-- `features/{ID}-{slug}-{brief}/feature.md` exists, is non-empty, and has `Goal`, `Success Criteria`, `Scope / Non-Scope` drafted.
+- `epics/{epic-folder}/features/{ID}-{slug}-{brief}/feature.md` (nested) exists, is non-empty, and has `Goal`, `Success Criteria`, `Scope / Non-Scope` drafted.
 - `Target Stories` and `Sequencing & Parallelization` remain empty (decomposition output).
 - `## Open Questions` is empty.
 - Parentage is the folder path; nesting is determined by the input mode: stub's parent (Mode A), Tech Stories epic (Mode B), or tracker-matched epic or Tech Stories (Mode C).

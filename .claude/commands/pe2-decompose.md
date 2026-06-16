@@ -151,7 +151,7 @@ The left column is the slug as it appeared in the prior `Decomposed …` line; t
 
 Verify before exiting:
 
-- [ ] N feature-stub folders exist at `features/{ID}-{feature-slug}-{brief}/` with `feature.md` files.
+- [ ] N feature-stub folders exist at `epics/{epic-folder}/features/{ID}-{feature-slug}-{brief}/` (nested) with `feature.md` files.
 - [ ] **New stubs** (per Step 3 partition; and every stub on first decomposition) carry `## Goal`, a `## Scope / Non-Scope` boundary, and a `## Decomposition Context` breadth section (the parent epic is the folder path), with the depth sections (`## Success Criteria` / `## Open Questions`) empty.
 - [ ] **Kept stubs** (re-decomposition only) are preserved unchanged from before this invocation — any user work inside (Open Questions / Success Criteria / Target Stories / Sequencing) survives untouched. The depth-sections-empty rule does not apply to Kept stubs.
 - [ ] Parent epic's `## Target Features` lists each stub with its one-liner.

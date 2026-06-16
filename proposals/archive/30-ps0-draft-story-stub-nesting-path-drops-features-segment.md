@@ -1,7 +1,7 @@
 # Proposal: ps0-draft-story-stub-nesting-path-drops-features-segment
 
 **Created:** 2026-06-14
-**Status:** Draft
+**Status:** Implemented
 **Number:** 30
 **Proposed by:**
 **Project context:**
@@ -10,7 +10,7 @@
 
 ## Problem
 
-`/ps0-draft` (and its mirror skill) write a new story-ticket stub to a path that **drops the `features/` segment** of the canonical nested PO work tree. The command's write/exit path uses a single placeholder `epics/{parent-feature-folder}/stories/{ID}-{story-slug}-{brief}/` — making the feature folder appear as a *direct child of `epics/`*. But a feature folder is never a direct child of `epics/`: it lives at `epics/{epic-folder}/features/{feature-folder}/`, and a story therefore lives at `epics/{epic-folder}/features/{feature-folder}/stories/{ID}-…`. The single `{parent-feature-folder}` placeholder collapses **two** real path levels (`{epic-folder}/features/{feature-folder}`) into one, so a literal read points story stubs at the wrong place. This directly contradicts the stub shape `/ps0-draft` *explicitly claims to mirror* — `/pf2-decompose`, which writes `epics/{epic-folder}/features/{feature-folder}/stories/{ID}-…` (`host/templates/claude/commands/pf2-decompose.md` line 131, exit-gate line 177) — and `/e8-finalize-story`'s Tech-story archive path `epics/{tech-stories-folder}/features/{bugs|quick-wins}/stories/…` (`host/templates/claude/commands/e8-finalize-story.md` line 70). `/ps0-draft` Step 1 already *resolves* the parent feature at the full nested depth correctly; only the write/exit path placeholder is wrong. Introduced by proposal #26 (the PO grid reorg, commit `499acf6`) when `/ps0-draft` absorbed the former Tech Stories fast-path; the collapse slipped past the plan.
+`/ps0-draft` (and its mirror skill) write a new story-ticket stub to a path that **drops the `features/` segment** of the canonical nested PO work tree. The command's write/exit path uses a single placeholder `epics/{parent-feature-folder}/stories/{ID}-{story-slug}-{brief}/` — making the feature folder appear as a *direct child of `epics/`*. But a feature folder is never a direct child of `epics/`: it lives at `epics/{epic-folder}/features/{feature-folder}/`, and a story therefore lives at `epics/{epic-folder}/features/{feature-folder}/stories/{ID}-…`. The single `{parent-feature-folder}` placeholder collapses **two** real path levels (`{epic-folder}/features/{feature-folder}`) into one, so a literal read points story stubs at the wrong place. This directly contradicts the stub shape `/ps0-draft` *explicitly claims to mirror* — `/pf2-decompose`, which spells the full nested form `epics/{epic-folder}/features/{feature-folder}/stories/{ID}-…` at its Purpose line 7 and exit-gate line 177 (its Step 8 write at line 131 uses the structurally-correct but vocabulary-divergent `{e}` abbreviation, which row 7 normalizes) — and `/e8-finalize-story`'s Tech-story archive path `epics/{tech-stories-folder}/features/{bugs|quick-wins}/stories/…` (`host/templates/claude/commands/e8-finalize-story.md` line 70). `/ps0-draft` Step 1 already *resolves* the parent feature at the full nested depth correctly; only the write/exit path placeholder is wrong. Introduced by proposal #26 (the PO grid reorg, commit `499acf6`) when `/ps0-draft` absorbed the former Tech Stories fast-path; the collapse slipped past the plan.
 
 The true root cause sits one altitude deeper than the five `/ps0-draft` occurrences the original capture named (adversarial root-cause diagnosis, Opus `root-cause-diagnoser` + Haiku `validation-checker` confirmation). Two findings reframe the scope:
 
@@ -85,3 +85,5 @@ _(none — all resolved; see Resolved Questions.)_
 - ~~Q: Where should the f5-audit process gap (D2/D9/D7 don't check path-composition consistency) be addressed?~~ → A: **Separate f0 capture** — keep #30 scoped to the path correction; capture the audit-detection improvement as its own f0 draft (`f5-audit-add-path-composition-check`). The audit's own logic is a different surface and merits a focused proposal.
 
 ---
+
+Validated 2026-06-15 — 2 rounds, 1 adversarial sub-agent confirmed
