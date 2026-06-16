@@ -24,21 +24,7 @@ Mirrors the `/e5-execute-tests {slug}` slash command. Same canonical body, two h
 
 ## Protocol
 
-Follow the canonical `/e5-execute-tests` command body verbatim — see [`commands/e5-execute-tests.md`](../../commands/e5-execute-tests.md). Summary:
-
-1. **Agent-as-user execution (always)** — hand off to the `user-simulator` persona ([`agents/user-simulator.md`](../../agents/user-simulator.md)); it drives the project as a user per `.shamt-core/project-specific-files/TESTING_STANDARDS.md`, writes `stories/{slug}/agent_test_session.md`, and reports `Session PASS` / `Session BLOCKED: …`. On `Session BLOCKED`, route the failing scenario through `/e7-resolve-feedback {slug}` as a feedback item (required phase-attributed root-cause), fix, and re-invoke `/e5-execute-tests {slug}`. If `TESTING_STANDARDS.md` declares no automated suites, this is the whole required pass.
-2. **Resolve** — apply the active-artifact pointer; confirm the active spec, plan, and testing artifact (full `testing_plan.md` or the spec's `### Quick path inline test checklist`) have validation footers. Halt if Build has not run.
-3. **Automated suites (when `TESTING_STANDARDS.md` declares them) — hand off to the `test-executor`** — Haiku persona ([`agents/test-executor.md`](../../agents/test-executor.md)). The executor runs each step's exact invocation, logs `PASS / FAIL / BLOCKED / PENDING` into the artifact's `## Results Log`, and fills `## Failure Diagnosis` on the first failure.
-4. **Monitor and route** —
-   - `All steps passed. Results logged.` → continue.
-   - `Session BLOCKED` (agent-as-user FAIL) → route through `/e7-resolve-feedback {slug}` (required phase-attributed root-cause); fix; re-invoke this command.
-   - `Step N failed: Story bug` → re-engage the architect/builder loop via `/e4-execute-plan` or an inline Quick-path fix; re-invoke this command.
-   - `Step N failed: Test bug` → patch via `/e3b-write-testing-plan`; re-validate; re-invoke.
-   - `Step N failed: Spec gap` → invoke the **Re-baseline Protocol**; do not patch the spec in place.
-   - `Plan defect / ambiguous` → patch via `/e3b-write-testing-plan`; re-validate; re-invoke.
-   - `Environment blocked` → resolve externally; re-invoke. **No "document and skip" disposition** — Phase 5 blocks until every step passes.
-5. **Post-execution** — walk `## Results Log`: every row must read `PASS`. Confirm `## Failure Diagnosis` rows have `Re-run result: PASS`. Run any `## Shared Teardown`.
-6. **Exit** — suggest `/clear` + `/e6-review-changes {slug}` (Phase 6). Suggest `/e5b-write-manual-testing-plan {slug}` for scope automated tests cannot cover.
+Follow the canonical `/e5-execute-tests` command body verbatim — see [`commands/e5-execute-tests.md`](../../commands/e5-execute-tests.md).
 
 ## Recommended models
 

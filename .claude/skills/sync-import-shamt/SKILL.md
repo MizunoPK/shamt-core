@@ -26,14 +26,7 @@ Mirrors the `/sync-import-shamt` slash command. Same canonical body, two host wi
 
 ## Protocol
 
-Follow the canonical `/sync-import-shamt` command body verbatim — see [`commands/sync-import-shamt.md`](../../commands/sync-import-shamt.md). Summary:
-
-1. **Resolve script** — `.shamt-core/import-shamt.sh` must exist under the cwd and be executable; if not, halt.
-2. **Working tree check** — if the target is a git repo and `.shamt-core/` or `.claude/` has uncommitted changes, ask via `AskUserQuestion`: commit-first / proceed-anyway / cancel. Skip the check on non-git targets.
-3. **Run** `bash .shamt-core/import-shamt.sh [--target {target_dir}]`. The script handles the clone (git URL) or local-copy (filesystem path), syncs master's sync set with overwrite, preserves local non-sync-set files (warn), auto-moves already-merged proposals, and runs regen at the end.
-4. **Surface results** — the script logs per-file lines only for *new* and *updated* paths (not unchanged) and prints its own end-of-run structured summary (new / updated / unchanged / preserved / proposals-moved). Reproduce the summary verbatim in chat, then list each `WARN: preserving local file not in master sync set: …` and each `moved .shamt-core/proposals/{slug}.md → .shamt-core/proposals/already-merged/…` line so the user can act on each.
-5. **Surface regen output** — apply the same surface rules as `/f4-regen-framework` for `wrote` / `removed` / `unchanged` / `WARN:` lines.
-6. **Suggest follow-ups** — `git diff` review, optional `/f4-regen-framework` for an independent drift check, optional `/f5-audit-framework` for a deeper post-import sweep.
+Follow the canonical `/sync-import-shamt` command body verbatim — see [`commands/sync-import-shamt.md`](../../commands/sync-import-shamt.md).
 
 ## Recommended model
 

@@ -27,20 +27,7 @@ Mirrors the `/e5b-write-manual-testing-plan {slug}` slash command. Same canonica
 
 ## Protocol
 
-Follow the canonical `/e5b-write-manual-testing-plan` command body verbatim — see [`commands/e5b-write-manual-testing-plan.md`](../../commands/e5b-write-manual-testing-plan.md). Resolve the story folder per `templates/SHAMT_RULES.template.md` §PO-tree resolution (tree-wide glob + legacy-flat fallback); `stories/{slug}/` below denotes that resolved folder. Summary:
-
-1. **Resolve mode** — apply the active-artifact pointer; pick **Author / Patch / Re-validate / Author-continue** based on whether the artifact exists and whether the footer is present.
-2. **Read spec / plan / context / testing_plan** — extract scope, requirements, Review Prevention Gates, verification, file manifest, and what automated tests already cover (so the `## Coverage Note` can delineate cleanly).
-3. **Draft `manual_test_plan.md`** from [`templates/manual_test_plan.template.md`](../../../../../templates/manual_test_plan.template.md). Required sections: header metadata, `## Open Questions`, `## Setup`, `## Scenarios` (numbered; each with Starting state / Steps / Expected outcome / Pass-fail criterion), `## Teardown`, `## Coverage Note`. Apply the **open-questions iterative dialog** (Principle 2) — one question at a time via `AskUserQuestion`, code-research first.
-4. **Inline validation loop (4 dimensions)** — runs here, not via `/validate-artifact`:
-   - **Scope coverage** (gap = HIGH)
-   - **Step reproducibility** (vague step = MEDIUM)
-   - **Observable pass/fail** ("looks right" = HIGH)
-   - **Setup completeness** (missing creds/data = HIGH)
-   Counter logic: clean = 0 issues or 1 LOW fixed; not clean = 2+ LOW or any MEDIUM/HIGH/CRITICAL. **Exit at `consecutive_clean = 1`** — one primary clean round (standard Pattern 1 exit per `/validate-artifact`), then the Standard-path adversarial sub-agent.
-5. **Adversarial sub-agent** — on Standard path (or Quick when any HIGH+ was found), spawn `validation-checker` Haiku per [`agents/validation-checker.md`](../../agents/validation-checker.md). No one-LOW allowance — any finding resets to 0.
-6. **Footer** — `Validated YYYY-MM-DD — N rounds, 1 adversarial sub-agent confirmed` (Standard) or `Validated YYYY-MM-DD — N rounds (Quick path)` (Quick no-sub-agent). Update `active_artifacts.md` when present.
-7. **Exit** — report mode + path + final dimension counts; link the artifact. Suggest the next phase (`/e6-review-changes` or `/e7-resolve-feedback`).
+Follow the canonical `/e5b-write-manual-testing-plan` command body verbatim — see [`commands/e5b-write-manual-testing-plan.md`](../../commands/e5b-write-manual-testing-plan.md). Resolve the story folder per `templates/SHAMT_RULES.template.md` §PO-tree resolution (tree-wide glob + legacy-flat fallback); `stories/{slug}/` below denotes that resolved folder.
 
 ## Recommended models
 

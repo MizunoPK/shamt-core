@@ -34,7 +34,7 @@ The audit exists to keep the framework **complete** (it covers what it should, w
 
 | Dim | Name | What "consistent" means here |
 |-----|------|------------------------------|
-| D2 | Cross-doc consistency | The rules file and the host body that implements it agree on steps, exit criteria, and naming. (Rules ↔ host.) |
+| D2 | Cross-doc consistency | The rules file and the host body that implements it agree on steps, exit criteria, and naming. (Rules ↔ host.) **Command → Skill Protocol pointer rule:** a `host/templates/claude/skills/{name}/SKILL.md` `## Protocol` section **is** the canonical "Follow the canonical `/{name}` command body verbatim — see `commands/{name}.md`" pointer and **must not** re-introduce a numbered step-by-step paraphrase of the command body (regen copies `SKILL.md` verbatim and cannot keep such a paraphrase in sync, so it is a drift class). D2 flags any SKILL `## Protocol` that carries a numbered step paraphrase as a finding — pointer form is required, not merely a "faithful" summary. |
 | D7 | Terminology consistency | One canonical term per concept across all canonical docs (including the managed shell-script comments / validation-footer lines under `host/templates/claude/` and `scripts/`). |
 | D9 | Duplication / contradiction | No two canonical files give conflicting instructions for the same protocol. (Host ↔ host, reference ↔ reference — the contradiction neither side of which is the rules file; that case is D2's.) |
 | D11 | Scope-clarity | Each command/skill states its scope unambiguously near its heading; no leftover migration notes or stale "(was X)" parentheticals inline in the instruction path (including the managed shell-script comments / validation-footer lines under `host/templates/claude/` and `scripts/`). |

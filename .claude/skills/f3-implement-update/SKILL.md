@@ -26,15 +26,7 @@ Mirrors the `/f3-implement-update {slug}` slash command. Same canonical body, tw
 
 ## Protocol
 
-Follow the canonical `/f3-implement-update` command body verbatim — see [`commands/f3-implement-update.md`](../../commands/f3-implement-update.md). Summary:
-
-1. **Preflight** — resolve the proposal exact-then-glob (`proposals/{slug}.md`, then `proposals/*-{slug}.md` for the master-side `{NN}-` prefix); confirm it has a validation footer; confirm the companion `{NN}-{slug}_PLAN.md` (when present) has one; halt if `proposals/archive/{slug}.md` (or `archive/*-{slug}.md`) exists; unrelated working-tree state (ad-hoc proposal captures or other in-progress work) is accepted and rides the landing — never a halt.
-2. **Path selection** — inline (≤10 file ops, no plan) or architect/builder (plan present, handoff to `plan-executor`). State the choice in one line. **Then create the proposal branch** `proposal/{NN}-{slug}` (`proposal/{slug}` grandfathered) from the base branch — inline path creates it directly (halt if it exists); architect/builder path lets `plan-executor` create it from the plan's pre-execution checklist. Branch creation moved here from f1/sync-triage; it is not a commit.
-3. **Hard rule — canonical-only**: enumerate every path the proposal/plan will touch. Halt if any falls under `.claude/` or any non-canonical path not justified in the proposal. Canonical roots: `shamt-core/templates/`, `shamt-core/reference/`, `shamt-core/host/templates/claude/`, `shamt-core/scripts/`, `shamt-core/proposals/`, and the root-level canonical docs (`CLAUDE.md`, `README.md`, `shamt-config.example.json`).
-4. **Apply edits** — inline: do each operation, verify after each row. Architect/builder: spawn `plan-executor` via the Task tool; monitor for `All steps completed. Verification passed.` / `Step [N] failed:` / `Step [N] is ambiguous:` / `Plan defect at Step [N]:`. For phase-decomposed plans, one phase at a time in deploy order.
-5. **Post-build verification (architect/builder path)** — after the builder's `All steps completed. Verification passed.`, the architect **independently** runs the plan's post-execution `## Verification` section (for a phase-decomposed plan, the *index* file's whole-plan `## Verification (post-execution, whole plan)` section) — the cross-phase invariants the builder, handed one phase, cannot own. Any failure is a `Step failed`, never delegated back to `plan-executor`. (Inline path: no plan, no builder — proceed straight to the diff-coverage gate.) Mirrors `/e4-execute-plan` Step 4.
-6. **Diff coverage gate** — `git status` + `git diff --stat`. Every Proposed Changes row covered; no edits outside canonical roots; no edits in `.claude/`.
-7. **Suggest next phase** — `/clear` + `/f4-regen-framework`.
+Follow the canonical `/f3-implement-update` command body verbatim — see [`commands/f3-implement-update.md`](../../commands/f3-implement-update.md).
 
 ## Recommended models
 

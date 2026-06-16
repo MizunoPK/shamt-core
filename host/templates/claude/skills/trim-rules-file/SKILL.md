@@ -16,13 +16,7 @@ Mirrors the `/trim-rules-file [slug]` slash command. Same canonical body, two ho
 
 ## Protocol
 
-Follow the canonical `/trim-rules-file` command body verbatim — see [`commands/trim-rules-file.md`](../../commands/trim-rules-file.md). Summary:
-
-1. **Master / self-host only** — the rules file is master-owned; halt in a child and redirect to `/f0-draft-proposal` → `/f1-propose-update` → `/sync-submit-proposal`.
-2. **Measure** — `wc -m templates/SHAMT_RULES.template.md` vs `rules_size_budget_chars` (fallback 40000); target ~75% of budget (~30000).
-3. **Analyze** — find concrete reductions: duplication/repetition, extraction to `reference/`, rephrase/tighten, relocate to command/skill bodies, other improvements. Record location, category, change, char delta per candidate.
-4. **Author a proposal draft** in the `/f0-draft-proposal` file shape (so `/f1-propose-update` ingests it), with the cut list + running total toward target in Scratch Notes. **Quality guardrail:** every cut is an extraction / rephrase / relocation — never a silent deletion of a normative rule; the draft preserves the full rule set and names where each touched rule now lives.
-5. **Exit** — report draft path + current/target chars; suggest `/f1-propose-update {slug}`. Does **not** edit `SHAMT_RULES.template.md`.
+Follow the canonical `/trim-rules-file` command body verbatim — see [`commands/trim-rules-file.md`](../../commands/trim-rules-file.md).
 
 ## Recommended model
 

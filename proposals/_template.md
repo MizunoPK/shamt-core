@@ -148,7 +148,7 @@ For purely additive changes (new file, new section, no edits to existing canonic
 Dimension hints for the Phase 2 validation loop (`/validate-artifact proposals/{slug}.md`). Tell the validator where to look hardest.
 
 - **Problem clarity** — [What in the Problem section is most likely to be misread? Any terminology overlap with existing v2 concepts?]
-- **Change-list completeness** — [Files that are easy to forget but must be edited together with the listed ones (e.g., the rule changes but the template referenced by the rule does not; the command changes but the mirrored skill does not).]
+- **Change-list completeness** — [Files that are easy to forget but must be edited together with the listed ones (e.g., the rule changes but the template referenced by the rule does not; the reference doc changes but the rule that points at it does not). Note: a `skills/{name}/SKILL.md` `## Protocol` **is** the command-body pointer, never a step-by-step paraphrase (the **Command → Skill Protocol pointer rule** at the D2 entry in `reference/audit_dimensions.md`) — so a command-step edit needs **no** paired SKILL summary edit; conversely, a Proposed Changes row must never (re-)introduce a numbered paraphrase into a SKILL Protocol.]
 - **Risk coverage** — [Specific scenarios the risks list might miss.]
 - **Rollback feasibility** — [Anything in the change that would make revert harder than the rollback plan describes — e.g., a destructive DELETE, a MOVE that loses git history.]
 - **Affected surfaces** — [Which Shamt surfaces does this touch: rules, references, templates, commands, skills, personas, scripts? Any cross-doc consistency to verify.]

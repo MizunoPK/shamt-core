@@ -24,15 +24,7 @@ Mirrors the `/e2-define-spec {slug}` slash command. Same canonical body, two hos
 
 ## Protocol
 
-Follow the canonical `/e2-define-spec` command body verbatim — see [`commands/e2-define-spec.md`](../../commands/e2-define-spec.md). Resolve the story folder per `templates/SHAMT_RULES.template.md` §PO-tree resolution (tree-wide glob + legacy-flat fallback); `stories/{slug}/` below denotes that resolved folder. Summary:
-
-1. **Ingest the ticket** (`stories/{slug}/ticket.md`). Halt if missing or empty.
-2. **Targeted research** — grep referenced files; read `.shamt-core/project-specific-files/ARCHITECTURE.md` and `.shamt-core/project-specific-files/CODING_STANDARDS.md`; capture findings (Standard: `context.md`; Quick: `spec.md` Evidence). Populate the review-prevention risk inventory using [`reference/pr_review_prevention.md`](../../../../../reference/pr_review_prevention.md); full required-captures detail in [`reference/spec_protocol_reference.md`](../../../../../reference/spec_protocol_reference.md).
-3. **Draft skeletons** from [`templates/spec.template.md`](../../../../../templates/spec.template.md) (and [`templates/context.template.md`](../../../../../templates/context.template.md) on Standard).
-4. **Design dialog (Gate 2a)** — present 1–3 options inline with pros/cons (each option needs its own pros/cons; no shared tradeoff paragraph). Apply the **open-questions iterative dialog** principle — surface each question to the user one at a time via `AskUserQuestion`, update the artifact, repeat. Code-research every question first.
-5. **Flesh out** — record the agreed approach. Required sections: Review Prevention Gates, Database Schema Changes (when applicable), Test Strategy (required), Key Design Decisions.
-6. **Validation** — invoke `/validate-artifact` on the active artifact(s). Standard: spec+context pair. Quick: spec only (single primary pass unless risk-triggered).
-7. **Gate 2b approval** — present the validated spec; wait for explicit user approval. Suggest `/clear` + `/e3-plan-implementation {slug}` (Standard) or direct Build (Quick).
+Follow the canonical `/e2-define-spec` command body verbatim — see [`commands/e2-define-spec.md`](../../commands/e2-define-spec.md). Resolve the story folder per `templates/SHAMT_RULES.template.md` §PO-tree resolution (tree-wide glob + legacy-flat fallback); `stories/{slug}/` below denotes that resolved folder.
 
 ## Recommended models
 

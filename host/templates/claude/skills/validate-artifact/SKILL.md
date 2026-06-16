@@ -29,13 +29,7 @@ Mirrors the `/validate-artifact <path>` slash command. Same canonical body, two 
 
 ## Protocol
 
-Follow the canonical `/validate-artifact` command body verbatim — see [`commands/validate-artifact.md`](../../commands/validate-artifact.md). Summary:
-
-1. **Path selection** — Quick (single primary pass) vs Standard (primary clean + 1 sub-agent). Default to Standard for non-story artifacts and for any risk-triggered subject matter (auth, tenant, DB schema, new service, public API/event contract, multi-deploy ordering, irreversible deletes, payment / regulated / safety-critical).
-2. **Per round** — re-read the entire artifact fresh; identify issues against the dimension set (8 spec / 8 plan / 6 review / 5 general / 4 phase-index / 4 manual-test-plan); classify severity per Pattern 2 (borderline → higher); fix all issues; update `consecutive_clean`.
-3. **Exit check** — Quick: `consecutive_clean = 1` exits to footer. Standard / risk-triggered: `consecutive_clean = 1` triggers the `validation-checker` Haiku sub-agent (no one-LOW allowance — ANY finding resets).
-4. **Sub-agent** — spawn `validation-checker` with the artifact path, dimensions, and governing references. The sub-agent only replies `CONFIRMED: Zero issues found after adversarial review.` when it independently finds nothing.
-5. **Footer** — `Validated YYYY-MM-DD — N rounds, 1 adversarial sub-agent confirmed` (Standard) or `Validated YYYY-MM-DD — 1 round (Quick path)`. Append to both files in a spec/context pair.
+Follow the canonical `/validate-artifact` command body verbatim — see [`commands/validate-artifact.md`](../../commands/validate-artifact.md).
 
 ## Batch handoff (≥2 artifacts)
 

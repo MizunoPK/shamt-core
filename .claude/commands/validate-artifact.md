@@ -76,7 +76,7 @@ Pick the dimension set that matches the artifact. First check alignment with `.s
 | Code review (story-mode) | 7 dimensions — 6 review dimensions + Plan Alignment |
 | Code review (formal-mode) | 6 review dimensions |
 | Phase index file | 4 phase-index dimensions — Phase Coverage, Deploy Ordering, Cross-phase Dependencies, Completeness |
-| Framework-update proposal | general 5 dimensions + proposal-specific checks (affected surfaces, propagation plan, rollback path) |
+| Framework-update proposal | general 5 dimensions + proposal-specific checks (affected surfaces, propagation plan, rollback path); **flag any Proposed Changes row that would (re-)introduce a numbered step-by-step paraphrase into a `skills/{name}/SKILL.md` `## Protocol`** — SKILL Protocols must stay the command-body pointer form (see the **Command → Skill Protocol pointer rule** at the D2 entry in [`reference/audit_dimensions.md`](../../../../reference/audit_dimensions.md)) |
 | Any other Markdown artifact | general 5 dimensions |
 
 Apply each dimension's hard checks where listed in [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md) Pattern 1 (multi-option pros/cons; Open Questions cannot contain code-answerable file/function/column questions; review-prevention surface coverage; DB cross-service lineage trace; mechanical executability for plans; per-file-and-function fresh review for code reviews; tenant-A-to-tenant-B consideration; etc.).

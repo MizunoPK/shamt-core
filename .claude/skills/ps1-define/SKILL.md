@@ -29,21 +29,7 @@ Mirrors the `/ps1-define {slug} [--tracker={ado|github|local}]` slash command. S
 
 ## Protocol
 
-Follow the canonical `/ps1-define` command body verbatim — see [`commands/ps1-define.md`](../../commands/ps1-define.md). Summary:
-
-1. **Read configuration** — `.shamt-core/shamt-config.json` → `work_item_tracker`; honor `--tracker={ado|github|local}` override. Read the corresponding profile in [`reference/trackers/`](../../../../../reference/trackers/). The override only affects Mode C (no-op in Mode A and B).
-2. **Resolve `{slug}`** — resolve per `templates/SHAMT_RULES.template.md` §PO-tree resolution (tree-wide story glob) and legacy-flat fallback. Halt on multiple matches. On a one-match resolution, **inspect `ticket.md`** to decide Mode A vs. re-entry:
-   - Draft marker present (`**Status:** Draft (f0 — story-idea capture, unrefined)` + `## Scratch Notes (stage-0 capture)` section) → Mode A (ingest; seed from Scratch Notes).
-   - Depth sections drafted (a prior `/ps1-define` deep-dive ran) → re-entry. Confirm refetch / overwrite / extend / exit. **Preserve `**Ticket ID:**` header verbatim** regardless of branch; strip any prior `Validated …` footer when extending.
-3. **For new stories** (zero matches): ask the user for a 2–4-word brief description; propose and create `epics/{epic-folder}/features/{feature-folder}/stories/{ID}-{slug}-{brief}/`. Mode B nests under the parent feature; Mode C nests under matched or parent feature per tracker + slug shape.
-4. **Mode disambiguation order** (filesystem-first):
-   - **Mode A** — draft marker + Scratch Notes present. Seed from Scratch Notes. Deepen via open-questions dialog. On completion, **strip the marker + Scratch Notes** (f1-style ingestion).
-   - **Mode C** — no draft marker, but active profile supports Story AND slug parses to a tracker ID. Fetch the payload, apply field mapping, nest under matched epic (or default per tracker). **No `raw/` subfolder** — preserve fidelity inline in `## All Remaining Fields` appendix (above the eventual validation footer). Write `shamt-state/active-story` and `shamt-state/active-feature` pointers.
-   - **Mode B** — no draft marker, tracker doesn't apply. Create from active tracker's per-provider ticket template, nest under resolved or default parent feature. Write `shamt-state/active-story` and `shamt-state/active-feature` pointers.
-5. **Consult `.shamt-core/project-specific-files/ARCHITECTURE.md`** (advisory). Flag architectural impact inline when the story implies new service / boundary / data store / external integration.
-6. **Open-questions iterative dialog** ([Principle 2](../../../../../templates/SHAMT_RULES.template.md#principle-2-open-questions-iterative-dialog)) — surface each question one at a time, update the ticket, drain the section. Focus on scope, spec readiness, acceptance criteria — not implementation detail (that is `/e1-start-story`'s job). **Mode A: after the dialog, strip the marker + Scratch Notes.**
-7. **Inline Pattern-1 validation loop** — primary agent self-reviews `ticket.md` against Pattern-1 dimensions (per `templates/SHAMT_RULES.template.md` Pattern 1), then spawns one independent adversarial `validation-checker` sub-agent (Haiku tier) for Standard-path confirmation. **No one-LOW allowance** — any sub-agent finding resets and returns to primary. On clean + CONFIRMED, stamp the two-line footer (the `---` delimiter + `Validated {YYYY-MM-DD} — N rounds, 1 adversarial sub-agent confirmed` line). Loop mechanics and dimensions cited from sibling `validate-artifact.md` (Steps 1–8) — do not re-derive.
-8. **Exit** — on successful validation (footer stamped), suggest `/e1-start-story {slug}` (stub-aware) next. The `/e1-start-story` ready-ticket pickup branch keys on the `Validated …` footer's presence.
+Follow the canonical `/ps1-define` command body verbatim — see [`commands/ps1-define.md`](../../commands/ps1-define.md).
 
 ## Mode A (draft ingestion)
 

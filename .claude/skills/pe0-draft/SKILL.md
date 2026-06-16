@@ -24,12 +24,7 @@ Mirrors the `/pe0-draft {slug} [blurb]` slash command. Same canonical body, two 
 
 ## Protocol
 
-Follow the canonical `/pe0-draft` command body verbatim — see [`commands/pe0-draft.md`](../../commands/pe0-draft.md). Summary:
-
-1. **Resolve the target path** — confirm `epics/` exists. Apply slug-collision rule to detect a global collision. Record the slug.
-2. **Slug-collision rule — non-destructive, non-interactive** — never overwrite, never prompt. If `{slug}` is taken globally (per §PO-tree resolution), halt and ask for a different slug. (Epic slugs are user-chosen and globally unique, unlike `/f0-draft-proposal`'s numeric-suffix fallback — per the PO-flow design.)
-3. **Seed a bare-minimum pe0 draft** — allocate ticket ID (`max` across the tree + 1); ask for a 2–4-word brief; create `epics/{ID}-{slug}-{brief}/` and write `epic.md` with: H1; `**Ticket ID:** T{N}`; `**Status:** Draft (f0 — epic-idea capture, unrefined)` (the distinct marker); the banner line; a `## Scratch Notes (stage-0 capture)` section holding the blurb verbatim (or a fill-in prompt if no blurb). Leave formal Goal / Success Criteria / Scope / Target Features / Sequencing as template placeholders. **No** open-questions dialog, **no** change list, **no** validation footer — all deferred to `/pe1-define`.
-4. **Exit** — report the created path and slug. Suggest `/pe1-define {slug}` next.
+Follow the canonical `/pe0-draft` command body verbatim — see [`commands/pe0-draft.md`](../../commands/pe0-draft.md).
 
 ## Recommended model
 

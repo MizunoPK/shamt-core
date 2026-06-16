@@ -29,14 +29,7 @@ Mirrors the `/ps0-draft {feature-slug | bugs | quick-wins} [story-slug] [blurb]`
 
 ## Protocol
 
-Follow the canonical `/ps0-draft` command body verbatim — see [`commands/ps0-draft.md`](../../commands/ps0-draft.md). Summary:
-
-1. **Resolve the parent** — if `{parent-selector}` is `bugs` or `quick-wins`, resolve to the standing Tech Stories epic's feature (halt + direct to `import-shamt` if absent); otherwise resolve as a feature slug per §PO-tree resolution.
-2. **Slug-collision rule — non-destructive, non-interactive** — never overwrite, never prompt. If `{story-slug}` is taken globally (tree-wide story glob), halt and ask for a different slug. (Story slugs are user-chosen and globally unique, per the PO-flow design.)
-3. **Allocate ticket ID** (`max` across the tree + 1). Confirm or derive the story slug.
-4. **Seed the story stub** — read `work_item_tracker` from `.shamt-core/shamt-config.json`; select the active tracker's per-provider ticket template (ado / github / local / none); create `epics/{epic-folder}/features/{feature-folder}/stories/{ID}-{story-slug}-{brief}/` and write `ticket.md` with the **same core stub shape `/pf2-decompose` emits** (per its Step 8 stub-section contract): metadata block; body intake area populated with scope one-liner; `## Decomposition Context` ("none" or initial breadth bullets); all other sections (Summary, Description, Acceptance Criteria, Related Work, Comments, Update History, All Remaining Fields, Open Questions) left empty; `**Status:** Draft (f0 — story-idea capture, unrefined)` marker line (under `**Ticket ID:**`); a `## Scratch Notes (stage-0 capture)` section holding the blurb (the additive draft-only overlay `/ps1-define` strips). **No** validation footer.
-5. **Additively append** to the parent feature's `## Target Stories` section (feature-parent mode only; one line; **do NOT rewrite** the section wholesale). Tech-story mode has no append (standing features carry no decomposition list).
-6. **Exit** — report the created path and slug. Suggest `/ps1-define {story-slug}` next.
+Follow the canonical `/ps0-draft` command body verbatim — see [`commands/ps0-draft.md`](../../commands/ps0-draft.md).
 
 ## Two parent modes
 

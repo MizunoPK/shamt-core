@@ -24,19 +24,7 @@ Mirrors the `/e3b-write-testing-plan {slug}` slash command. Same canonical body,
 
 ## Protocol
 
-Follow the canonical `/e3b-write-testing-plan` command body verbatim — see [`commands/e3b-write-testing-plan.md`](../../commands/e3b-write-testing-plan.md). Summary:
-
-1. **No-op gate** — if `.shamt-core/project-specific-files/TESTING_STANDARDS.md` declares no automated suites, print one line and exit. Do not touch any file.
-2. **Read the spec's `## Test Strategy`** — extract test kinds, existing files, new files, conventions.
-
-Resolve the story folder per `templates/SHAMT_RULES.template.md` §PO-tree resolution (tree-wide glob + legacy-flat fallback); `stories/{slug}/` below denotes that resolved folder.
-
-3. **Decide artifact shape:**
-   - **Quick path + small scope** (≤5 steps **and** no new test file) → update the spec's inline `### Quick path inline test checklist`.
-   - **Quick path + larger scope** OR **Standard path** → create `stories/{slug}/testing_plan.md` from [`templates/testing_plan.template.md`](../../../../../templates/testing_plan.template.md).
-4. **Draft** — each step has an exact invocation and binary pass criterion; cross-reference `.shamt-core/project-specific-files/ARCHITECTURE.md` and `.shamt-core/project-specific-files/CODING_STANDARDS.md` for runner / file naming / fixture / assertion conventions. Apply the **open-questions iterative dialog** principle.
-5. **Validate** via `/validate-artifact stories/{slug}/testing_plan.md` (or re-validate `spec.md` when the inline checklist was used). Primary clean + 1 sub-agent confirmation (Standard default for plan validation). Footer.
-6. **Exit** — report shape produced; return control to caller (or suggest `/e5-execute-tests {slug}` after Build).
+Follow the canonical `/e3b-write-testing-plan` command body verbatim — see [`commands/e3b-write-testing-plan.md`](../../commands/e3b-write-testing-plan.md).
 
 ## Recommended models
 

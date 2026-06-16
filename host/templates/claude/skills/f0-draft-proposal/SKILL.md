@@ -30,12 +30,7 @@ Mirrors the `/f0-draft-proposal {slug} [blurb]` slash command. Same canonical bo
 
 ## Protocol
 
-Follow the canonical `/f0-draft-proposal` command body verbatim — see [`commands/f0-draft-proposal.md`](../../commands/f0-draft-proposal.md). Summary:
-
-1. **Resolve the target path** — prefer a top-level `proposals/` (master / self-host); otherwise `.shamt-core/proposals/` (child). Target is `{proposals-dir}/{slug}.md`.
-2. **Slug-collision rule — non-destructive, non-interactive** — never overwrite, never prompt. If `{slug}.md` exists in **any** state (active top level or the `archive/` / `rejected/` / `deferred/` / `submitted/` / `already-merged/` subfolders), append the lowest free numeric suffix (`{slug}-2`, `{slug}-3`, …). Report the final slug written. (Recognizing whether an *addressing* draft already exists for a finding is the **caller's** judgment — the audit reads `proposals/` before deciding to capture — not a mechanical check inside f0.)
-3. **Seed a bare-minimum f0 draft** — title; `Status: Draft (f0 — audit capture, unrefined)` (the distinct marker, not plain `Draft`); the banner line; a `## Scratch Notes (f0 capture)` section holding the `blurb` verbatim (implicated files mentioned informally if known). Leave the formal Proposed Changes table and Risks / Rollback / Validation Considerations as template placeholders. **No** open-questions dialog, **no** change list, **no** validation footer — all deferred to `/f1-propose-update`.
-4. **Exit** — report the created path and the final slug (including any collision suffix). Suggest `/f1-propose-update {final-slug}` next (then `/sync-submit-proposal {final-slug}` on a child). When invoked **by the audit**, print no user next-command suggestion — the audit reports the captured slug in its own loop output and continues.
+Follow the canonical `/f0-draft-proposal` command body verbatim — see [`commands/f0-draft-proposal.md`](../../commands/f0-draft-proposal.md).
 
 ## Recommended model
 

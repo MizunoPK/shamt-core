@@ -27,20 +27,7 @@ Mirrors the `/sync-triage-proposals` slash command. Same canonical body, two hos
 
 ## Protocol
 
-Follow the canonical `/sync-triage-proposals` command body verbatim — see [`commands/sync-triage-proposals.md`](../../commands/sync-triage-proposals.md). Summary:
-
-1. **Master-side check** — confirm `proposals/incoming/` exists at the cwd. (That folder is master's; child projects never have it. Both sides have `shamt-core/`, so its presence is not a master indicator.) Halt and direct to `/sync-submit-proposal` if invoked on a child. (The seven master-side framework-update phases that follow promote are: `/f1-propose-update` ▸ `/validate-artifact` ▸ optional `/f2-plan-update-implementation` ▸ `/f3-implement-update` ▸ `/f4-regen-framework` ▸ `/f5-audit-framework` ▸ `/f6-archive-proposal`.)
-2. **Enumerate** — list `proposals/incoming/*.md` in alphabetical order; report count.
-3. **Per file** —
-   - **Surface verbatim**: `Proposed by`, `Project context`, `Status`, the full Problem section, the full Proposed Changes table, the first 3 Risks, footer presence.
-   - **Compute slug**: extract `Proposed by:` from the body, verify `${basename%.md}` begins with `${Proposed by}-`, then strip that prefix; the remainder is the slug. Malformed cases (blank `Proposed by`, filename prefix doesn't match `Proposed by`, the stripped result is empty, OR the derived slug does not match `^[a-z0-9][a-z0-9._-]*$`) → surface options (reject / defer / promote-with-user-supplied-slug). Slug used in Step 2d depends on the chosen disposition: **promote-with-user-supplied-slug** → follow up with a second `AskUserQuestion` to capture the slug (validate `^[a-z0-9][a-z0-9._-]*$` — intentionally stricter than `init-shamt.sh`'s `project_name` regex `^[A-Za-z0-9._-]+$`; project names may be mixed-case identifiers, slugs are lowercase-kebab filesystem identifiers); **reject** or **defer** → fall back to `${basename%.md}` so the original filename is preserved in `proposals/rejected/{bare_basename}.md` or `proposals/deferred/{bare_basename}.md` for traceability. Malformed-case disposition is final: skip the well-formed disposition question and apply it directly in Step 2d.
-   - **Ask disposition** via `AskUserQuestion`: promote / reject / defer / skip.
-   - **Apply**:
-     - Promote → **assign the master-side number** (`max(existing NN across proposals/, archive/, deferred/, rejected/) + 1`, two-digit zero-padded, **re-read from disk per promote** so same-run promotes don't collide; same algorithm as `/f1-propose-update`), write the `{NN}-` prefix + `**Number:**` header, then `git mv` (or `mv`) to `proposals/{NN}-{slug}.md`. Halt on slug collision (`proposals/{slug}.md` or `*-{slug}.md`). **No branch** — branch creation is deferred to `/f3-implement-update`, so triage stays a pure router. State next command: `/clear` then `/validate-artifact proposals/{NN}-{slug}.md`.
-     - Reject → ask for a one-line rejection note; `mv` to `proposals/rejected/{slug}.md` and prepend `<!-- REJECTED YYYY-MM-DD by master triage: {note} -->`. Halt if destination exists.
-     - Defer → `mv` to `proposals/deferred/{slug}.md`. Halt if destination exists.
-     - Skip → leave in `incoming/`, continue.
-4. **Summary** — counts and next-command suggestion. One proposal promoted: the single `/clear` + `/validate-artifact proposals/{NN}-{slug}.md`. Two or more promoted (a batch): emit a **batch-validation handoff prompt** (recommended) filled with the promoted `proposals/{NN}-{slug}.md` paths per [`reference/batch_validation_handoff.md`](../../../../../reference/batch_validation_handoff.md), plus the sequential per-slug `/clear` + `/validate-artifact` list as the fallback. Same Pattern 1 rigor per proposal either way.
+Follow the canonical `/sync-triage-proposals` command body verbatim — see [`commands/sync-triage-proposals.md`](../../commands/sync-triage-proposals.md).
 
 ## Recommended model
 
