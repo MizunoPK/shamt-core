@@ -1,7 +1,7 @@
 # Shamt Rules
 
 **Version:** v2 (template)
-**Purpose:** Canonical agent rules: story workflow, validation, spec, code review, implementation planning, and the two cross-cutting design principles.
+**Purpose:** Canonical agent rules: story workflow, validation, spec, code review, implementation planning, and the three cross-cutting design principles.
 
 > This file is a **template** rendered into a child project's `CLAUDE.md` (or a managed section of it) at install or regen time. Edit only here, in `shamt-core/templates/`. Generated copies are overwritten; the canonical source is this file.
 
@@ -33,7 +33,7 @@ Core files:
 
 # Cross-Cutting Design Principles
 
-These two principles apply to **every** multi-phase flow and every artifact-generation flow Shamt defines.
+These three principles apply to **every** multi-phase flow and every artifact-generation flow Shamt defines.
 
 ## Principle 1: Phase-per-command + slug resumability
 
@@ -58,6 +58,15 @@ When an agent drafts a new artifact (spec, plan, proposal, epic, feature, story 
 5. **Never proceed on an assumption when a question exists.** If the answer changes the artifact, write it down. If the answer doesn't, record the resolution inline so future agents understand why the question was closable.
 
 Applies to every artifact-generation flow: Engineer-flow Spec / Plan / Review / Polish; PO-flow Epic / Feature / Story definition; framework-update proposals; any v2-original artifact.
+
+## Principle 3: Disk-authoritative cross-session work
+
+Shamt is multi-session and parallel by design: multiple agents author and update artifacts, run personas, and advance work concurrently (per the slug-resumability rule, items can be worked in any order across parallel sessions). The on-disk artifacts — not any one agent's conversation history — are the authoritative record of work performed.
+
+1. **Disk is the record; the session is not.** An agent reasons about what work has occurred from on-disk artifacts (proposals and their footers/banners, story folders, `feedback/`, `active_artifacts.md`, the archive/deferred/rejected folders) and from git history — never from the assumption that its own session observed everything.
+2. **Absence-from-session is not evidence of fabrication.** An agent must not infer that "I did not perform or observe X in this session" means "X never happened." A provenance claim recorded in an artifact (a validation footer, an f0 capture banner, a `Confirmed root cause (adversarial diagnosis — …)` line, a tracker attribution) is **presumed genuine** — a parallel session did real work the current session has no visibility into.
+3. **Verify by reading, never by destroying.** If a cross-session claim genuinely needs verification, the evidence is git history across branches, the cited artifact/folder, or the user — never silent deletion, revert, or rename-back of the artifact. (This is the belief the existing "never halt or revert on unrelated tree state" rules in `/f3-implement-update` and `/f6-archive-proposal` already depend on.)
+4. **This does not relax Pattern 1.** Pattern 1's adversarial validation still distrusts unsupported *claims about reality* (code, governing docs) and verifies them from evidence, and agents still never fabricate a claim of work they did not do. Session-absence is simply not the evidence Pattern 1 demands: distrusting a claim about the codebase is in scope; distrusting an artifact's cross-session **provenance** merely because this session didn't author it is not.
 
 ---
 
