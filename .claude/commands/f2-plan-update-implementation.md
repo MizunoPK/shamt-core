@@ -69,6 +69,11 @@ Write `proposals/{slug}_PLAN.md`. The plan reuses the **operation contracts** fr
 
 `plan-executor` (the Phase 4 builder) treats both omissions as N/A; see [`agents/plan-executor.md`](../agents/plan-executor.md) Pre-flight Step 2 and Post-execution Step 2.
 
+**Verification ownership — per-step vs. whole-plan / cross-phase invariant.** Split every verification by who can observe it, and place it where its owner will run it:
+
+- **Per-step verifications → `plan-executor` (the builder).** A check scoped to a single step's own output — `grep -F` for the replacement marker in the one file just edited, a file-existence check for a CREATE, a sibling-shape check. These live in the step block's **Verification:** line (and, for a phase-decomposed plan, inside the relevant phase file). The builder runs them per step and attests to them with `All steps completed. Verification passed.`
+- **Whole-plan / cross-phase invariants → the architect at `/f3` post-build.** A check that expresses a *global* invariant depending on more than one step's (or phase's) output — a whole-tree zero-match sweep (`grep -rnE '…' <roots>` must return zero), an expected footer/file count, a link-resolution sweep across all edited files. The builder handed a single phase file structurally cannot own these. They live in the plan's `## Verification (post-execution, whole plan)` section — **and for a phase-decomposed plan that section lives in the *index* file, not any phase file** — where the architect runs them independently at `/f3-implement-update` post-build (Step 3), never delegating them back to the builder.
+
 **Plan shape:**
 
 ```markdown
@@ -111,7 +116,9 @@ Write `proposals/{slug}_PLAN.md`. The plan reuses the **operation contracts** fr
 
 …
 
-## Verification (post-execution)
+## Verification (post-execution, whole plan)
+
+<!-- Whole-plan / cross-phase invariants — run by the architect at /f3-implement-update post-build (Step 3), never by the builder. For a phase-decomposed plan this section lives in the INDEX file, not any phase file. -->
 
 - [ ] Every row in the Proposed Changes table has a corresponding step.
 - [ ] Every CREATE file exists and matches the sibling shape where one was named.
@@ -131,6 +138,7 @@ triggers, etc.}
 - **No design judgment in steps.** Every EDIT has an exact locate string and exact replacement. Every CREATE has a concrete path and either a full initial content block or a named template/sibling with concrete deltas. Every DELETE has a justification. MOVE = paired CREATE + DELETE rows with verification between them.
 - **No `if / when / consider` branches.** Plan order encodes dependency ordering. Each step has a single deterministic outcome.
 - **Every step has a verification.** A step without a verification is a plan defect.
+- **Place each verification with its owner.** A *per-step* verification (scoped to that one step's output) lives in the step block and is the builder's to run. A *whole-plan / cross-phase invariant* (a zero-match sweep, an expected count, a link sweep — anything depending on more than one step's or phase's output) lives in the `## Verification (post-execution, whole plan)` section and is the **architect's** to run at `/f3` post-build — for a phase-decomposed plan it lives in the **index** file, never a phase file. Do not bury a cross-phase invariant inside one phase file's step verification: the builder handed that phase cannot observe the others' output, so it would go un-run.
 - **No generated-file edits.** The plan never touches `.claude/`. Regen (Phase 5) propagates canonical changes into `.claude/`.
 - **Phase decomposition** — if the plan would exceed ~1500 lines or a single Phase-4 session would compact, split it into `proposals/{slug}_PLAN_phase_1.md`, `_phase_2.md`, etc., plus an index file `{slug}_PLAN.md`. Each phase file is validated independently. Mirrors the [story-level phase decomposition rule](../../../../templates/SHAMT_RULES.template.md#principle-1-phase-per-command--slug-resumability) (Principle 1, single-session sizing constraint).
 

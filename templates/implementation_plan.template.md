@@ -113,6 +113,16 @@ No optional rows. If a path is not in this manifest, it must not be created or e
 
 ---
 
+## Verification (post-execution, whole plan)
+
+<!-- Cross-phase / whole-plan invariants ONLY — checks depending on more than one step's (or phase's) output: whole-tree zero-match sweeps, expected file/footer counts, link-resolution sweeps. Per-step verifications stay on each step's **Verification:** line above and are the builder's. -->
+
+**Owner: the architect, run at Phase 4 (Build) post-build** — `/e4-execute-plan` Step 4 (story altitude) / `/f3-implement-update` post-build (framework altitude). **Never the builder:** `plan-executor` is handed a single phase and cannot observe the other phases' output. **For a phase-decomposed plan this section lives in the *index* file, not any phase file**, and the architect runs it after the final phase reports `All steps completed. Verification passed.`
+
+- [ ] [Whole-tree zero-match sweep, expected count, or link sweep — the cross-phase invariant(s) this plan must satisfy, or "None" for a single-step plan with no global invariant.]
+
+---
+
 ## Notes
 
 [Optional: gotchas, constraints, implementation notes]

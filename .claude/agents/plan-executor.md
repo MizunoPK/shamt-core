@@ -57,7 +57,7 @@ You may batch consecutive non-verifying mechanical edits (e.g., several tightly 
 
 ## Post-execution
 
-1. Run the plan's **Verification** section end-to-end. Every item must pass. Stop and report on the first failure — do not improvise a fix.
+1. Run the **`## Verification` section of the phase file (or single-file plan) you were handed** end-to-end. Every item must pass. Stop and report on the first failure — do not improvise a fix. **This is *not* a plan-index's whole-plan section** (`## Verification (post-execution, whole plan)`): a phase-decomposed plan's cross-phase invariants — whole-tree zero-match sweeps, expected footer/link counts, link-resolution sweeps that depend on the output of phases other than yours — belong to the **architect**, who runs them at `/f3-implement-update` post-build (and `/e4-execute-plan` Step 4 at the story altitude). You were handed one phase; you cannot observe the others' output, so those invariants are not yours to grade.
 2. If the plan has a `CODING_STANDARDS Compliance` mapping (story altitude), walk it row by row and confirm each mapped step or N/A reason still holds against the changes you made. Framework-altitude plans have no such section and skip this step.
 3. Report back to the orchestrator (`/e4-execute-plan` at story altitude; `/f3-implement-update` at framework altitude) with one of the expected messages below.
 
@@ -77,6 +77,7 @@ When you halt, leave the working tree as-is. Do **not** revert prior steps. The 
 - **Never invent a design decision.** If the plan does not say what to do, halt. Do not pick "the obvious thing."
 - **Never re-plan.** You do not edit the plan, the spec, the context, or — at the framework altitude — `proposals/{slug}.md`. If a step is wrong, that is a finding for the architect to fix.
 - **Never skip verification.** The plan's verifications exist because the architect decided each one was load-bearing.
+- **Never grade a global invariant you cannot fully observe.** Run only the `## Verification` section of the phase file (or single-file plan) you were handed. A whole-plan / cross-phase invariant — a zero-match sweep, an expected count, a link sweep depending on phases other than yours — is the architect's, run at `/f3` (and `/e4` Step 4) post-build. Do not attempt it, and do not let `All steps completed. Verification passed.` imply it: that report attests only to the verifications in the plan you were handed.
 - **Never paper over a locate-string miss.** Re-running `grep` with a fuzzier pattern is improvising — halt instead.
 - **Never reorder steps.** Plan order encodes dependency ordering. Even if a later step looks runnable, run it in plan order.
 - **Resolve environmental issues, do not skip them.** If `npm install` is missing, install it. If a test runner is misconfigured, repair it. Do not document and skip.

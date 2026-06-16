@@ -106,7 +106,16 @@ Creating a branch is not a commit — the "No commits here" rule (Notes) still h
 
 3. For phase-decomposed plans, hand off **one phase at a time in deploy order**. Do not hand off `{slug}_PLAN_phase_2.md` until phase 1 has reported `All steps completed. Verification passed.`.
 
-### Step 3 — Diff coverage gate
+### Step 3 — Post-build verification (architect/builder path)
+
+After the builder reports `All steps completed. Verification passed.` (the final phase's report, for a phase-decomposed plan), the architect (this orchestrator) **independently** runs the plan's post-execution `## Verification` section — mirroring `/e4-execute-plan` Step 4:
+
+1. Walk the plan's post-execution `## Verification` section end-to-end. Every item must pass. **For a phase-decomposed plan this is the *index* file's whole-plan `## Verification (post-execution, whole plan)` section** — the cross-phase invariants (whole-tree zero-match sweeps, expected footer/link counts, link-resolution sweeps) that depend on more than one phase's output and that the builder, handed only its single phase file, structurally cannot own. Re-run each verification yourself rather than accepting the builder's report for it.
+2. Any failure here is a **`Step failed`** — diagnose, patch the plan and re-validate (or invoke the re-baseline protocol on the proposal), re-hand off. **Never** delegate the whole-plan verification back to `plan-executor`: the builder owns only the per-step / per-phase verifications inside the phase file it was handed (see [`agents/plan-executor.md`](../agents/plan-executor.md) Post-execution Step 1), and `plan-executor`'s `All steps completed. Verification passed.` attests only to those — never to the index's whole-plan section.
+
+(For the **inline path** there is no separate plan and no builder; the primary agent has already run each row's inline verification in Step 2 and proceeds directly to the diff-coverage gate.)
+
+### Step 4 — Diff coverage gate
 
 Walk the Proposed Changes table one final time. For each row, confirm the working-tree diff contains the change. Run `git status` and `git diff --stat` against the project root to make the diff visible. The exit gate is:
 
@@ -115,7 +124,7 @@ Walk the Proposed Changes table one final time. For each row, confirm the workin
 
 If any row is uncovered, treat it as a `Step failed` — diagnose. **Unrelated tree state is accepted** — ad-hoc proposal captures (new files under `proposals/`) or other in-progress work ride the landing and are **not** scope creep; never halt or revert on them. The **in-place amendment** path still applies to the distinct case where the agent's *own* work legitimately needs a canonical change not yet in the table (a genuinely-missing row): legitimize it via an **[in-place amendment](f1-propose-update.md#in-place-amendment)** (append the row for it, strip the proposal's prior footer, re-run `/validate-artifact`) rather than a full `/f1-propose-update` re-run.
 
-### Step 4 — Suggest the next phase
+### Step 5 — Suggest the next phase
 
 Suggest a context-clear and the next command:
 

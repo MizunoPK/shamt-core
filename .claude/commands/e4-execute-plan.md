@@ -88,7 +88,7 @@ The architect (this orchestrator) re-engages **only** on builder-reported failur
 
 After the builder reports completion:
 
-1. Walk the plan's `## Verification` section end-to-end. Every item must pass; re-run any verification the builder skipped or that needs orchestrator-side context (e.g., reading the rendered output of a CREATE step).
+1. Walk the plan's `## Verification` section end-to-end. Every item must pass; re-run any verification the builder skipped or that needs orchestrator-side context (e.g., reading the rendered output of a CREATE step). **For a phase-decomposed plan, this means the *index* file's whole-plan `## Verification (post-execution, whole plan)` section, run here after the final phase reports `All steps completed. Verification passed.`** — those cross-phase invariants (zero-match sweeps, expected counts, link sweeps depending on more than one phase's output) are the architect's to run, never the builder's, since `plan-executor` handed a single phase file cannot observe the others' output (see [`agents/plan-executor.md`](../agents/plan-executor.md) Post-execution Step 1).
 2. Walk the plan's `## Review Prevention Gate Mapping`. For each gate, confirm the change either covers it concretely or matches the explicit N/A reason.
 3. Walk the plan's `## CODING_STANDARDS Compliance` mapping (when present). Re-confirm each row against the changes you made.
 4. If a verification fails post-builder, treat it as a `Step [N] failed` report — diagnose, patch the plan, re-hand off; do **not** improvise a fix.

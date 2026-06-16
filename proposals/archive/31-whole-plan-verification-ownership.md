@@ -1,7 +1,7 @@
 # Proposal: whole-plan-verification-ownership
 
 **Created:** 2026-06-14
-**Status:** Draft
+**Status:** Implemented
 **Number:** 31
 **Proposed by:**
 **Project context:**
@@ -80,3 +80,5 @@ _None — all resolved (see below)._
 - ~~OQ2 — Fix scope: minimal (`/f3` only) or comprehensive (harden the shared contract)?~~ → A: **Comprehensive.** Add the post-build verification step to `/f3` (row 1) AND name the per-step-vs-whole-plan verification split with owners in `/f2` + the implementation-plan template (rows 2, 4), scope the `plan-executor` persona to its handed phase file (row 3), and clarify `/e4` runs the index's whole-plan section for decomposed plans (row 5). Closes the unowned-slot class at both altitudes and matches `/f1`'s default stance that an incident signals a genuine framework gap, not a one-off. Still ≤10 rows (no Phase 3).
 
 ---
+
+Validated 2026-06-16 — 2 rounds, 1 adversarial sub-agent confirmed
