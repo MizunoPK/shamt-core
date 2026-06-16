@@ -94,6 +94,8 @@ Phase resolution is at **phase-boundary granularity** — the driver dispatches 
 
 **Strict-halt on an inconsistent state.** A working tree that matches none of these cleanly — a partially-applied phase left by an interrupted sub-agent (e.g. the `proposal/{NN}-{slug}` branch exists but `/f3`'s diff-coverage gate would **not** pass, so not every Proposed Changes row is present as an edit) — is an inconsistent state the driver **halts** on rather than guessing. Surface what was found and direct the user to finish or reset that phase by hand with the per-phase command. This mirrors the strict-halt rule (Step 3): the driver never re-dispatches a phase whose exit gate it cannot confirm from disk.
 
+**Unrelated `proposals/` additions are NOT an inconsistent state.** New files under `proposals/` (or commits on the base branch adding them) that the slug derivation does not map to *this* proposal's phase signals are **expected and accepted** parallel-session work — Shamt is multi-session and parallel by design (Principle 3 — disk-authoritative cross-session work). They are **never** an "inconsistent state" the driver halts on, and the driver **never** reverts, renames-back, or deletes them. The strict-halt above fires only on a partially-applied phase of *this* proposal whose exit gate cannot be confirmed — not on unrelated tree state. This is the driver-level analog of the live `/f3`/`/f6` accept-and-fold rule (`/f3-implement-update.md:34`, `/f6-archive-proposal.md`).
+
 State the derived starting phase in one line before dispatching anything (e.g. `Starting at Phase 4 — proposal validated, no Phase-3 note, no proposal branch yet.`).
 
 ---
@@ -111,6 +113,16 @@ There are two kinds of phase:
 **The infeasible approach, ruled out:** naively dispatching a sub-agent to *invoke* `/validate-artifact` or `/f3` and expecting it to halt is wrong — invoking `/validate-artifact` auto-proceeds to Step 7 and spawns its own checker (a forbidden second nesting level); invoking `/f3` auto-hands-off to `plan-executor`. The per-phase agent for those phases must run the **inline steps**, never the `/fX` command.
 
 **No persona edit is required.** `/f-all` reuses `validation-checker` and `plan-executor` unchanged — the driver branches off their existing verbatim report contracts (Step 3), so the change set adds no new persona.
+
+**Accept-and-fold — every dispatch prompt carries it (load-bearing).** A dispatched phase agent runs in a fresh context and reads **only** what its dispatch prompt carries — so the accept-and-fold invariant has to live *in the dispatch prompt*, not just in this command's Notes. **Every** dispatched phase agent's prompt (every kind above — self-contained `/fX`, inline-validation primary, inline-audit primary, `plan-executor`, `validation-checker`, `audit-checker`) must carry this clause verbatim:
+
+```text
+Unrelated in-tree work already present on entry is expected and accepted — never
+revert, rename-back, or delete it. You may revert only your own this-dispatch
+off-task edits.
+```
+
+The disambiguator is **provenance + timing**, never "is this proposal unfamiliar to me": work *already present in the tree when this agent started* (or authored by another session) is accepted and folds into the landing; only an edit *this agent itself made this dispatch, off-task* may be reverted (the agent's own scope creep — the existing own-stray-edit guardrail stands). This is the same two-case split `/f3-implement-update.md:125` encodes (unrelated/parallel state → never revert; the agent's own genuinely-missing change → in-place amendment). The inline-audit primary, which sweeps `proposals/`, is the highest-risk site to "tidy" an unfamiliar stub — its prompt must carry this clause especially.
 
 ### Phase-by-phase dispatch
 
@@ -153,6 +165,8 @@ The driver branches on the **dispatched agent's own already-shipped report contr
 
   The driver matches that `Open question: … | To resolve: …` line to trigger the pause; any other terminal text from the primary routes to the relevant advance / halt branch. (`validation-checker` is untouched — it still only runs the adversarial re-read the driver lifts.)
 
+**Accept-and-fold travels in the same dispatch prompt (load-bearing, reinforced).** Alongside the sentinel contract above, every phase agent's dispatch prompt carries the accept-and-fold clause from Step 2 verbatim — *unrelated in-tree work already present on entry is expected and accepted; never revert/rename-back/delete it; you may revert only your own this-dispatch off-task edits.* This is the channel that actually reaches each inline phase agent (it never reads this command's Notes), so the clause is load-bearing here, not optional documentation. A phase agent that returns a report claiming it reverted/removed unrelated `proposals/` work has violated the invariant — the driver does **not** accept such a revert and does **not** re-create the loss; per Step 1 unrelated `proposals/` additions are never an inconsistent state.
+
 **Halt** (surface the report verbatim, no retry, no remediation — the user's next move is to fix and re-run the per-phase command):
 - `plan-executor` → `Step [N] failed: …` or `Plan defect at Step [N]: …`.
 - Any failed or non-convergent validation (a checker that never reaches `CONFIRMED`, a primary that cannot reach a clean round).
@@ -188,6 +202,7 @@ If the run **paused**, the pause is not an exit — it is one round-trip through
 - **Shared working tree, never worktree isolation.** The chain depends on cross-phase git + disk state: `/f3` creates `proposal/{NN}-{slug}` and writes canonical edits that `/f4` (regen) and `/f6` (commit + squash-merge) must see. Dispatching any phase with `isolation: worktree` would hide that branch / those edits from later phases and break the landing.
 - **One nesting level (per `reference/batch_validation_handoff.md`).** Phases that internally need a sub-agent run inline steps and halt at the hand-off; the driver lifts the `validation-checker` / `plan-executor` spawn up to itself. Dispatching a sub-agent to *run the `/fX` command* and expecting it to halt is the infeasible reading and is explicitly ruled out.
 - **Autonomous archive is accepted (with guards).** `/f-all` ends at `/f6-archive-proposal`, so it performs the irreversible squash-merge + branch delete without a per-step human confirm. Mitigations: the whole chain runs on the `proposal/{NN}-{slug}` branch (recoverable via reflog), the driver halts before archive on any earlier-phase failure, and `/f6`'s own pre-merge guards are re-confirmed (never bypassed).
+- **Never revert parallel work.** Unrelated in-tree work — new `proposals/` files (or base-branch commits adding them) from a parallel session — is expected and accepted: it folds into this proposal's landing and is **never** reverted, renamed-back, or deleted by the driver or any phase agent it dispatches. This is the driver-level expression of the live `/f3`/`/f6` accept-and-fold rule (`/f3-implement-update.md:34` and `:125`, `/f6-archive-proposal.md`) and the now-live cross-cutting **Principle 3 — disk-authoritative cross-session work** (`CLAUDE.md` / `templates/SHAMT_RULES.template.md`). The disambiguator is provenance + timing — already-present-on-entry / another session = accepted; this-dispatch own off-task edit = revertable — and the **load-bearing** carrier is the Step 2 / Step 3 dispatch-prompt clause every phase agent reads, not this Notes bullet (a dispatched agent never reads Notes). The rule is self-standing — anchored on the live `/f3`/`/f6` rules — so it holds regardless of Principle 3's landing order.
 - **Fresh-agent runnable.** Proposal + companion plan (when present) + working-tree / branch state are sufficient inputs; the start phase is re-derived from disk. No conversation history required.
 
 ---

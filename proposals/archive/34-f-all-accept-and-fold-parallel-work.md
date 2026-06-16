@@ -1,7 +1,7 @@
 # Proposal: f-all-accept-and-fold-parallel-work
 
 **Created:** 2026-06-15
-**Status:** Draft
+**Status:** Implemented
 **Number:** 34
 **Proposed by:**
 **Project context:**
@@ -38,7 +38,7 @@ A flat list of canonical files the proposal will touch. **Every file the proposa
 
 | # | Canonical path | Operation | One-line change description |
 |---|----------------|-----------|------------------------------|
-| 1 | `shamt-core/host/templates/claude/commands/f-all.md` | EDIT | Add the **accept-and-fold invariant** as a first-class driver rule, at three reinforcing sites: (a) **load-bearing** — a clause in the Step 2 dispatch-prompt guidance + the Step 3 sentinel paragraph instructing that *every dispatched phase agent's prompt* must carry "unrelated in-tree work already present on entry is expected and accepted — never revert/rename-back/delete it; you may revert only your own this-dispatch off-task edits"; (b) a Step 1 strict-halt clarification that unrelated `proposals/` additions are **not** an "inconsistent state" the driver halts/reverts on; (c) a Notes bullet ("Never revert parallel work") cross-referencing the live `/f3`/`/f6` accept-and-fold rule and (forward-compatibly) Principle 3. |
+| 1 | `shamt-core/host/templates/claude/commands/f-all.md` | EDIT | Add the **accept-and-fold invariant** as a first-class driver rule, at three reinforcing sites: (a) **load-bearing** — a clause in the Step 2 dispatch-prompt guidance + the Step 3 sentinel paragraph instructing that *every dispatched phase agent's prompt* must carry "unrelated in-tree work already present on entry is expected and accepted — never revert/rename-back/delete it; you may revert only your own this-dispatch off-task edits"; (b) a Step 1 strict-halt clarification that unrelated `proposals/` additions are **not** an "inconsistent state" the driver halts/reverts on; (c) a Notes bullet ("Never revert parallel work") cross-referencing the live `/f3`/`/f6` accept-and-fold rule and the now-live Principle 3 (kept self-standing so the rule holds regardless of landing order). |
 | 2 | `shamt-core/host/templates/claude/skills/f-all/SKILL.md` | EDIT | Mirror the invariant into the Protocol summary — one clause in point 1 (start-derivation: unrelated additions ≠ inconsistent state) and point 3/4 (dispatch topology / advance-pause-halt: the dispatch prompt carries "never revert parallel work"). Keep the command ↔ skill wording consistent. |
 | 3 | `shamt-core/host/templates/claude/commands/e-all.md` | EDIT | Same invariant as row 1, adapted to `/e-all`: Step 1 strict-halt clause, Step 2/Step 3 dispatch-prompt + sentinel clause, Notes bullet. **Additionally** note that because `/e7-resolve-feedback` (Phase 7) writes to `.shamt-core/proposals/` when routing root causes, the driver must not revert *other* proposals present alongside the one `/e7` adds. |
 | 4 | `shamt-core/host/templates/claude/skills/e-all/SKILL.md` | EDIT | Mirror the invariant into `/e-all`'s Protocol summary (points 1 and 3/4), matching the command. |
@@ -58,7 +58,7 @@ Row count is **4** — well under the 10-op Phase-3 threshold, so no `/f2` imple
 - **Authored by *this* agent *this* dispatch, off-task** → may be reverted (it is the agent's own scope creep — the existing guardrail stands).
 - **Already present in the tree on entry / authored by another session** → **accepted, never reverted** (it folds into the landing, exactly as `/f3`/`/f6` already specify for their own phases).
 
-The disambiguator is simply: *was it already there when this phase agent started, or did this agent create it?* This is the same two-case split `/f3-implement-update.md:116` already encodes (unrelated/parallel state → never revert; the agent's own genuinely-missing change → in-place amendment).
+The disambiguator is simply: *was it already there when this phase agent started, or did this agent create it?* This is the same two-case split `/f3-implement-update.md:125` already encodes (unrelated/parallel state → never revert; the agent's own genuinely-missing change → in-place amendment).
 
 ---
 
@@ -107,3 +107,6 @@ Dimension hints for the Phase 2 validation loop (`/validate-artifact proposals/3
 ## Open Questions
 
 *(none — all resolved above)*
+
+---
+Validated 2026-06-16 — 3 rounds, 1 adversarial sub-agent confirmed
