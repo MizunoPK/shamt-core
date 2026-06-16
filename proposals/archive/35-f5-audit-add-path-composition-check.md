@@ -1,7 +1,7 @@
 # Proposal: f5-audit-add-path-composition-check
 
 **Created:** 2026-06-15
-**Status:** Draft
+**Status:** Implemented
 **Number:** 35
 **Proposed by:**
 **Project context:**
@@ -77,3 +77,4 @@ _(none — all resolved; see Resolved Questions.)_
 - ~~Q: Is #30 a hard blocker, or can #35 land independently?~~ → A: **Sequencing dependency, not an absolute blocker.** #35's D2 framing asserts against §PO-tree's write-vocabulary (#30's row 8), so #35 lands after/with #30; absent #30 the check degrades to a weaker D9 (host ↔ host) uniformity check with no privileged canonical. #30's own resolved-question 3 already anticipated this sequencing.
 
 ---
+Validated 2026-06-16 — 2 rounds (primary clean + adversarial validation-checker confirmed: zero issues)
