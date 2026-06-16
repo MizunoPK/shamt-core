@@ -1,7 +1,7 @@
 # Proposal: f6-archive-preserve-uncommitted-footer
 
 **Created:** 2026-06-15
-**Status:** Draft
+**Status:** Implemented
 **Number:** 36
 **Proposed by:** (master-local)
 **Project context:**
@@ -28,7 +28,7 @@ A flat list of canonical files the proposal will touch.
 |---|----------------|-----------|------------------------------|
 | 1 | `shamt-core/host/templates/claude/commands/f6-archive-proposal.md` | EDIT | In Step 3 ("Commit + merge"), replace substep 1 ("Stage and commit the change on the proposal branch") with: (1a) `git add -A` to stage **all** working-tree state with an explicit rationale (after `git mv`, only the pre-validation rename is staged; the validated content modification at the archive path, the `/f3` canonical edits, the `/f4` `.claude/` regen output, and any Phase-6 audit auto-fixes / f0 captures are all unstaged); (1b) the `git commit`; (1c) a **mandatory post-commit halt gate** — read the archive-path blob out of HEAD (`git show HEAD:proposals/archive/{resolved-filename}`) and assert it contains `Status: Implemented` + the `Validated YYYY-MM-DD …` footer, and assert `git status --porcelain` is empty (nothing escaped `-A`); halt (do NOT `git checkout {base-branch}`) on either failure, surfacing the verbatim diff. Renumber the existing `git checkout`/`git merge --squash`/`git commit`/`git branch -D` sequence to run only after the gate passes. Add a one-line note at Step 2.4 that its read is the pre-commit early check and the new Step 3 gate is the authoritative post-commit assertion. |
 | 2 | `shamt-core/host/templates/claude/skills/f6-archive-proposal/SKILL.md` | EDIT | Update Protocol bullet 3 (the "Commit + squash-merge + delete branch" summary) to mirror the command: name the `git add -A` requirement (and *why* — `git mv` stages only the rename) and the mandatory post-commit assertion (`git show HEAD:`archive-path carries `Status: Implemented` + footer, `git status --porcelain` empty) before the `git merge --squash`. |
-| 3 | `shamt-core/host/templates/claude/commands/f-all.md` | EDIT | In the "### Phase-by-phase dispatch" subsection, **Phase 7 — `/f6-archive-proposal`** paragraph (~line 133): after the existing guard list (which names *what* must be in the working tree — canonical edits + archive move + regen output + audit auto-fixes + f0 captures), add that the dispatched agent must `git add -A` before the proposal-branch commit so the regen output, audit auto-fixes, and f0 captures actually land in the squash commit — naming the staging *mechanism*, not just the contents. |
+| 3 | `shamt-core/host/templates/claude/commands/f-all.md` | EDIT | In the "### Phase-by-phase dispatch" subsection, **Phase 7 — `/f6-archive-proposal`** paragraph (the named anchor is authoritative; ~line 145): after the existing guard list (which names *what* must be in the working tree — canonical edits + archive move + regen output + audit auto-fixes + f0 captures), add that the dispatched agent must `git add -A` before the proposal-branch commit so the regen output, audit auto-fixes, and f0 captures actually land in the squash commit — naming the staging *mechanism*, not just the contents. |
 
 **Path discipline:** all three are canonical host-template paths (`host/templates/claude/...`). No `.claude/` paths. Regen (Phase 5) propagates the command + SKILL edits to `.claude/`.
 
@@ -82,3 +82,6 @@ Dimension hints for the Phase 2 validation loop (`/validate-artifact proposals/3
 ---
 
 <!-- Phase 2 validation appends the footer below on a clean exit. Do not pre-fill. -->
+
+---
+Validated 2026-06-16 — 2 rounds (primary clean + adversarial validation-checker confirmed: zero issues)

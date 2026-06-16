@@ -42,7 +42,7 @@ description: Phase 7 of the framework-update flow — move proposals/{slug}.md (
 1. Ensure `proposals/archive/` exists. If not, create it.
 2. Move the resolved proposal file → `proposals/archive/{same-filename}` (preserving the `{NN}-` prefix when present; use `git mv` when the proposal is tracked, plain `mv` when untracked).
 3. Move any companion `{NN}-{slug}_PLAN.md` / `{NN}-{slug}_PLAN_phase_*.md` (or the unnumbered forms for a grandfathered proposal) to `proposals/archive/` alongside the proposal.
-4. Confirm the validation footer is intact in each archived file — it must not be stripped by the move.
+4. Confirm the validation footer is intact in each archived file — it must not be stripped by the move. **(This read is the pre-commit *early* check; it runs against the working tree while the validated content is still present and so cannot catch a commit that stages the wrong blob. The Step 3 post-commit gate below is the authoritative assertion.)**
 
 ### Step 3 — Commit, squash-merge, and delete the branch
 
@@ -57,10 +57,28 @@ The archive is the landing point. `/f6-archive-proposal` now commits the change,
 
 **Commit + merge** (only after every guard holds):
 
-1. Stage and commit the change on the proposal branch. **Commit subject** (per the Conventions section of `shamt-core/CLAUDE.md`; derive the short description from the proposal title / Problem):
-   - Numbered: `shamt-core: land #{NN} {slug} (short description)`
-   - Grandfathered/unnumbered: `shamt-core: land {slug} (short description)`
-2. Squash-merge the proposal branch into the base branch as the **single** commit above:
+1. **Stage all working-tree state, then commit on the proposal branch.**
+
+   1a. **`git add -A` — stage *everything*.** This is mandatory, not `git add {paths}`. After the Step 2 `git mv`, **only the pre-validation rename is staged** — `git mv` of a file that carries uncommitted content modifications stages the rename of the *committed (pre-validation) blob*, leaving the validated content modification at the archive path **unstaged**. A partial stage would commit the stale `Status: Draft`, footer-stripped blob. The validated content modification at the archive path, the `/f3` canonical edits, the `/f4` `.claude/` regen output, and any Phase-6 audit auto-fixes / captured f0 stubs are **all** unstaged; `git add -A` is what brings them (including untracked files) into the commit.
+
+      ```text
+      git add -A
+      ```
+
+   1b. **Commit.** **Commit subject** (per the Conventions section of `shamt-core/CLAUDE.md`; derive the short description from the proposal title / Problem):
+      - Numbered: `shamt-core: land #{NN} {slug} (short description)`
+      - Grandfathered/unnumbered: `shamt-core: land {slug} (short description)`
+
+   1c. **Mandatory post-commit halt gate (the authoritative assertion).** Read the archive-path blob out of HEAD and assert it carries the validated content, and assert the tree is clean — **before** the checkout, **never after**:
+
+      ```text
+      git show HEAD:proposals/archive/{resolved-filename}   # must contain Status: Implemented + the Validated YYYY-MM-DD … footer
+      git status --porcelain                                # must be empty — nothing escaped -A
+      ```
+
+      Assert the `git show HEAD:` output contains both `Status: Implemented` and the `Validated YYYY-MM-DD …` footer line, and that `git status --porcelain` is empty. **If either assertion fails, halt — do NOT `git checkout {base-branch}`** (the checkout against a dirty/wrong-blob tree is exactly what loses the validated bytes). Surface the verbatim diff (`git diff HEAD:proposals/archive/{resolved-filename}` against the intended content, or the non-empty `git status --porcelain`) and report. Only after **both** assertions pass does the gate clear.
+
+2. **(Only after the gate passes.)** Squash-merge the proposal branch into the base branch as the **single** commit above:
 
    ```text
    git checkout {base-branch}                  # main for shamt-core
