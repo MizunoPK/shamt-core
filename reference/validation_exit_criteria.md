@@ -6,6 +6,28 @@
 
 ---
 
+## The 8-Step Validation Process — per-step mechanics
+
+The rules file keeps Pattern 1's exit criteria, the risk-trigger list, the Step-2 dimension lists (Specs / Plans / Reviews / General), and the footer format block; this is the expanded per-step prose.
+
+**Step 1 — Read and investigate.** Re-read the entire artifact top-to-bottom each round. Research Pending / Open questions and important claims using code, project docs, and other verifiable sources. Cite evidence for resolved answers; if a product / platform decision is required, say so instead of guessing. Update the artifact with verified answers before Step 2.
+
+**Step 2 — Identify issues across dimensions.** First check alignment with `.shamt-core/project-specific-files/ARCHITECTURE.md` and `.shamt-core/project-specific-files/CODING_STANDARDS.md`. Then sweep the dimension list for the artifact type — the per-type dimension lists (Specs: 8; Implementation Plans: 8; Code Reviews: 6; General Artifacts: 5) and their Pattern-3 / Pattern-5 / `reference/review_categories.md` hard checks are kept in the rules file as the normative contract (also mirrored under [Validation Dimensions Quick Reference](#validation-dimensions-quick-reference) below).
+
+**Step 3 — Classify severity.** CRITICAL blocks workflow / causes failure / serious risk. HIGH causes confusion or wrong decisions. MEDIUM noticeably reduces quality. LOW is cosmetic. Borderline cases classify higher.
+
+**Step 4 — Fix all issues immediately.** Do not defer or batch.
+
+**Step 5 — Update `consecutive_clean`.** Clean round = zero issues, or exactly one LOW issue fixed. Not clean = 2+ LOW or any MEDIUM/HIGH/CRITICAL. Clean increments to 1; not clean resets to 0. (See the Counter Logic block below for the full state machine.)
+
+**Step 6 — Check exit.** If `consecutive_clean = 0`, return to Step 1. If `consecutive_clean = 1`, run Step 7. If the sub-agent finds any issue, fix it, reset to 0, and return to Step 1.
+
+**Step 7 — Adversarial review.** Spawn one independent adversarial sub-agent using the configured cheap-tier model (Haiku). Prompt contract: identify the artifact and applicable dimensions; require zero-bias, distrust-by-default reread; verify claims from evidence; report any unsupported assertion, hidden assumption, ambiguity, missing dependency, or edge case; if and only if no issue is found, reply exactly `CONFIRMED: Zero issues found after adversarial review.` **Sub-agents have no one-LOW allowance** (see Sub-Agent Exception Rule and Adversarial Review Posture below).
+
+**Step 8 — Add footer.** When complete, append the footer in the format the rules file specifies (`Validated {date} — N rounds, 1 adversarial sub-agent confirmed`).
+
+---
+
 ## Exit Criterion (by path)
 
 - **Standard path:** Primary clean round + **1 independent Haiku adversarial review sub-agent confirmation**. Applies to all Standard-path validation loops (specs, plans, code reviews, and ad-hoc artifacts).

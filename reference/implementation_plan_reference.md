@@ -4,6 +4,28 @@ Expanded formatting and execution details for Pattern 5. `SHAMT_RULES.template.m
 
 **Stack-agnostic by design.** Examples below name *categories* of work (route, write path, schema migration) rather than specific runtimes. Project-specific planning conventions belong in the project's `.shamt-core/project-specific-files/CODING_STANDARDS.md` or `.shamt-core/project-specific-files/ARCHITECTURE.md`; add stack-specific gates via a framework-update proposal if a pattern keeps recurring across stories.
 
+## The 5-Step Process — per-step walkthrough
+
+The rules file keeps the required-plan-contract bullets, the operation-contract names (CREATE/EDIT/DELETE/MOVE), the hard-check names, and the builder contract/report strings; this is the expanded per-step prose.
+
+**Step 1 — Read spec/context and confirm decisions.** Apply active artifacts and global story-folder resolution. Read the active spec/context completely. Research repo conventions for file placement, sibling shapes, naming, and deployment. For new services, add the standard monitoring template to the manifest, verify outbound auth from siblings, and confirm required configuration. For EDIT steps, look up only the 5–10 lines around each target symbol; use code shapes recorded in `context.md` / Quick-path `spec.md`.
+
+**Step 2 — Create the mechanical plan.** Use `templates/implementation_plan.template.md`. Every step must be executable without design judgment. The required plan contract (no optional/if/when/consider branches or executor judgment; stop planning if implementation is unclear; verification failure is stop-and-escalate; index + validated phase files for plans over one deploy boundary / any phase over 10 steps / ~1500+ lines; per-repo `Step 0-A`/`Step 0-B` steps following the Story branch baseline rule with `#{slug}: {message}` commits; metadata, pre-execution checklist, files manifest, review-prevention gate mapping, numbered steps, verification, Notes, and `CODING_STANDARDS` compliance mapping) is kept verbatim in the rules file as the normative contract. Skeleton-first authoring is recommended for plans with 5+ steps: write all headers, sanity-check structure, then fill locate strings and verification just-in-time.
+
+**Operation contracts.** CREATE / EDIT / DELETE / MOVE specifics are enumerated under [Operation contracts](#operation-contracts) below; the four operation names stay in the rules file as the contract.
+
+**Hard planning checks.** Each maps to a concrete step, a verification, or an explicit N/A before validation. The six routed checks (review-prevention coverage; DB write routing for direct **and** transitive writes; new-service/route manifest coverage; tenant-A-to-tenant-B bypass verification; removed/weakened-check replacement analysis; migration CREATE coverage) have expanded per-check detail in the [Review Prevention Gate Examples](#review-prevention-gate-examples) and [Migration CREATE checklist](#migration-create-checklist-example-pattern) sections below. Three checks (named in the rules file; expanded here):
+
+- **Transitive call graph** — new service handlers enumerate the transitive call graph for imported shared utilities, reachable environment-variable keys, and reachable external-resource accesses, adding missing symbol/env/IAM steps before proceeding.
+- **Byte-for-byte copy** — byte-for-byte copy files verify every called function has identical signature/behavior in every repo maintaining that file (else place the function repo-specifically and record why).
+- **CODING_STANDARDS mapping** — each applicable `.shamt-core/project-specific-files/CODING_STANDARDS.md` rule maps to a step or explicit N/A in `## CODING_STANDARDS Compliance` (saying it was read is insufficient).
+
+**Step 3 — Validate plan.** Run Pattern 1 using the 8 plan dimensions. Exit: primary clean + 1 adversarial sub-agent. Add footer.
+
+**Step 4 — Hand off to builder.** In the Standard path, builder handoff is unconditional after Gate 3. Single-file plans hand off `implementation_plan.md`; phase-decomposed plans hand off one phase at a time in deploy order. In the Quick path, the primary agent executes the Build Checklist unless delegation is explicitly requested. The builder contract (follow steps exactly, execute sequentially, run specified verification, stop on failed verification or ambiguity; report strings `All steps completed. Verification passed.` / `Step N failed: ...` / `Step N is ambiguous: ...` / `Plan defect at Step N: ...`; cheap-tier builder) is kept in the rules file; the full handoff template is under [Builder handoff template](#builder-handoff-template) below.
+
+**Step 5 — Verify completeness.** Test against spec requirements, verify no unintended side effects, confirm all verifications passed. If the builder reports failure or ambiguity, diagnose, fix the plan, and re-hand off.
+
 ## Checklist vs Full Plan Escalation
 
 The **Quick path** embeds a compact `## Build Checklist` inside `spec.md` instead of creating `implementation_plan.md`.

@@ -16,7 +16,7 @@ Shamt is a quality framework for AI-assisted development under Claude Code. It d
 - **The story** as the handoff artifact between the two roles.
 - **A path system inside the Engineer flow** — every story runs the **Quick path** (default, low-ceremony) unless a risk trigger escalates it to the **Standard path**.
 
-The Engineer flow is the load-bearing surface. The PO flow exists for initiatives large enough to warrant top-down decomposition. There are no top-level orphans: every feature nests under an epic and every story under a feature (see §PO-tree resolution). One-off / standalone work (bugs, quick wins, tech stories) lives under the standing **Tech Stories** epic and runs the Engineer flow from there. Within the PO flow, **decomposition catalogs breadth-context** (a bounded `## Decomposition Context` plus each child's breadth boundary — `## Scope / Non-Scope` for a feature, a scope one-liner for a story) and **define-\* deepens depth** from that seed before its terminal gate — see the `/pe2-decompose`/`/pf2-decompose` decompose and `/pf1-define`/`/e1` define command bodies for per-altitude detail.
+The Engineer flow is the load-bearing surface. The PO flow exists for initiatives large enough to warrant top-down decomposition. There are no top-level orphans: every feature nests under an epic and every story under a feature (see §PO-tree resolution). One-off / standalone work (bugs, quick wins, tech stories) lives under the standing **Tech Stories** epic and runs the Engineer flow from there. Within the PO flow, **decomposition catalogs breadth-context** and **define-\* deepens depth** from that seed before its terminal gate — see the `/pe2-decompose`/`/pf2-decompose` and `/pf1-define`/`/e1` command bodies for per-altitude detail.
 
 Core files:
 
@@ -61,11 +61,11 @@ Applies to every artifact-generation flow: Engineer-flow Spec / Plan / Review / 
 
 ## Principle 3: Disk-authoritative cross-session work
 
-Shamt is multi-session and parallel by design: multiple agents author and update artifacts, run personas, and advance work concurrently (per the slug-resumability rule, items can be worked in any order across parallel sessions). The on-disk artifacts — not any one agent's conversation history — are the authoritative record of work performed.
+Shamt is multi-session and parallel by design: multiple agents author and update artifacts, run personas, and advance work concurrently. The on-disk artifacts — not any one agent's conversation history — are the authoritative record of work performed.
 
-1. **Disk is the record; the session is not.** An agent reasons about what work has occurred from on-disk artifacts (proposals and their footers/banners, story folders, `feedback/`, `active_artifacts.md`, the archive/deferred/rejected folders) and from git history — never from the assumption that its own session observed everything.
-2. **Absence-from-session is not evidence of fabrication.** An agent must not infer that "I did not perform or observe X in this session" means "X never happened." A provenance claim recorded in an artifact (a validation footer, an f0 capture banner, a `Confirmed root cause (adversarial diagnosis — …)` line, a tracker attribution) is **presumed genuine** — a parallel session did real work the current session has no visibility into.
-3. **Verify by reading, never by destroying.** If a cross-session claim genuinely needs verification, the evidence is git history across branches, the cited artifact/folder, or the user — never silent deletion, revert, or rename-back of the artifact. (This is the belief the existing "never halt or revert on unrelated tree state" rules in `/f3-implement-update` and `/f6-archive-proposal` already depend on.)
+1. **Disk is the record; the session is not.** An agent reasons about what work has occurred from on-disk artifacts (proposals/footers/banners, story folders, `feedback/`, `active_artifacts.md`, the archive/deferred/rejected folders) and from git history — never from the assumption that its own session observed everything.
+2. **Absence-from-session is not evidence of fabrication.** An agent must not infer that "I did not perform or observe X in this session" means "X never happened." A provenance claim recorded in an artifact (a validation footer, an f0 capture banner, a confirmed-root-cause line, a tracker attribution) is **presumed genuine** — a parallel session did real work this session has no visibility into.
+3. **Verify by reading, never by destroying.** If a cross-session claim genuinely needs verification, the evidence is git history across branches, the cited artifact/folder, or the user — never silent deletion, revert, or rename-back of the artifact. (The existing "never halt or revert on unrelated tree state" rules in `/f3-implement-update` and `/f6-archive-proposal` depend on this.)
 4. **This does not relax Pattern 1.** Pattern 1's adversarial validation still distrusts unsupported *claims about reality* (code, governing docs) and verifies them from evidence, and agents still never fabricate a claim of work they did not do. Session-absence is simply not the evidence Pattern 1 demands: distrusting a claim about the codebase is in scope; distrusting an artifact's cross-session **provenance** merely because this session didn't author it is not.
 
 ---
@@ -165,7 +165,7 @@ Slug-first commands resolve a folder by a **tree-wide glob with a legacy-flat fa
 - **Feature**: `epics/*/features/{ID}-*/` · `epics/*/features/{slug}-*/` · `epics/*/features/*-{slug}-*/`; legacy fallback `features/{slug}-*/`.
 - **Story**: `epics/*/features/*/stories/{ID}-*/` · `…/stories/{slug}-*/` · `…/stories/*-{slug}-*/`; legacy fallback `stories/{slug}-*/`.
 
-New work is **written nested**; pre-existing flat folders stay and resolve via the fallback (no migration). Parentage is encoded by the path — there are **no `**Parent Epic:**` / `**Parent Feature:**` back-ref headers**. Throughout command / skill / template / reference bodies, `epics/{slug}/`, `features/{slug}/`, `stories/{slug}/` denote **the resolved folder** (per the globs above; leaf still `…-{brief}/`). **Write-side composition.** A producer writing a child path must spell the **full nested form** using the canonical resolved-folder placeholders `{epic-folder}` and `{feature-folder}` — a feature at `epics/{epic-folder}/features/{feature-folder}/`, a story at `epics/{epic-folder}/features/{feature-folder}/stories/{ID}-…/`. Never collapse an intermediate segment into a single placeholder (a feature is never a direct child of `epics/`). **Work root:** all bare `epics/`/`features/`/`stories/`/`code_reviews/`/`shamt-state/` paths are **work-root-relative** — repo root on self-host, `.shamt-core/` in a child (resolve the work root once via `.shamt-core/`-presence before globbing/writing). A child writes work-tree artifacts only under `.shamt-core/`; its project root holds only `CLAUDE.md` + `.claude/`.
+New work is **written nested**; pre-existing flat folders stay and resolve via the fallback (no migration). Parentage is encoded by the path — there are **no `**Parent Epic:**` / `**Parent Feature:**` back-ref headers**. Throughout command / skill / template / reference bodies, `epics/{slug}/`, `features/{slug}/`, `stories/{slug}/` denote **the resolved folder** (leaf still `…-{brief}/`). **Write-side composition.** A producer writing a child path must spell the **full nested form** using the canonical resolved-folder placeholders `{epic-folder}` and `{feature-folder}` — a feature at `epics/{epic-folder}/features/{feature-folder}/`, a story at `epics/{epic-folder}/features/{feature-folder}/stories/{ID}-…/`. **Never collapse an intermediate segment** into a single placeholder (a feature is never a direct child of `epics/`). **Work root:** all bare `epics/`/`features/`/`stories/`/`code_reviews/`/`shamt-state/` paths are **work-root-relative** — repo root on self-host, `.shamt-core/` in a child (resolve the work root once via `.shamt-core/`-presence before globbing/writing). A child writes work-tree artifacts only under `.shamt-core/`; its project root holds only `CLAUDE.md` + `.claude/`.
 
 **Active-item pointers.** The status line reads `{work-root}/shamt-state/active-{epic,feature,story}` (`.shamt-core/shamt-state/` in a child), each holding the active item's **work-root-relative** nested path (parentage = walk it up). The `p*`/`e1` commands write/refresh the matching pointer as work advances; `import-shamt` preserves them (outside its sync set).
 
@@ -175,7 +175,7 @@ The standing **Tech Stories** epic (introduced above) is the home for one-off wo
 
 - **Standing fixtures, fixed reserved names.** `epics/{tech-stories-folder}/` holds two standing features, **Bugs** and **Quick Wins**, under fixed reserved folder names (`tech-stories`, `bugs`, `quick-wins`) — *not* the `{ID}-{slug}-{brief}` convention, since they carry no ticket ID. Seeded once (create-if-absent) by the install/sync flow (`init-shamt.sh` / `import-shamt.sh`), never per-initiative by `/pe1-define`; their globally-unique reserved slugs make the existing collision checks refuse any reuse.
 - **Local-only, tracker-agnostic.** The standing epic + features never map to tracker work items — only the tickets filed under them do, per the active profile (a bug = a GitHub issue / ADO bug).
-- **Entry + archive.** `/ps0-draft [bugs|quick-wins]` seeds a ticket stub under the chosen feature and hands to `/e1-start-story` (bypassing the `/pe1-define`→`/pf2-decompose` cascade); on finalize, `/e8-finalize-story` moves the folder into the feature's `archive/`. See those command bodies for the mechanics.
+- **Entry + archive.** Entry is via `/ps0-draft [bugs|quick-wins]` (seeds a ticket stub under the chosen feature, hands to `/e1-start-story`, bypassing the `/pe1-define`→`/pf2-decompose` cascade); archive-on-finalize moves the folder into the feature's `archive/`. Mechanics live in the `/ps0-draft` + `/e8-finalize-story` command bodies.
 
 ---
 
@@ -207,9 +207,9 @@ Apply across Spec, Plan, Build, Test, Review, and Polish:
 
 ### The 8-Step Validation Process
 
-**Step 1 — Read and investigate.** Re-read the entire artifact top-to-bottom each round. Research Pending / Open questions and important claims using code, project docs, and other verifiable sources. Cite evidence for resolved answers; if a product / platform decision is required, say so instead of guessing. Update the artifact with verified answers before Step 2.
+The eight steps — read/investigate, identify issues across dimensions, classify severity, fix immediately, update `consecutive_clean` (clean = zero issues or one LOW fixed), check exit, adversarial sub-agent review (**no one-LOW allowance**), add footer — have their full per-step mechanics + worked counter examples in [`reference/validation_exit_criteria.md`](reference/validation_exit_criteria.md). The normative dimension lists and footer format stay here:
 
-**Step 2 — Identify issues across dimensions.** First check alignment with `.shamt-core/project-specific-files/ARCHITECTURE.md` and `.shamt-core/project-specific-files/CODING_STANDARDS.md`.
+**Step 2 — dimensions per artifact type** (first check alignment with `.shamt-core/project-specific-files/ARCHITECTURE.md` + `CODING_STANDARDS.md`):
 
 **Specs (8 dimensions):** Completeness; Correctness; Consistency; Helpfulness; Improvements; Missing proposals; Open questions; Standards/architecture alignment. Hard checks per Pattern 3: multi-option pros/cons, Open-Questions-answered-from-code, review-prevention inventory, and the schema data-lineage trace.
 
@@ -219,17 +219,7 @@ Apply across Spec, Plan, Build, Test, Review, and Polish:
 
 **General Artifacts (5 dimensions):** Completeness; Clarity; Accuracy; Actionability; Standards/architecture alignment.
 
-**Step 3 — Classify severity.** CRITICAL blocks workflow / causes failure / serious risk. HIGH causes confusion or wrong decisions. MEDIUM noticeably reduces quality. LOW is cosmetic. Borderline cases classify higher.
-
-**Step 4 — Fix all issues immediately.** Do not defer or batch.
-
-**Step 5 — Update `consecutive_clean`.** Clean round = zero issues, or exactly one LOW issue fixed. Not clean = 2+ LOW or any MEDIUM/HIGH/CRITICAL. Clean increments to 1; not clean resets to 0.
-
-**Step 6 — Check exit.** If `consecutive_clean = 0`, return to Step 1. If `consecutive_clean = 1`, run Step 7. If the sub-agent finds any issue, fix it, reset to 0, and return to Step 1.
-
-**Step 7 — Adversarial review.** Spawn one independent adversarial sub-agent using the configured cheap-tier model (Haiku). Prompt contract: identify the artifact and applicable dimensions; require zero-bias, distrust-by-default reread; verify claims from evidence; report any unsupported assertion, hidden assumption, ambiguity, missing dependency, or edge case; if and only if no issue is found, reply exactly `CONFIRMED: Zero issues found after adversarial review.` **Sub-agents have no one-LOW allowance.** See `reference/validation_exit_criteria.md` for expanded examples.
-
-**Step 8 — Add footer.** When complete, append:
+**Step 8 — footer format.** When complete, append:
 
 ```text
 ---
@@ -253,31 +243,20 @@ Exactly one LOW issue fixed still counts as a clean primary round. Any sub-agent
 
 ### The 7-Step Spec Protocol
 
-**Step 1 — Ingest the ticket.** Apply the active-artifact pointer and global story-folder resolution. Read `ticket.md` (or provided content); extract ask, acceptance criteria, links, due dates, constraints; output a 3–5 bullet in-agent summary; do not write to disk yet. Empty/missing content → halt and ask.
+The seven steps — ingest the ticket, targeted research, draft skeletons, **Gate 2a** design dialog, flesh out spec/context, validate, **Gate 2b** approval — have their full per-step walkthrough (including Step 2's required research captures and Step 5's per-surface prevention requirements + schema/lineage detail + spec/context split) in [`reference/spec_protocol_reference.md`](reference/spec_protocol_reference.md). The normative contract stays here:
 
-**Step 2 — Targeted research.** Scope to ticket references, not broad exploration: grep referenced files/functions/features; read `.shamt-core/project-specific-files/ARCHITECTURE.md` + `CODING_STANDARDS.md`; skim related code. Record findings in `context.md` (Standard) or `spec.md` Evidence (Quick). Required captures — **code shapes**, **pre-existing gaps**, **current flow**, **review-prevention risk inventory**, **boundary-diagram evidence**, and **file placement** — each enumerated in `reference/spec_protocol_reference.md` (which routes the risk inventory to `reference/pr_review_prevention.md`).
-
-**Step 3 — Draft skeletons.**
+**Step 3 — artifact shape per path:**
 
 | Path | Required artifact shape |
 |---|---|
 | Standard | `spec.md` (from `templates/spec.template.md`) + `context.md` (from `templates/context.template.md`). `spec.md` is the approval contract; `context.md` is evidence/planning handoff. Approval-relevant persistence design and review-prevention requirements must appear in `spec.md`, not only `context.md`. Key Design Decision IDs appear in both. |
 | Quick | `spec.md` only — populate Evidence, compact Review Prevention Evidence, Code Shapes, Review Prevention Checklist, Build Checklist, and Verification inline. Do not create `context.md` or `implementation_plan.md` unless the story escalates or a risk trigger applies. |
 
-Optional Standard-path plan skeleton: after `spec.md`/`context.md`, create `implementation_plan.md` with exploratory headers only, mark unresolved decisions `Blocked:`, set Planning Status to "Blocked on spec (Gate 2a)"; do not fill locate strings until after Gate 2a.
+**Gate 2a (Step 4).** Present 1–3 design options inline in chat (not in `spec.md` yet) — each with description, pros, cons, effort (S/M/L), and a recommendation; 2–3 required for non-trivial user-facing forks. **Wait for explicit user confirmation before proceeding.**
 
-**Step 4 — Architecture/design dialog (Gate 2a).** Present 1–3 design options inline in chat, not in `spec.md` yet: one option is fine when the choice is obvious, 2–3 are required for non-trivial user-facing forks; each needs description, pros, cons, effort (S/M/L), and a recommendation (if an option has no meaningful downside, say so). For open sub-questions, use `reference/question_brainstorm_categories.md` and omit empty categories. Mermaid diagrams are not part of Spec creation — for boundary-crossing stories, record enough approved design-option, workflow, schema, and source-backed component evidence for a later Mermaid generation step; an existing Mermaid block is optional supporting material, do not create or update it during Spec. **Wait for explicit user confirmation before proceeding.**
+**Step 6 — validation pair checks (Standard path).** Run Pattern 1 on the `spec.md` + `context.md` pair using spec dimensions plus five pair checks — every factual claim in `spec.md` is supported by `context.md`; every Key Design Decision ID appears in both without contradiction; approval-relevant schema/persistence in `context.md` appears in `spec.md` unless deferred/out of scope; implementation-relevant prevention evidence in `context.md` appears in `spec.md` when approval-relevant; multi-option comparisons give each option explicit pros/cons. Treat schema-only-in-context, approval-relevant prevention-only-in-context, and missing per-option pros/cons as HIGH by default. Exit: primary clean + 1 adversarial sub-agent; footer both files. (Quick path: Pattern 1 on `spec.md` alone; one primary clean pass unless a risk trigger requires an adversarial sub-agent.)
 
-**Step 5 — Flesh out spec/context.** Record the agreed approach into the Step 3 artifacts (Standard: approval-facing `spec.md` + detailed `context.md`; Quick: all inline in `spec.md`). Before placing anything in Open Questions, answer it from the codebase — only product/team/external-system decisions remain open, surfaced one at a time (Principle 2). For each applicable high-risk surface state the approval-facing **prevention requirement**, and if a prevention surface is itself a risk trigger escalate to Standard path. For any schema, migration, or table-level change the spec must trace the end-to-end cross-service read **and** write data lineage across service boundaries (so data is not written but ignored at runtime), including any missing backchannel API / query route / config endpoint as in-scope **or** listing it a Blocker for Gate 2a/2b vetting. The per-surface prevention requirements, the schema/lineage rules (column/delta listing, reviewable candidate options, explicit deferral), and the path-specific spec/context split are enumerated in `reference/spec_protocol_reference.md`. Resolve all parallel-skeleton `Blocked:` markers after Gate 2a.
-
-**Step 6 — Validate.**
-
-- **Standard path:** run Pattern 1 on the `spec.md` + `context.md` pair using spec dimensions plus five pair checks — every factual claim in `spec.md` is supported by `context.md`; every Key Design Decision ID appears in both without contradiction; approval-relevant schema/persistence in `context.md` appears in `spec.md` unless deferred/out of scope; implementation-relevant prevention evidence in `context.md` appears in `spec.md` when approval-relevant; multi-option comparisons give each option explicit pros/cons. Treat schema-only-in-context, approval-relevant prevention-only-in-context, and missing per-option pros/cons as HIGH by default. If a Mermaid diagram is recorded in the active artifacts, verify it renders, every node/edge is research- or decision-backed, it does not contradict spec/context, and it conforms to `reference/mermaid_diagram_standards.md`. Exit: primary clean + 1 adversarial sub-agent; footer both files.
-- **Quick path:** run Pattern 1 on `spec.md` alone (Requirements, Evidence, Review Prevention Gates/Evidence/Checklist, Code Shapes, Build Checklist, Verification); one primary clean pass is enough unless a risk trigger requires an adversarial sub-agent; footer `spec.md`.
-
-Each round ask, "What code should I have read that I haven't?" — and read it.
-
-**Step 7 — User approval (Gate 2b).** Present the validated `spec.md` as the approval artifact and link `context.md` as supporting detail (Standard path). If a new service is in scope, standard monitoring requirements must appear in Requirements or be explicitly Deferred with reason.
+**Gate 2b (Step 7).** Present the validated `spec.md` as the approval artifact and link `context.md` as supporting detail (Standard path). If a new service is in scope, standard monitoring requirements must appear in Requirements or be explicitly Deferred with reason.
 
 ## Pattern 4: Code Review Process
 
@@ -289,7 +268,7 @@ Each round ask, "What code should I have read that I haven't?" — and read it.
 
 ### Formal steps
 
-The formal-mode procedure is executed by the `review-executor` persona (full steps in that agent body + the `/e6-review-changes` command): a read-only fetch with a changed-file inventory (halt-and-ask on uncommitted local changes), a validated `overview.md` (ELI5 / What / Why / How), then `review_vN.md` — deep reading of files whose surrounding context controls the finding (logging, exception handling, auth, tenant isolation, state/token handling, DB routing, monitoring), the required review sections (Summary, Verdict, Degree of Risk, Changed File Inventory, Blockers, Required/Suggested Changes, Monitoring + Security Checklists, Positive Notes), and findings grouped by severity then category at **BLOCKING / CONCERN / SUGGESTION / NITPICK** — each artifact validated with Pattern 1. Re-reviews create the next `review_vN.md` without overwriting (add `Baseline reviewed: vN` when `active_artifacts.md` exists). v2 does not post formal-mode reviews back to external trackers — the artifact stays local; the user posts manually if desired.
+The formal-mode procedure is executed by the `review-executor` persona — full steps live in that agent body + the `/e6-review-changes` command + `reference/review_categories.md`: a read-only fetch with a changed-file inventory, a validated `overview.md`, then `review_vN.md` with findings grouped by severity then category at **BLOCKING / CONCERN / SUGGESTION / NITPICK**, each artifact validated with Pattern 1. v2 does not post formal-mode reviews back to external trackers — the artifact stays local.
 
 Every review must consider all 16 categories even when no finding is recorded; the category list, the mechanical checks, and the finding format all live in `reference/review_categories.md`.
 
@@ -303,7 +282,7 @@ The Standard path requires a validated implementation plan after spec approval a
 
 ### The 5-Step Process
 
-**Step 1 — Read spec/context and confirm decisions.** Apply active artifacts and global story-folder resolution. Read the active spec/context completely. Research repo conventions for file placement, sibling shapes, naming, and deployment. For new services, add the standard monitoring template to the manifest, verify outbound auth from siblings, and confirm required configuration. For EDIT steps, look up only the 5–10 lines around each target symbol; use code shapes recorded in `context.md` / Quick-path `spec.md`.
+The five steps — read spec/context and confirm decisions, create the mechanical plan, validate plan (Pattern 1, 8 dimensions, primary clean + 1 adversarial sub-agent), hand off to builder, verify completeness — have their full per-step walkthrough + operation-contract detail in [`reference/implementation_plan_reference.md`](reference/implementation_plan_reference.md). The normative contract stays here:
 
 **Step 2 — Create the mechanical plan.** Use `templates/implementation_plan.template.md`. Every step must be executable without design judgment.
 
@@ -323,21 +302,9 @@ The Standard path requires a validated implementation plan after spec approval a
 - **DELETE:** file/section plus justification.
 - **MOVE:** separate create and delete sub-steps, each verified.
 
-**Hard planning checks** (each maps to a concrete step, a verification, or an explicit N/A before validation). Six checks have expanded per-check detail in `reference/implementation_plan_reference.md` — **review-prevention coverage**, **DB write routing** (direct **and** transitive writes, writer routing decided before any build step), **new-service/route manifest coverage** (handler, application/route modules, monitoring, packaging, environment, IAM/secrets, log retention, networking, deployment/stage — or N/A), **tenant-A-to-tenant-B bypass verification**, **removed/weakened-check replacement analysis** before the code-edit step, and **migration CREATE coverage** (table creation, row-level-security policy in the same block, information-schema verification). Three checks stay stated here:
-
-- new service handlers enumerate the transitive call graph for imported shared utilities, reachable environment-variable keys, and reachable external-resource accesses, adding missing symbol/env/IAM steps before proceeding;
-- byte-for-byte copy files verify every called function has identical signature/behavior in every repo maintaining that file (else place the function repo-specifically and record why);
-- each applicable `.shamt-core/project-specific-files/CODING_STANDARDS.md` rule maps to a step or explicit N/A in `## CODING_STANDARDS Compliance` (saying it was read is insufficient).
-
-Skeleton-first authoring is recommended for plans with 5+ steps: write all headers, sanity-check structure, then fill locate strings and verification just-in-time.
-
-**Step 3 — Validate plan.** Run Pattern 1 using the 8 plan dimensions. Exit: primary clean + 1 adversarial sub-agent. Add footer.
-
-**Step 4 — Hand off to builder.** In the Standard path, builder handoff is unconditional after Gate 3. Single-file plans hand off `implementation_plan.md`; phase-decomposed plans hand off one phase at a time in deploy order. In the Quick path, the primary agent executes the Build Checklist unless delegation is explicitly requested.
+**Hard planning checks** (each maps to a concrete step, a verification, or an explicit N/A before validation). Nine checks — **review-prevention coverage**, **DB write routing** (direct **and** transitive), **new-service/route manifest coverage**, **tenant-A-to-tenant-B bypass verification**, **removed/weakened-check replacement analysis**, **migration CREATE coverage**, **transitive call graph** (imported shared utilities, env keys, external-resource accesses), **byte-for-byte copy** (identical signature/behavior in every repo maintaining the file), and **CODING_STANDARDS mapping** (every applicable rule maps to a step or explicit N/A in `## CODING_STANDARDS Compliance`) — have their expanded per-check detail in [`reference/implementation_plan_reference.md`](reference/implementation_plan_reference.md). Skeleton-first authoring is recommended for plans with 5+ steps.
 
 **Builder contract:** follow steps exactly, execute sequentially, run specified verification, and stop on failed verification or ambiguity. Expected reports: `All steps completed. Verification passed.`, `Step N failed: ...`, `Step N is ambiguous: ...`, `Plan defect at Step N: ...`. Builder model: cheap-tier (Haiku).
-
-**Step 5 — Verify completeness.** Test against spec requirements, verify no unintended side effects, confirm all verifications passed. If the builder reports failure or ambiguity, diagnose, fix the plan, and re-hand off.
 
 ---
 
@@ -376,28 +343,7 @@ Each phase's purpose, minimum-viable artifact, gate, recommended model, and per-
 
 # Requirement Re-baseline Protocol
 
-Use a re-baseline when a large requirement change arrives after Gate 2b, Gate 3, or Build execution and the active spec or plan would become misleading.
-
-**Triggers include:**
-
-- accepted behavior changes materially;
-- the implementation plan needs substantial replacement;
-- code already changed under the superseded plan must be accounted for;
-- a new architecture, data flow, API contract, persistence shape, or deployment boundary appears;
-- the team would reasonably ask which spec or plan is current.
-
-### Re-baseline contract
-
-1. Stop the current phase.
-2. State whether the change is minor or a re-baseline.
-3. Determine the next version number.
-4. Create `spec_vN.md` and `context_vN.md`, carrying forward only still-valid material.
-5. Record prior baseline and current code state in `context_vN.md`.
-6. Validate the new spec/context pair.
-7. Create `implementation_plan_vN.md` and any phase files needed.
-8. Validate the new plan.
-9. Create or update `active_artifacts.md` from `templates/active_artifacts.template.md`.
-10. Resume at Gate 2b, then Gate 3, then continue the workflow.
+Use a re-baseline when a large requirement change arrives after Gate 2b, Gate 3, or Build execution and the active spec or plan would become misleading. The full trigger list + the 10-step re-baseline contract live in [`reference/rebaseline_protocol.md`](reference/rebaseline_protocol.md).
 
 Unversioned names remain baseline v1. Do not rename or overwrite them.
 
