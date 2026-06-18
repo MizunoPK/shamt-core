@@ -39,7 +39,15 @@ description: Phase 3 of the PO flow — flesh out a feature (stub from /pe2-deco
 
 ### Step 2 — Resolve the slug to a feature folder
 
-Apply the global slug-resolution rule from [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md) (Principle 1) — resolve per `templates/SHAMT_RULES.template.md` §PO-tree resolution:
+Apply the global slug-resolution rule from [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md) (Principle 1) — resolve per `templates/SHAMT_RULES.template.md` §PO-tree resolution. Slugs are globally unique, so the resolved folder's altitude is unambiguous.
+
+**Altitude dispatch (own vs. parent vs. neither).** Resolve the slug and branch on the altitude of the folder it resolves to:
+
+- **Own altitude (the slug resolves to a *feature* folder)** → the single-feature behavior below (the rest of Step 2 and the Step-by-step) runs **unchanged**. This is the default, by-far-common case.
+- **Parent altitude (the slug resolves to an *epic* folder)** → enter **[Parent-slug batch mode](#parent-slug-batch-mode-epic--all-features)**: define every feature under that epic, sequentially. Hand off to that section and do not run the single-feature steps directly.
+- **Neither (the slug resolves to no feature and no epic, or to a story)** → halt and report `slug {slug} resolves to neither a feature (own altitude) nor an epic (parent altitude) — nothing to define`.
+
+The single-feature resolution that follows runs only on the own-altitude branch:
 
 1. Glob the nested feature path: `epics/*/features/{ID}-*/feature.md` (for a ticket ID) or, for a slug, **both** `epics/*/features/{slug}-*/feature.md` and `epics/*/features/*-{slug}-*/feature.md` (tree-wide feature glob). Also check the legacy-flat fallback: `features/{ID}-*/feature.md`, `features/{slug}-*/feature.md`, or `features/*-{slug}-*/feature.md` (for backwards compatibility with flat-layout features).
 2. If any match is found, verify it is the only one; if multiple matches exist for the same slug, halt and ask the user which folder to use.
@@ -177,6 +185,17 @@ Surface — but do **not** auto-invoke — the next command:
 
 After validation appends the footer, `/pf2-decompose {slug}` can run. This command stays independently runnable by a fresh agent off on-disk state per Principle 1 — chaining validation here would couple the two phases.
 
+## Parent-slug batch mode (epic → all features)
+
+Entered from Step 2's altitude dispatch when the slug resolves to an **epic** folder (the parent altitude) rather than a feature folder. The command then runs its own single-feature define logic across every feature under that epic, sequentially. This is **horizontal sibling fan-out at one altitude** — it defines each feature; it does **not** decompose them (that stays `/pf2-decompose`) and does **not** chain into any other altitude's command. The batch loop is a **stateless, disk-derived dispatcher of this command's own single-feature logic** — the worklist comes from the epic's on-disk decomposition output, and re-invocation is resumable (see Principle 1 reconciliation in Notes).
+
+1. **Derive the ordered worklist from disk.** Read the epic's `epic.md` and take its child features in the order given by `## Sequencing & Parallelization` (`Recommended order`), falling back to `## Target Features` list order when no sequencing is recorded. Resolve each listed slug to its feature folder per §PO-tree resolution.
+   - **Empty / un-decomposed parent.** If the epic has no children (its `## Target Features` decomposition list is empty / absent — e.g. the epic has not yet been run through `/pe2-decompose`), the worklist is empty: report `parent {slug} has no children to process — run the decompose phase (/pe2-decompose {slug}) first` and **exit cleanly** (a no-op, distinct from the Step 2 "neither own nor parent altitude → halt" dispatch case).
+2. **Skip-already-defined-with-notice (resumability).** For each feature in worklist order, first check whether it is already defined — its depth sections (`## Success Criteria` / `## Open Questions`) are drafted (the single-slug completion signal). If so, emit a one-line notice (`skipping {feature-slug} — already defined`) and move to the next child. This makes re-invocation resumable: a batch interrupted partway resumes at the first incomplete child without re-prompting completed ones.
+3. **Per-child execution.** For each not-yet-defined feature, run this command's **single-feature** Step-by-step verbatim on that feature's slug — including the full per-child open-questions iterative dialog (Step 6), one question at a time per Principle 2. Each child runs its **own complete dialog before the next child starts**; never bulk-bomb the union of all children's questions across the batch.
+4. **Halt-at-child on an unresolvable outcome.** If any child hits a condition it cannot resolve (slug collision, ambiguous resolution, a dialog that cannot converge), **stop the batch at that child** and surface its report verbatim. The user fixes it and re-invokes; resumability (step 2) resumes at that child without re-prompting the children already defined ahead of it.
+5. **Final summary.** When the worklist is exhausted, report a one-line-per-child summary: each child slug and its outcome (`defined` / `skipped — already defined`), then the next-command suggestion (`/clear`, then `/validate-artifact` on each newly defined feature, or `/pf2-decompose {epic-slug}` to decompose them).
+
 ## Tracker integration
 
 `/pf1-define` mirrors `/e1-start-story` and `/pe1-define`'s tracker plumbing at the Feature altitude. The active profile's `## Supported work-item types` section is authoritative — if it does not declare **Feature**, this command **falls through to freeform mode** with a one-line notice (the contract template instantiated at this altitude: `tracker profile {name} has no Feature work-item type — proceeding freeform`) and continues per Step 4 Mode A or Mode B (whichever applies given the filesystem state). Per the freeform-fallback rule in [`reference/trackers/_contract.md`](../../../../reference/trackers/_contract.md) (which defines the template generically as `tracker profile <name> has no <Type> work-item type — proceeding freeform`, instantiated here with `<Type>` = `Feature`). Do **not** silently fail; do **not** halt.
@@ -201,5 +220,6 @@ When the fetch succeeds, raw payload data is preserved inline in `feature.md`'s 
 - **`--tracker=` is one-off, not persisted.** The project default in `.shamt-core/shamt-config.json` is unchanged. The override only affects Mode C; in Mode A and Mode B it is a no-op (a notice is surfaced when the flag is supplied in those modes).
 - **The freeform-fallback rule** means future tracker profiles that don't declare `Feature` natively still work — `/pf1-define` degrades gracefully with a one-line notice and continues into Mode A or Mode B based on the filesystem state.
 - **Mode disambiguation is filesystem-first.** Mode A wins when the stub is present; Mode C wins next when the tracker profile and slug shape align; Mode B is the default fallback. No new flags are needed to pick a mode.
+- **Parent-slug batch mode is horizontal fan-out, not vertical chaining — and honors Principle 1.** Passing an **epic** slug (the parent altitude) runs this command's single-feature logic across every feature under the epic (`## Parent-slug batch mode`). This is **horizontal sibling fan-out at one altitude** — distinct from the vertical cross-altitude chaining the "No `/pf2-decompose` / Engineer-flow auto-invocation" discipline forbids: batch `/pf1-define` over an epic still does **not** decompose those features (that stays `/pf2-decompose`); it only runs the *same* define phase across siblings. It honors Principle 1 by the same argument `CLAUDE.md` homes for the `/f-all` / `/e-all` drivers: it is a **stateless, disk-derived dispatcher** of this command's own single-feature logic (worklist derived from the epic's on-disk `Target Features` / `Sequencing & Parallelization`, resumable by re-invocation via the skip-already-defined check, each child independently runnable via its own single slug) — not a state-holding mega-orchestrator.
 
 <!-- Managed by Shamt — do not edit. Regenerate from shamt-core/host/templates/claude/commands/pf1-define.md. -->

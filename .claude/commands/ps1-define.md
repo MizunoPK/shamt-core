@@ -37,7 +37,15 @@ description: Story stage-1 define (story altitude analogue of /pf1-define) — f
 
 ### Step 2 — Resolve the slug to a story folder
 
-Apply the global slug-resolution rule from [`templates/SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md) (Principle 1) — resolve per §PO-tree resolution (tree-wide story glob):
+Apply the global slug-resolution rule from [`templates/SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md) (Principle 1) — resolve per §PO-tree resolution (tree-wide story glob). Slugs are globally unique, so the resolved folder's altitude is unambiguous.
+
+**Altitude dispatch (own vs. parent vs. neither).** Resolve the slug and branch on the altitude of the folder it resolves to:
+
+- **Own altitude (the slug resolves to a *story* folder)** → the single-story behavior below (the rest of Step 2 and the Step-by-step) runs **unchanged**. This is the default, by-far-common case.
+- **Parent altitude (the slug resolves to a *feature* folder)** → enter **[Parent-slug batch mode](#parent-slug-batch-mode-feature--all-stories)**: define every story under that feature, sequentially. Hand off to that section and do not run the single-story steps directly.
+- **Neither (the slug resolves to no story and no feature, or to an epic)** → halt and report `slug {slug} resolves to neither a story (own altitude) nor a feature (parent altitude) — nothing to define`.
+
+The single-story resolution that follows runs only on the own-altitude branch:
 
 1. Glob the nested story path: `epics/*/features/*/stories/{ID}-*/ticket.md` (for a ticket ID) or, for a slug, **both** `epics/*/features/*/stories/{slug}-*/ticket.md` and `epics/*/features/*/stories/*-{slug}-*/ticket.md` (tree-wide story glob). Also check the legacy-flat fallback: `stories/{ID}-*/ticket.md`, `stories/{slug}-*/ticket.md`, or `stories/*-{slug}-*/ticket.md` (for backwards compatibility).
 2. If any match is found, verify it is the only one; if multiple matches exist for the same slug, halt and ask the user which folder to use.
@@ -146,9 +154,24 @@ Next: /e1-start-story {slug} (stub-aware) to proceed to engineering intake.
 
 The `/e1-start-story` ready-ticket pickup branch keys on the `Validated …` footer's presence.
 
+## Parent-slug batch mode (feature → all stories)
+
+Entered from Step 2's altitude dispatch when the slug resolves to a **feature** folder (the parent altitude) rather than a story folder. The command then runs its own single-story define logic — **including its inline Pattern-1 validation loop / footer stamp (Step 7)** — across every story under that feature, sequentially. This is **horizontal sibling fan-out at one altitude** — it defines + validates each story; it does **not** chain into any other altitude's command. The batch loop is a **stateless, disk-derived dispatcher of this command's own single-story logic** — the worklist comes from the feature's on-disk decomposition output, and re-invocation is resumable (see Principle 1 reconciliation in Notes).
+
+1. **Derive the ordered worklist from disk.** Read the feature's `feature.md` and take its child stories in the order given by `## Sequencing & Parallelization` (`Recommended order`), falling back to `## Target Stories` list order when no sequencing is recorded. Resolve each listed slug to its story folder per §PO-tree resolution.
+   - **Empty / un-decomposed parent.** If the feature has no children (its `## Target Stories` decomposition list is empty / absent — e.g. the feature has not yet been run through `/pf2-decompose`), the worklist is empty: report `parent {slug} has no children to process — run the decompose phase (/pf2-decompose {slug}) first` and **exit cleanly** (a no-op, distinct from the Step 2 "neither own nor parent altitude → halt" dispatch case).
+2. **Skip-already-validated-with-notice (resumability).** For each story in worklist order, first check whether it is already defined + validated — its `ticket.md` carries a `Validated …` footer (the single-slug completion signal this command stamps). If so, emit a one-line notice (`skipping {story-slug} — already validated`) and move to the next child. This makes re-invocation resumable: a batch interrupted partway resumes at the first incomplete child without re-prompting completed ones.
+3. **Per-child execution.** For each not-yet-validated story, run this command's **single-story** Step-by-step verbatim on that story's slug — including the full per-child open-questions iterative dialog (Step 6), one question at a time per Principle 2, **and the inline Pattern-1 validation loop (Step 7) that stamps the child's `Validated …` footer**. Each child runs its **own complete dialog and validation before the next child starts**; never bulk-bomb the union of all children's questions across the batch.
+4. **Halt-at-child on an unresolvable outcome.** If any child hits a condition it cannot resolve (slug collision, ambiguous resolution, a dialog or validation loop that cannot converge), **stop the batch at that child** and surface its report verbatim. The user fixes it and re-invokes; resumability (step 2) resumes at that child without re-prompting the children already validated ahead of it.
+5. **Final summary.** When the worklist is exhausted, report a one-line-per-child summary: each child slug and its outcome (`validated` / `skipped — already validated`), then the next-command suggestion (`/clear`, then `/e1-start-story {story-slug}` on each newly validated story to proceed to engineering intake).
+
 ## Mode A note (draft ingestion)
 
 When Mode A is detected (Step 2, draft marker + Scratch Notes present), the command's Step 6 exit and the footer-stamping step (Step 7, item 3) both happen. After the dialog drains `## Open Questions` (Step 6) **and before** entering the inline validation loop (Step 7), **strip the marker + Scratch Notes**. This is the f1-style ingestion: the draft overlay is a temporary staging vehicle for intake, removed once the story is defined (the same pattern `/f1-propose-update` uses to ingest `/f0-draft-proposal` drafts, but applied here to story-altitude ingestion).
+
+## Notes
+
+- **Parent-slug batch mode is horizontal fan-out, not vertical chaining — and honors Principle 1.** Passing a **feature** slug (the parent altitude) runs this command's single-story logic — dialog **and** inline validation — across every story under the feature (`## Parent-slug batch mode`). This is **horizontal sibling fan-out at one altitude** — it defines + validates each story and does **not** chain into any other altitude's command. It honors Principle 1 by the same argument `CLAUDE.md` homes for the `/f-all` / `/e-all` drivers: it is a **stateless, disk-derived dispatcher** of this command's own single-story logic (worklist derived from the feature's on-disk `Target Stories` / `Sequencing & Parallelization`, resumable by re-invocation via the skip-already-validated check, each child independently runnable via its own single slug) — not a state-holding mega-orchestrator.
 
 ---
 

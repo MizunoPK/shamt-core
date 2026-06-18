@@ -121,12 +121,14 @@ Commands form an **altitude × stage grid** — prefix by altitude (`pe` = epic,
 | `/pe2-decompose {slug}` | Epic stage-2 → feature stubs | shipped |
 | `/pe3-finalize {slug}` | Epic stage-3 finalize → `epics/archive/` | shipped |
 | `/pf0-draft {epic-slug}` | Feature stage-0 draft (one stub under an epic) | shipped |
-| `/pf1-define {slug}` | Feature stage-1 define (intake/flesh-out) | shipped |
-| `/pf2-decompose {slug}` | Feature stage-2 → story stubs | shipped |
+| `/pf1-define {slug}` | Feature stage-1 define (intake/flesh-out; a **parent epic slug** defines all its features) | shipped |
+| `/pf2-decompose {slug}` | Feature stage-2 → story stubs (a **parent epic slug** decomposes all its features) | shipped |
 | `/ps0-draft {feature-slug \| bugs \| quick-wins}` | Story stage-0 draft (one stub; absorbs the old tech-story fast path) | shipped |
-| `/ps1-define {slug}` | Story stage-1 define (flesh-out **+ inline Pattern-1 validation** → engineer-ready ticket) | shipped |
+| `/ps1-define {slug}` | Story stage-1 define (flesh-out **+ inline Pattern-1 validation** → engineer-ready ticket; a **parent feature slug** defines all its stories) | shipped |
 
 Every command above is **ID-or-slug-first** and **fresh-agent runnable** per Principle 1: pass a **ticket ID or slug** (`{id-or-slug}` — the tables show the common `{slug}` form, but a ticket ID like `T5` works equally, resolved per §PO-tree resolution / # Ticket IDs), the command resolves the folder, reads on-disk state, executes its phase. Each one mirrors `/e1-start-story`'s tracker plumbing: when the active profile (read from `.shamt-core/shamt-config.json`) declares the matching work-item type (e.g., ADO supports Epic + Feature + Story; GitHub supports Issue only), the slug-to-ID parse and payload fetch happen — otherwise the command falls through to freeform mode with a one-line notice (`tracker profile {name} has no {Type} work-item type — proceeding freeform`).
+
+> **Parent-slug batch mode.** `/pf1-define`, `/ps1-define`, and `/pf2-decompose` also accept a **parent** slug — one altitude up from their own (`/pf1-define {epic-slug}`, `/ps1-define {feature-slug}`, `/pf2-decompose {epic-slug}`). Given a parent slug, the command runs its single-artifact phase across **all children** of that parent, sequentially: a stateless, disk-derived dispatch of the command's own logic — the child worklist is derived from the parent's on-disk `Target …` / `Sequencing & Parallelization`, and re-invocation is **resumable** (it skips children already complete and resumes at the first incomplete one). This is horizontal sibling fan-out at one altitude — it does **not** chain into the next altitude's command. Passing the command's own (single-artifact) slug is unchanged.
 
 #### Hierarchy + folder layout
 

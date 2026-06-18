@@ -10,9 +10,13 @@ description: >
   (each carrying the scope one-liner in the body intake area + a Decomposition Context breadth section; parentage is the folder path; all other template
   sections empty) and appends Target Stories + Sequencing & Parallelization
   back onto the parent feature. Per-story deep dialog is deferred to
-  /e1-start-story (stub-aware). Invoke when the user wants to decompose a feature,
-  break it into stories, lay out the story breakdown for a feature, or plan
-  parallel story work.
+  /e1-start-story (stub-aware). Parent-slug batch mode: passing the parent
+  **epic** slug decomposes every feature under that epic, sequentially — a
+  stateless, disk-derived dispatch of the single-feature decompose logic that
+  is itself resumable (halts at the first feature lacking a Validated footer).
+  Invoke when the user wants to decompose a feature,
+  break it into stories, lay out the story breakdown for a feature, plan
+  parallel story work, or decompose all features in the epic.
 triggers:
   - "decompose feature"
   - "decompose this feature"
@@ -21,6 +25,7 @@ triggers:
   - "plan the stories for this feature"
   - "lay out the story work for"
   - "decompose {feature-slug}"
+  - "decompose all features in the epic"
 ---
 
 ## Overview
@@ -46,6 +51,6 @@ Reasoning (Opus) — see [`reference/model_selection.md`](../../../../../referen
 
 ## Exit criteria
 
-N story-stub folders exist nested under `epics/{epic-folder}/features/{feature-folder}/stories/`: New stubs (and every stub on first decomposition) carry the scope one-liner in the body and a `## Decomposition Context` breadth section (parentage is the folder path), with all other template sections empty; Kept stubs (re-decomposition only) are preserved unchanged from before the invocation, including any in-progress engineer work inside. Every stub's scope one-liner passes the individually-testable rubric. The parent feature's `Target Stories` + `Sequencing & Parallelization` sections carry the approved list and analysis; a slug-only `Decomposed YYYY-MM-DD — N story stubs at stories/{slug-1}, stories/{slug-2}, …` line is present directly above the preserved `Validated …` footer (actual folder paths recovered via tree-wide story glob per §PO-tree resolution); orphaned stubs (on re-decomposition) surfaced as a warning, not auto-deleted; the user approved the batch with rubric verdicts surfaced.
+N story-stub folders exist nested under `epics/{epic-folder}/features/{feature-folder}/stories/`: New stubs (and every stub on first decomposition) carry the scope one-liner in the body and a `## Decomposition Context` breadth section (parentage is the folder path), with all other template sections empty; Kept stubs (re-decomposition only) are preserved unchanged from before the invocation, including any in-progress engineer work inside. Every stub's scope one-liner passes the individually-testable rubric. The parent feature's `Target Stories` + `Sequencing & Parallelization` sections carry the approved list and analysis; a slug-only `Decomposed YYYY-MM-DD — N story stubs at stories/{slug-1}, stories/{slug-2}, …` line is present directly above the preserved `Validated …` footer (actual folder paths recovered via tree-wide story glob per §PO-tree resolution); orphaned stubs (on re-decomposition) surfaced as a warning, not auto-deleted; the user approved the batch with rubric verdicts surfaced. **Parent-slug batch mode** (a parent **epic** slug is passed): every feature under the epic has been decomposed per the above, skipping any already-decomposed child and halting at the first feature lacking a `Validated …` footer, with a one-line-per-child summary reported.
 
 <!-- Managed by Shamt — do not edit. Regenerate from shamt-core/host/templates/claude/skills/pf2-decompose/SKILL.md. -->

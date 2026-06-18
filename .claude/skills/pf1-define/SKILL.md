@@ -10,9 +10,12 @@ description: >
   Mode A or B. Mode disambiguation is filesystem-first: Mode A wins when a
   stub exists, Mode C wins next when the tracker + slug shape align, Mode B
   is the default fallback. Consults .shamt-core/project-specific-files/ARCHITECTURE.md for architectural impact
-  in all three modes. Invoke when the user wants to start, flesh out, define,
-  or open a feature; capture an ADO Feature; or scope a feature for an
-  upcoming initiative.
+  in all three modes. Parent-slug batch mode: passing the parent **epic** slug
+  defines every feature under that epic, sequentially — a stateless,
+  disk-derived dispatch of the single-feature logic that is itself resumable.
+  Invoke when the user wants to start, flesh out, define,
+  or open a feature; define all features in the epic; capture an ADO Feature;
+  or scope a feature for an upcoming initiative.
 triggers:
   - "start a feature"
   - "flesh out feature {slug}"
@@ -22,6 +25,7 @@ triggers:
   - "create feature"
   - "pull this ADO feature"
   - "capture this work as a feature"
+  - "define all features in the epic"
 ---
 
 ## Overview
@@ -42,6 +46,6 @@ Reasoning (Opus) — see [`reference/model_selection.md`](../../../../../referen
 
 ## Exit criteria
 
-Non-empty `epics/{epic-folder}/features/{ID}-{slug}-{brief}/feature.md` exists nested with `Goal`, `Success Criteria`, `Scope / Non-Scope` drafted; `Target Stories` and `Sequencing & Parallelization` empty; `## Open Questions` empty; nesting reflects the input mode (stub's parent in Mode A, Tech Stories epic in Mode B, matched or Tech Stories epic in Mode C); `shamt-state/active-feature` and `shamt-state/active-epic` pointers written; no validation footer yet; user has confirmed slug + content.
+Non-empty `epics/{epic-folder}/features/{ID}-{slug}-{brief}/feature.md` exists nested with `Goal`, `Success Criteria`, `Scope / Non-Scope` drafted; `Target Stories` and `Sequencing & Parallelization` empty; `## Open Questions` empty; nesting reflects the input mode (stub's parent in Mode A, Tech Stories epic in Mode B, matched or Tech Stories epic in Mode C); `shamt-state/active-feature` and `shamt-state/active-epic` pointers written; no validation footer yet; user has confirmed slug + content. **Parent-slug batch mode** (a parent **epic** slug is passed): every feature under the epic has been defined per the above, skipping any already-defined child, with a one-line-per-child summary reported.
 
 <!-- Managed by Shamt — do not edit. Regenerate from shamt-core/host/templates/claude/skills/pf1-define/SKILL.md. -->
