@@ -1,10 +1,10 @@
 ---
-description: Phase 3 of the PO flow — flesh out a feature (stub from /pe2-decompose, standalone, or tracker-seeded) into a feature.md ready for /validate-artifact
+description: Phase 3 of the PO flow — flesh out a feature (stub from /pe3-decompose, standalone, or tracker-seeded) into a feature.md ready for /pf2-validate
 ---
 
 # /pf1-define
 
-**Purpose:** Run Phase 3 of the PO flow at the **Feature** altitude. Resolve a slug, branch on three input modes (flesh out an existing stub written by `/pe2-decompose`, create a standalone feature from scratch, or seed from a tracker work-item payload), drive an open-questions iterative dialog over `Goal`, `Success Criteria`, and `Scope / Non-Scope`, and produce the feature under its parent epic — `epics/{epic-folder}/features/{ID}-{slug}-{brief}/feature.md` (the parent epic is the stub's epic, or the Tech Stories epic for standalone work). Leaves `Target Stories` and `Sequencing & Parallelization` empty — `/pf2-decompose` fills them later.
+**Purpose:** Run Phase 3 of the PO flow at the **Feature** altitude. Resolve a slug, branch on three input modes (flesh out an existing stub written by `/pe3-decompose`, create a standalone feature from scratch, or seed from a tracker work-item payload), drive an open-questions iterative dialog over `Goal`, `Success Criteria`, and `Scope / Non-Scope`, and produce the feature under its parent epic — `epics/{epic-folder}/features/{ID}-{slug}-{brief}/feature.md` (the parent epic is the stub's epic, or the Tech Stories epic for standalone work). Leaves `Target Stories` and `Sequencing & Parallelization` empty — `/pf3-decompose` fills them later.
 
 **Recommended model:** Reasoning (Opus). Feature drafting is a design / multi-dimensional scoping task — same justification as `/pe1-define`. See [`reference/model_selection.md`](../../../../reference/model_selection.md).
 
@@ -53,7 +53,7 @@ The single-feature resolution that follows runs only on the own-altitude branch:
 2. If any match is found, verify it is the only one; if multiple matches exist for the same slug, halt and ask the user which folder to use.
 3. **Multiple matches** → halt and ask the user which folder to use.
 4. **One match** → that folder is the feature folder. **Detect Mode A vs. re-entry** by inspecting `feature.md`:
-   - If `feature.md` has its **decomposition-authored fields** filled — `**Ticket ID:** T{N}` + `## Goal`, plus (on a richer-cataloging stub) `## Scope / Non-Scope` + `## Decomposition Context` — but the **depth sections `## Success Criteria` and `## Open Questions` are still empty** (per the `/pe2-decompose` Step 8 contract), this is a **stub** — proceed to **Mode A** under Step 4. (The parent epic is the folder path.)
+   - If `feature.md` has its **decomposition-authored fields** filled — `**Ticket ID:** T{N}` + `## Goal`, plus (on a richer-cataloging stub) `## Scope / Non-Scope` + `## Decomposition Context` — but the **depth sections `## Success Criteria` and `## Open Questions` are still empty** (per the `/pe3-decompose` Step 8 contract), this is a **stub** — proceed to **Mode A** under Step 4. (The parent epic is the folder path.)
    - If `feature.md` has its **depth sections drafted** (`## Success Criteria` / `## Open Questions` populated — a prior `/pf1-define` deep-dive ran), this is a **re-entry**. Confirm with the user how to proceed. **Available options depend on whether the active tracker actually has a Feature fetch path** (resolved in Step 1 plus the profile's `## Supported work-item types`):
      - **Fetching profile that declares Feature support** (e.g., `ado`): offer all four — **refetch**, **overwrite**, **extend**, **exit**.
      - **Fetching profile that does *not* declare Feature support** (e.g., `github`): same options as `local` / `none` — **overwrite**, **extend**, **exit**. Refetch is suppressed because the profile would just fall through to freeform anyway (per the freeform-fallback rule), making the offered branch pointless.
@@ -61,9 +61,9 @@ The single-feature resolution that follows runs only on the own-altitude branch:
      - **`none`:** no tracker fetch path. Offer **overwrite**, **extend**, **exit**.
 
      Footer handling per branch (same rules as `/pe1-define`):
-     - **Refetch** (offered only when the active profile declares Feature support) — re-run the tracker fetch (Step 4 Mode C) and re-author the artifact from scratch. The file is rewritten wholesale; any prior `Validated …` footer is discarded along with the prior content. `/validate-artifact` must re-run. **Note:** if the existing artifact was originally drafted via Mode A (stub-fleshing) or Mode B (standalone), Refetch will replace that hand-authored content with tracker-seeded content — surface a one-line warning (`current artifact was not tracker-seeded — Refetch will replace hand-authored content with tracker payload`) before proceeding so the user can opt for Extend instead.
+     - **Refetch** (offered only when the active profile declares Feature support) — re-run the tracker fetch (Step 4 Mode C) and re-author the artifact from scratch. The file is rewritten wholesale; any prior `Validated …` footer is discarded along with the prior content. `/pf2-validate` must re-run. **Note:** if the existing artifact was originally drafted via Mode A (stub-fleshing) or Mode B (standalone), Refetch will replace that hand-authored content with tracker-seeded content — surface a one-line warning (`current artifact was not tracker-seeded — Refetch will replace hand-authored content with tracker payload`) before proceeding so the user can opt for Extend instead.
      - **Overwrite** — start the freeform open-questions dialog (Step 6) from a fresh template. Same wholesale rewrite; prior footer discarded.
-     - **Extend** — preserve existing content and add to it. **If a prior `Validated …` footer is present, strip it before continuing** — extension changes the artifact and invalidates the prior pass; `/validate-artifact` must re-run.
+     - **Extend** — preserve existing content and add to it. **If a prior `Validated …` footer is present, strip it before continuing** — extension changes the artifact and invalidates the prior pass; `/pf2-validate` must re-run.
      - **Exit** — leave the file untouched and return. No footer change.
 
      **Preserve the `**Ticket ID:**` header verbatim on re-entry.** The `**Ticket ID:** …` line is never rewritten by `/pf1-define` regardless of the chosen branch — it is decomposition-owned per the decomposition step. Only the body sections are touched. (Parentage is the folder path.)
@@ -86,15 +86,15 @@ The command supports three input modes. **Mode disambiguation order:**
 2. **Mode C — tracker-seeded** if Mode A did not apply AND the active tracker profile declares Feature work-item type support AND the slug parses to a tracker ID per the profile's `## Slug resolution` rule.
 3. **Mode B — standalone from scratch** otherwise.
 
-#### Mode A — flesh out an existing stub (the common case after `/pe2-decompose`)
+#### Mode A — flesh out an existing stub (the common case after `/pe3-decompose`)
 
-The folder exists; `feature.md` already carries a populated `## Goal` from `/pe2-decompose` Step 8 — and, for a stub created under richer-cataloging decomposition, a populated `## Scope / Non-Scope` boundary and a `## Decomposition Context` section. (The parent epic is the folder path.)
+The folder exists; `feature.md` already carries a populated `## Goal` from `/pe3-decompose` Step 8 — and, for a stub created under richer-cataloging decomposition, a populated `## Scope / Non-Scope` boundary and a `## Decomposition Context` section. (The parent epic is the folder path.)
 
-**Stage-0 draft ingest.** If the resolved `feature.md` carries the `/pf0-draft` stage-0 draft marker (`**Status:** Draft (f0 — feature-idea capture, unrefined)` + a `## Scratch Notes (stage-0 capture)` section), **ingest the draft** the way `/f1-propose-update` ingests an f0 draft: seed the open-questions dialog (Step 6) from the captured `## Scratch Notes (stage-0 capture)` content (and the populated `## Goal`), then **strip both the `**Status:** Draft (f0 …)` marker line and the entire `## Scratch Notes (stage-0 capture)` section on completion** so the finished `feature.md` carries no draft residue. When the marker is **absent** (an ordinary `/pf2-decompose` stub or an older stub), the existing seed-from-`## Decomposition Context` / bare-stub path below is unchanged.
+**Stage-0 draft ingest.** If the resolved `feature.md` carries the `/pf0-draft` stage-0 draft marker (`**Status:** Draft (f0 — feature-idea capture, unrefined)` + a `## Scratch Notes (stage-0 capture)` section), **ingest the draft** the way `/f1-propose-update` ingests an f0 draft: seed the open-questions dialog (Step 6) from the captured `## Scratch Notes (stage-0 capture)` content (and the populated `## Goal`), then **strip both the `**Status:** Draft (f0 …)` marker line and the entire `## Scratch Notes (stage-0 capture)` section on completion** so the finished `feature.md` carries no draft residue. When the marker is **absent** (an ordinary `/pf3-decompose` stub or an older stub), the existing seed-from-`## Decomposition Context` / bare-stub path below is unchanged.
 
 1. **Preserve the `## Goal` verbatim.** Do not rewrite it.
-2. **Consume the stub's `## Decomposition Context` as a research seed when present** — a stub created before #12 (or via a path that didn't catalog it) lacks the section, so fall back to the existing `## Goal` alone (and `## Scope / Non-Scope` if it was already populated), with no failure. Then proceed to Step 5 (architecture consult) and Step 6 (open-questions dialog) to populate `Success Criteria` + `Open Questions` and the `## Scope / Non-Scope` boundary — **deepening** it when decomposition pre-populated it (a richer-cataloging stub), or **populating it from scratch** when it is empty (an older stub). The existing `/validate-artifact` handoff at the end of the command is unchanged; validation is not folded in here.
-3. Leave `Target Stories` and `Sequencing & Parallelization` empty — those are `/pf2-decompose`'s output.
+2. **Consume the stub's `## Decomposition Context` as a research seed when present** — a stub created before #12 (or via a path that didn't catalog it) lacks the section, so fall back to the existing `## Goal` alone (and `## Scope / Non-Scope` if it was already populated), with no failure. Then proceed to Step 5 (architecture consult) and Step 6 (open-questions dialog) to populate `Success Criteria` + `Open Questions` and the `## Scope / Non-Scope` boundary — **deepening** it when decomposition pre-populated it (a richer-cataloging stub), or **populating it from scratch** when it is empty (an older stub). The existing `/pf2-validate` handoff at the end of the command is unchanged; validation is not folded in here.
+3. Leave `Target Stories` and `Sequencing & Parallelization` empty — those are `/pf3-decompose`'s output.
 4. **No `## All Remaining Fields` appendix** — there was no tracker fetch in this mode.
 
 #### Mode B — create a standalone feature from scratch
@@ -148,7 +148,7 @@ Apply [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md)
 2. Surface each question to the user **one at a time** via `AskUserQuestion` (or equivalent). Never bulk-bomb.
 3. Update the feature with each answer **before** moving to the next question. The artifact is not "drafted" while `## Open Questions` is non-empty.
 4. Never proceed on a silent assumption. If an answer changes `Goal`, edit it (Mode B and Mode C only — Mode A's Goal is preserved per Step 4 Mode A sub-step 1). If it changes `Success Criteria`, edit them. If it changes `Scope / Non-Scope`, edit it (including the `**Architecture impact:** …` flag).
-5. **Do not populate `Target Stories` or `Sequencing & Parallelization`** in this command. Those sections are owned by `/pf2-decompose`; leave them present-but-empty per the template.
+5. **Do not populate `Target Stories` or `Sequencing & Parallelization`** in this command. Those sections are owned by `/pf3-decompose`; leave them present-but-empty per the template.
 
 ### Step 7 — Detect slug collisions
 
@@ -164,12 +164,12 @@ Verify before exiting:
 - [ ] `epics/{epic-folder}/features/{ID}-{slug}-{brief}/feature.md` exists and is non-empty (nested).
 - [ ] `## Open Questions` is empty (every question resolved, with answers folded into the artifact).
 - [ ] `Goal`, `Success Criteria`, and `Scope / Non-Scope` are drafted.
-- [ ] `Target Stories` and `Sequencing & Parallelization` are **left empty** (owned by `/pf2-decompose`).
+- [ ] `Target Stories` and `Sequencing & Parallelization` are **left empty** (owned by `/pf3-decompose`).
 - [ ] **Mode A:** the original `## Goal` one-liner from the stub is preserved verbatim.
 - [ ] **Mode B:** created under the Tech Stories epic (per #15).
 - [ ] **Mode C:** `## All Remaining Fields` appendix is present iff the fetched payload had non-empty fields worth preserving.
 - [ ] `shamt-state/active-feature` and `shamt-state/active-epic` pointers have been written.
-- [ ] No `Validated …` footer present yet — `/validate-artifact` appends it.
+- [ ] No `Validated …` footer present yet — `/pf2-validate` appends it.
 - [ ] User has confirmed the slug + content.
 
 If any item fails, return to the relevant step.
@@ -180,21 +180,21 @@ Surface — but do **not** auto-invoke — the next command:
 
 ```
 /clear
-/validate-artifact epics/{epic-folder}/features/{ID}-{slug}-{brief}/feature.md
+/pf2-validate {slug}
 ```
 
-After validation appends the footer, `/pf2-decompose {slug}` can run. This command stays independently runnable by a fresh agent off on-disk state per Principle 1 — chaining validation here would couple the two phases.
+After `/pf2-validate` appends the footer, `/pf3-decompose {slug}` can run. This command stays independently runnable by a fresh agent off on-disk state per Principle 1 — chaining validation here would couple the two phases.
 
 ## Parent-slug batch mode (epic → all features)
 
-Entered from Step 2's altitude dispatch when the slug resolves to an **epic** folder (the parent altitude) rather than a feature folder. The command then runs its own single-feature define logic across every feature under that epic, sequentially. This is **horizontal sibling fan-out at one altitude** — it defines each feature; it does **not** decompose them (that stays `/pf2-decompose`) and does **not** chain into any other altitude's command. The batch loop is a **stateless, disk-derived dispatcher of this command's own single-feature logic** — the worklist comes from the epic's on-disk decomposition output, and re-invocation is resumable (see Principle 1 reconciliation in Notes).
+Entered from Step 2's altitude dispatch when the slug resolves to an **epic** folder (the parent altitude) rather than a feature folder. The command then runs its own single-feature define logic across every feature under that epic, sequentially. This is **horizontal sibling fan-out at one altitude** — it defines each feature; it does **not** decompose them (that stays `/pf3-decompose`) and does **not** chain into any other altitude's command. The batch loop is a **stateless, disk-derived dispatcher of this command's own single-feature logic** — the worklist comes from the epic's on-disk decomposition output, and re-invocation is resumable (see Principle 1 reconciliation in Notes).
 
 1. **Derive the ordered worklist from disk.** Read the epic's `epic.md` and take its child features in the order given by `## Sequencing & Parallelization` (`Recommended order`), falling back to `## Target Features` list order when no sequencing is recorded. Resolve each listed slug to its feature folder per §PO-tree resolution.
-   - **Empty / un-decomposed parent.** If the epic has no children (its `## Target Features` decomposition list is empty / absent — e.g. the epic has not yet been run through `/pe2-decompose`), the worklist is empty: report `parent {slug} has no children to process — run the decompose phase (/pe2-decompose {slug}) first` and **exit cleanly** (a no-op, distinct from the Step 2 "neither own nor parent altitude → halt" dispatch case).
+   - **Empty / un-decomposed parent.** If the epic has no children (its `## Target Features` decomposition list is empty / absent — e.g. the epic has not yet been run through `/pe3-decompose`), the worklist is empty: report `parent {slug} has no children to process — run the decompose phase (/pe3-decompose {slug}) first` and **exit cleanly** (a no-op, distinct from the Step 2 "neither own nor parent altitude → halt" dispatch case).
 2. **Skip-already-defined-with-notice (resumability).** For each feature in worklist order, first check whether it is already defined — its depth sections (`## Success Criteria` / `## Open Questions`) are drafted (the single-slug completion signal). If so, emit a one-line notice (`skipping {feature-slug} — already defined`) and move to the next child. This makes re-invocation resumable: a batch interrupted partway resumes at the first incomplete child without re-prompting completed ones.
 3. **Per-child execution.** For each not-yet-defined feature, run this command's **single-feature** Step-by-step verbatim on that feature's slug — including the full per-child open-questions iterative dialog (Step 6), one question at a time per Principle 2. Each child runs its **own complete dialog before the next child starts**; never bulk-bomb the union of all children's questions across the batch.
 4. **Halt-at-child on an unresolvable outcome.** If any child hits a condition it cannot resolve (slug collision, ambiguous resolution, a dialog that cannot converge), **stop the batch at that child** and surface its report verbatim. The user fixes it and re-invokes; resumability (step 2) resumes at that child without re-prompting the children already defined ahead of it.
-5. **Final summary.** When the worklist is exhausted, report a one-line-per-child summary: each child slug and its outcome (`defined` / `skipped — already defined`), then the next-command suggestion (`/clear`, then `/validate-artifact` on each newly defined feature, or `/pf2-decompose {epic-slug}` to decompose them).
+5. **Final summary.** When the worklist is exhausted, report a one-line-per-child summary: each child slug and its outcome (`defined` / `skipped — already defined`), then the next-command suggestion (`/clear`, then `/pf2-validate {epic-slug}` to validate all the newly defined features, or `/pf2-validate` on each one individually, then `/pf3-decompose {epic-slug}` to decompose them).
 
 ## Tracker integration
 
@@ -208,18 +208,18 @@ When the fetch succeeds, raw payload data is preserved inline in `feature.md`'s 
 - `Target Stories` and `Sequencing & Parallelization` remain empty (decomposition output).
 - `## Open Questions` is empty.
 - Parentage is the folder path; nesting is determined by the input mode: stub's parent (Mode A), Tech Stories epic (Mode B), or tracker-matched epic or Tech Stories (Mode C).
-- No validation footer yet — `/validate-artifact` adds it.
+- No validation footer yet — `/pf2-validate` adds it.
 - The user has confirmed slug + content; the next command has been suggested in chat.
 
 ## Notes
 
 - **Fresh-agent runnable.** Every input lives on disk (`.shamt-core/shamt-config.json`, the tracker profile, `.shamt-core/project-specific-files/ARCHITECTURE.md`, the existing stub or prior draft when re-entering). No conversation history required.
-- **Feature-level validation is `/validate-artifact`.** Features have no review phase — Pattern 1 validation only. The decomposition exit gate run inside `/pf2-decompose` is a stub-batch check on that command's output and is **distinct from `/validate-artifact`**; do not conflate.
-- **No `Target Stories` work here.** This command writes the feature with the decomposition sections empty; `/pf2-decompose` fills them. Two reasons: keeps single-session sizing tight (Principle 1 — single-session sizing constraint), and keeps deep dialog at the right altitude per the stub-list-then-drill-in decomposition.
+- **Feature-level validation is `/pf2-validate`** (a thin wrapper over `/validate-artifact`). Features have no review phase — Pattern 1 validation only. The decomposition exit gate run inside `/pf3-decompose` is a stub-batch check on that command's output and is **distinct from `/validate-artifact`**; do not conflate.
+- **No `Target Stories` work here.** This command writes the feature with the decomposition sections empty; `/pf3-decompose` fills them. Two reasons: keeps single-session sizing tight (Principle 1 — single-session sizing constraint), and keeps deep dialog at the right altitude per the stub-list-then-drill-in decomposition.
 - **No `.shamt-core/project-specific-files/CODING_STANDARDS.md` consult.** Coding style is irrelevant at the feature altitude. Same rule as `/pe1-define`.
 - **`--tracker=` is one-off, not persisted.** The project default in `.shamt-core/shamt-config.json` is unchanged. The override only affects Mode C; in Mode A and Mode B it is a no-op (a notice is surfaced when the flag is supplied in those modes).
 - **The freeform-fallback rule** means future tracker profiles that don't declare `Feature` natively still work — `/pf1-define` degrades gracefully with a one-line notice and continues into Mode A or Mode B based on the filesystem state.
 - **Mode disambiguation is filesystem-first.** Mode A wins when the stub is present; Mode C wins next when the tracker profile and slug shape align; Mode B is the default fallback. No new flags are needed to pick a mode.
-- **Parent-slug batch mode is horizontal fan-out, not vertical chaining — and honors Principle 1.** Passing an **epic** slug (the parent altitude) runs this command's single-feature logic across every feature under the epic (`## Parent-slug batch mode`). This is **horizontal sibling fan-out at one altitude** — distinct from the vertical cross-altitude chaining the "No `/pf2-decompose` / Engineer-flow auto-invocation" discipline forbids: batch `/pf1-define` over an epic still does **not** decompose those features (that stays `/pf2-decompose`); it only runs the *same* define phase across siblings. It honors Principle 1 by the same argument `CLAUDE.md` homes for the `/f-all` / `/e-all` drivers: it is a **stateless, disk-derived dispatcher** of this command's own single-feature logic (worklist derived from the epic's on-disk `Target Features` / `Sequencing & Parallelization`, resumable by re-invocation via the skip-already-defined check, each child independently runnable via its own single slug) — not a state-holding mega-orchestrator.
+- **Parent-slug batch mode is horizontal fan-out, not vertical chaining — and honors Principle 1.** Passing an **epic** slug (the parent altitude) runs this command's single-feature logic across every feature under the epic (`## Parent-slug batch mode`). This is **horizontal sibling fan-out at one altitude** — distinct from the vertical cross-altitude chaining the "No `/pf3-decompose` / Engineer-flow auto-invocation" discipline forbids: batch `/pf1-define` over an epic still does **not** decompose those features (that stays `/pf3-decompose`); it only runs the *same* define phase across siblings. It honors Principle 1 by the same argument `CLAUDE.md` homes for the `/f-all` / `/e-all` drivers: it is a **stateless, disk-derived dispatcher** of this command's own single-feature logic (worklist derived from the epic's on-disk `Target Features` / `Sequencing & Parallelization`, resumable by re-invocation via the skip-already-defined check, each child independently runnable via its own single slug) — not a state-holding mega-orchestrator.
 
 <!-- Managed by Shamt — do not edit. Regenerate from shamt-core/host/templates/claude/commands/pf1-define.md. -->

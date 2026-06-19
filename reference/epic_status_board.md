@@ -46,7 +46,7 @@ For a feature row, aggregate its child stories with this precedence (first match
 `STATUS.md` is refreshed two ways, both of which **re-derive the whole table from disk** (never patch a cell):
 
 - **On demand** — `/po-status {epic-slug}` regenerates the epic's `STATUS.md` from the current subtree.
-- **Auto-refresh hooks** — five transition commands re-derive the parent epic's `STATUS.md` after their own work, so the rollup stays live: `/pe2-decompose` (new features → New), `/pf2-decompose` (new stories → New), `/ps1-define` (story → Validated), `/e4-execute-plan` (story → Building), `/e8-finalize-story` (story → Released; feature rollup recomputed).
+- **Auto-refresh hooks** — transition commands re-derive the parent epic's `STATUS.md` after their own work, so the rollup stays live: `/pe3-decompose` (new features → New), `/pf3-decompose` (new stories → New), the `-validate` stage `/pe2-validate` / `/pf2-validate` / `/ps2-validate` (epic / feature / story → Validated), `/e4-execute-plan` (story → Building), `/e8-finalize-story` (story → Released; feature rollup recomputed).
 
 ## Place in the PO tree
 

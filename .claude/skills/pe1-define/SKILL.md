@@ -7,7 +7,7 @@ description: >
   through to freeform), consults .shamt-core/project-specific-files/ARCHITECTURE.md for architectural impact, and
   drives an open-questions iterative dialog over Goal, Success Criteria, and
   Scope / Non-Scope to produce epics/{ID}-{slug}-{brief}/epic.md. Leaves Target
-  Features and Sequencing & Parallelization empty for /pe2-decompose. Invoke
+  Features and Sequencing & Parallelization empty for /pe3-decompose. Invoke
   when the user wants to start, create, or open a new epic; capture an ADO
   Epic; or scope an epic for an upcoming initiative.
 triggers:

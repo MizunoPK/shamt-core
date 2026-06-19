@@ -36,7 +36,7 @@ Cheap (Haiku) — pf0 is mechanical: resolve an epic, allocate an ID, seed a fil
 
 ## Single-stub incremental
 
-This is the feature-level analogue of `/ps0-draft` (story-level fast-path) — add one feature without re-decomposing the whole epic. Contrast with `/pe2-decompose` (the batch producer).
+This is the feature-level analogue of `/ps0-draft` (story-level fast-path) — add one feature without re-decomposing the whole epic. Contrast with `/pe3-decompose` (the batch producer).
 
 ---
 

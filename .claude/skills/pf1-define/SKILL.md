@@ -2,7 +2,7 @@
 name: pf1-define
 description: >
   Run Phase 3 of the Shamt PO flow at the Feature altitude. Three input modes:
-  (A) flesh out an existing feature stub written by /pe2-decompose — preserve
+  (A) flesh out an existing feature stub written by /pe3-decompose — preserve
   the Goal one-liner and drive the open-questions dialog — seeded by the stub's Decomposition Context when present — to populate Success Criteria + deepen Scope (parentage is the folder path); (B) create a standalone feature
   under the Tech Stories epic (per #15); (C) seed from a tracker
   work-item payload when the active profile (read from .shamt-core/shamt-config.json)

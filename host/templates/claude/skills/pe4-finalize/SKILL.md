@@ -1,5 +1,5 @@
 ---
-name: pe3-finalize
+name: pe4-finalize
 description: >
   Run the terminal PO-flow command at the Epic altitude. Guard that every child
   feature/story of the epic is finalized, mark the epic done via the active
@@ -18,11 +18,11 @@ triggers:
 
 ## Overview
 
-Mirrors the `/pe3-finalize {slug}` slash command. Same canonical body, two host wirings. The terminal PO-flow command at the Epic altitude, modelled on `/f6-archive-proposal`.
+Mirrors the `/pe4-finalize {slug}` slash command. Same canonical body, two host wirings. The terminal PO-flow command at the Epic altitude, modelled on `/f6-archive-proposal`.
 
 ## Protocol
 
-Follow the canonical `/pe3-finalize` command body verbatim — see [`commands/pe3-finalize.md`](../../commands/pe3-finalize.md).
+Follow the canonical `/pe4-finalize` command body verbatim — see [`commands/pe4-finalize.md`](../../commands/pe4-finalize.md).
 
 ## Recommended model
 
@@ -34,4 +34,4 @@ Every child was finalized before the move; the epic is marked done (tracker + `e
 
 ---
 
-<!-- Managed by Shamt — do not edit. Regenerate from shamt-core/host/templates/claude/skills/pe3-finalize/SKILL.md. -->
+<!-- Managed by Shamt — do not edit. Regenerate from shamt-core/host/templates/claude/skills/pe4-finalize/SKILL.md. -->

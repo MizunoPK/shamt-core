@@ -4,7 +4,7 @@ description: Story stage-0 draft (replaces the former Tech Stories fast-path com
 
 # /ps0-draft
 
-**Purpose:** Quickly create one **DRAFT** story-ticket stub under an existing feature or under the standing Tech Stories epic (bugs / quick-wins fast-path) — a scope one-liner plus the supplied `blurb` written into a **Scratch Notes (stage-0 capture)** section — marked as an unrefined idea capture. ps0 is the **single-story-stub incremental** producer: write **one** story stub without re-running `/pf2-decompose` and without re-gating the whole batch. ps0 runs **no** open-questions dialog and writes **no** formal Acceptance Criteria structure; it is the fast pre-story stage. The full drafting pass (scope one-liner + spec + deep dialog, with the open-questions dialog) is deferred to `/ps1-define {slug}`, which ingests a ps0 draft as its intake.
+**Purpose:** Quickly create one **DRAFT** story-ticket stub under an existing feature or under the standing Tech Stories epic (bugs / quick-wins fast-path) — a scope one-liner plus the supplied `blurb` written into a **Scratch Notes (stage-0 capture)** section — marked as an unrefined idea capture. ps0 is the **single-story-stub incremental** producer: write **one** story stub without re-running `/pf3-decompose` and without re-gating the whole batch. ps0 runs **no** open-questions dialog and writes **no** formal Acceptance Criteria structure; it is the fast pre-story stage. The full drafting pass (scope one-liner + spec + deep dialog, with the open-questions dialog) is deferred to `/ps1-define {slug}`, which ingests a ps0 draft as its intake.
 
 **Deprecation note:** `/ps0-draft` **replaces the former Tech Stories fast-path command**. A tech story is just a story drafted under the Tech Stories epic's standing `bugs` / `quick-wins` feature. The fast-path semantics are now unified under ps0.
 
@@ -32,7 +32,7 @@ description: Story stage-0 draft (replaces the former Tech Stories fast-path com
 
 ## Parent modes
 
-ps0 supports **two parent modes**, both writing the **same story-ticket stub shape `/pf2-decompose` emits**:
+ps0 supports **two parent modes**, both writing the **same story-ticket stub shape `/pf3-decompose` emits**:
 
 1. **Feature-parent mode** — `{feature-slug}` resolves to an existing feature. Write one story stub under it and additively append to that feature's `## Target Stories`.
 2. **Tech-story mode** (absorbs the former tech-story fast-path) — `bugs` / `quick-wins` resolves the standing Tech Stories epic's reserved feature (`epics/{tech-stories-folder}/features/{bugs|quick-wins}/`). Write the stub there. Carry forward the former tech-story fast-path's tracker-template selection (ado / github / local — read `work_item_tracker` from `.shamt-core/shamt-config.json`), its standing-fixture prerequisite check (halt + direct to re-run `import-shamt` if the standing containers are absent), and its completion-archive note (finalize via `/e8-finalize-story` moves the story into the feature's `archive/`).
@@ -57,7 +57,7 @@ ps0 supports **two parent modes**, both writing the **same story-ticket stub sha
    - **github** → [`templates/ticket.github.template.md`](../../../../templates/ticket.github.template.md)
    - **local** or **none** → [`templates/ticket.github.template.md`](../../../../templates/ticket.github.template.md) as the **generic baseline**. **Replace the template's `**Tracker profile:** GitHub (see …)` metadata line with `**Tracker profile:** {local|none}` to match the active config.**
 3. Ask the user for a 2–4-word **brief description** of the story, or derive it from the blurb if supplied.
-4. Create the folder `epics/{epic-folder}/features/{feature-folder}/stories/{ID}-{story-slug}-{brief}/` and write `ticket.md` with the **same core stub shape `/pf2-decompose` emits** (per its Step 8 stub-section contract):
+4. Create the folder `epics/{epic-folder}/features/{feature-folder}/stories/{ID}-{story-slug}-{brief}/` and write `ticket.md` with the **same core stub shape `/pf3-decompose` emits** (per its Step 8 stub-section contract):
    - **Ticket metadata block** — unchanged from the template.
    - **Body intake area** (the paragraph immediately after the metadata block, marked "Paste ticket content here — any format accepted"): write the story's scope one-liner verbatim (from the blurb or prompt).
    - **`## Decomposition Context` section:** "none" (to be refined later) or initial breadth bullets (dependencies on siblings, shared context, boundary rationale) if known. **NOT a depth dump** — acceptance / spec detail is the Engineer flow's job.
@@ -95,9 +95,9 @@ Next: /ps1-define {story-slug} to flesh it out and define the story.
 
 ## Notes
 
-- **Single-story-stub incremental.** Add one story at a time without re-decomposing the whole feature. Contrast with `/pf2-decompose` (the batch producer).
+- **Single-story-stub incremental.** Add one story at a time without re-decomposing the whole feature. Contrast with `/pf3-decompose` (the batch producer).
 - **Tech Stories fast-path unified.** `/ps0-draft` absorbs the former tech-story fast-path — the two modes are now one command. A tech story is just a story under the standing Tech Stories epic's `bugs` / `quick-wins` feature.
-- **Tracker-template selection per active profile.** Same template-selection semantics as `/pf2-decompose` Step 8 and the former tech-story fast-path.
+- **Tracker-template selection per active profile.** Same template-selection semantics as `/pf3-decompose` Step 8 and the former tech-story fast-path.
 - **Completion archive for tech stories.** When a tech story is finalized via `/e8-finalize-story`, it is moved into the feature's `archive/` folder — keeping the standing features from growing without bound (same semantics as the former fast-path).
 - **Non-destructive by construction.** The collision halt reflects the PO-flow design where slugs are user-chosen and globally unique.
 - **Fresh-agent runnable** — the config, tracker templates, and standing epic are sufficient. No conversation history required.

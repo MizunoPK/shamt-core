@@ -1,7 +1,7 @@
 ---
-name: pe2-decompose
+name: pe3-decompose
 description: >
-  Run Phase 2 of the Shamt PO flow at the Epic altitude. Reads a validated
+  Run Phase 3 of the Shamt PO flow at the Epic altitude. Reads a validated
   epic.md, proposes a list of features (title + one-line goal each), gates the
   whole list with the user once, produces a parallelization analysis
   (recommended development order + concurrent-work callout), checks the
@@ -23,16 +23,16 @@ triggers:
 
 ## Overview
 
-Mirrors the `/pe2-decompose {slug}` slash command. Same canonical body, two host wirings.
+Mirrors the `/pe3-decompose {slug}` slash command. Same canonical body, two host wirings.
 
 ## Protocol
 
-Follow the canonical `/pe2-decompose` command body verbatim — see [`commands/pe2-decompose.md`](../../commands/pe2-decompose.md).
+Follow the canonical `/pe3-decompose` command body verbatim — see [`commands/pe3-decompose.md`](../../commands/pe3-decompose.md).
 
 ## Key distinctions
 
-- **Decomposition exit gate ≠ `/validate-artifact`.** The gate is a 2-condition stub-batch check run **before** stubs land on disk. `/validate-artifact` runs the full Pattern 1 loop against `epic.md` (already, before this command) and against each `feature.md` (later, after `/pf1-define` completes its dialog). Do not conflate.
-- **No tracker fetch** at this altitude — `/pe2-decompose` operates entirely on the already-written `epic.md`.
+- **Decomposition exit gate ≠ `/validate-artifact`.** The gate is a 2-condition stub-batch check run **before** stubs land on disk. `/validate-artifact` runs the full Pattern 1 loop against `epic.md` (already, via `/pe2-validate`, before `/pe3-decompose`) and against each `feature.md` (later, via `/pf2-validate`, after `/pf1-define` completes its dialog). Do not conflate.
+- **No tracker fetch** at this altitude — `/pe3-decompose` operates entirely on the already-written `epic.md`.
 - **No epic-level review.** The 16-category code-review framework stays story-level per Pattern 4.
 - **No `/pf1-define` auto-invocation.** Per Principle 1, every command stays independently runnable.
 
@@ -44,4 +44,4 @@ Reasoning (Opus) — see [`reference/model_selection.md`](../../../../../referen
 
 N feature-stub folders exist nested under `epics/{epic-folder}/features/`: New stubs (and every stub on first decomposition) carry `## Goal` + `## Scope / Non-Scope` + `## Decomposition Context` filled (parent epic is the folder path), with the depth sections (`## Success Criteria` / `## Open Questions`) empty; Kept stubs (re-decomposition only) are preserved unchanged from before the invocation, including any in-progress user work inside. The parent epic's `Target Features` + `Sequencing & Parallelization` sections carry the approved list and analysis; a slug-only `Decomposed YYYY-MM-DD — N feature stubs at features/{slug-1}, features/{slug-2}, …` line is present directly above the preserved `Validated …` footer (actual folder paths recovered via `features/{slug}-*/` glob via §PO-tree resolution); orphaned stubs (on re-decomposition) surfaced as a warning, not auto-deleted; the user approved the batch.
 
-<!-- Managed by Shamt — do not edit. Regenerate from shamt-core/host/templates/claude/skills/pe2-decompose/SKILL.md. -->
+<!-- Managed by Shamt — do not edit. Regenerate from shamt-core/host/templates/claude/skills/pe3-decompose/SKILL.md. -->

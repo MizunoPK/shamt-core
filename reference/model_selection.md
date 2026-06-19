@@ -55,15 +55,18 @@ Personas declare their tier in the persona body (e.g., a frontmatter `model:` fi
 | 7. Polish — code edits | Balanced | Apply reviewer feedback; mechanical fixes |
 | 7. Polish — root cause / upstream proposals | Reasoning | Generalize recurring feedback into framework-update proposals; multi-piece synthesis |
 | 8. Finalize (`/e8-finalize-story`) | Cheap | Mechanical: evaluate three guards, scoped commit, one tracker-close command, status flip — mirrors `/f6-archive-proposal` |
-| PO — Epic finalize (`/pe3-finalize`) | Cheap | Mechanical: children-done guard, tracker close, `epic.md` status flip, folder move into `epics/archive/`, commit |
+| PO — Epic finalize (`/pe4-finalize`) | Cheap | Mechanical: children-done guard, tracker close, `epic.md` status flip, folder move into `epics/archive/`, commit |
 | PO — Epic draft (`/pe0-draft`) | Cheap | f0-style bare idea capture: seed `epic.md` with Scratch Notes + draft status; no design judgment, no open-questions dialog (mirrors `/f0-draft-proposal`) |
 | PO — Epic define (`/pe1-define`) | Balanced | Open-questions iterative dialog over Goal / Success Criteria / Scope; consults ARCHITECTURE.md; ingests a `/pe0-draft` stub when present |
-| PO — Epic decompose (`/pe2-decompose`) | Balanced | Stub-list-then-drill-in batch decomposition into feature stubs; parallelization analysis; re-decomposition partition |
+| PO — Epic decompose (`/pe3-decompose`) | Balanced | Stub-list-then-drill-in batch decomposition into feature stubs; parallelization analysis; re-decomposition partition |
 | PO — Feature draft (`/pf0-draft`) | Cheap | f0-style single-stub capture under an existing epic; no dialog (mirrors `/f0-draft-proposal`) |
 | PO — Feature define (`/pf1-define`) | Balanced | Open-questions iterative dialog over Success Criteria + Scope; consults ARCHITECTURE.md; ingests a `/pf0-draft` stub when present |
-| PO — Feature decompose (`/pf2-decompose`) | Balanced | Stub-list-then-drill-in batch decomposition into story stubs; individually-testable rubric; parallelization analysis |
+| PO — Feature decompose (`/pf3-decompose`) | Balanced | Stub-list-then-drill-in batch decomposition into story stubs; individually-testable rubric; parallelization analysis |
 | PO — Story draft (`/ps0-draft`) | Cheap | f0-style single-stub capture under an existing feature (absorbs the old tech-story fast path); no dialog |
-| PO — Story define (`/ps1-define`) | Reasoning | Open-questions dialog **plus** an inline Pattern-1 validation loop producing the engineer-ready planning ticket (mirrors the story-altitude design+validation tiers) |
+| PO — Story define (`/ps1-define`) | Balanced | Open-questions dialog producing the engineer-ready planning ticket — a pure define/dialog stage (validation moved to the `-validate` stage); consistent with `/pe1-define` / `/pf1-define` |
+| PO — Epic validate (`/pe2-validate`) | Reasoning | Thin wrapper over the `/validate-artifact` Pattern-1 loop on `epic.md`; the loop escalates to Reasoning (primary) with a Cheap `validation-checker` sub-agent, per the `/validate-artifact` row. Single mode only |
+| PO — Feature validate (`/pf2-validate`) | Reasoning | Thin wrapper over `/validate-artifact` on `feature.md`; same loop tiering as the `/validate-artifact` row; a parent epic slug batch-validates all features (stateless disk-derived dispatcher) |
+| PO — Story validate (`/ps2-validate`) | Reasoning | Thin wrapper over `/validate-artifact` on `ticket.md` (the inline loop moved out of `/ps1-define`); same loop tiering; a parent feature slug batch-validates all stories |
 | Manual-test-plan drafting (`/e5b-write-manual-testing-plan`) | Balanced | Drafting + validation loop per the manual-test-plan rule |
 | Engineer flow — `/e-all` driver (spans Phases 1–8) | Balanced | Meta-driver: sequences phases, dispatches one sub-agent per phase, inspects each report, and pauses on each interactive gate / halts on failure. The heavy per-phase reasoning lives in the dispatched agents at their own tiers (spec / plan-validation primary Reasoning; `plan-executor` Cheap; `user-simulator` Balanced; `test-executor` / `validation-checker` Cheap; story-review primary Balanced). Child-facing analog of the `/f-all` driver row below |
 | Framework update — Phase 0 (`/f0-draft-proposal`) | Cheap | Quick-capture an unrefined DRAFT proposal from a blurb: resolve a slug, seed a bare file, drop the blurb into Scratch Notes; no design judgment, no open-questions dialog |

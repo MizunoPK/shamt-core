@@ -2,29 +2,29 @@
 description: Phase 4 of the PO flow — break a validated feature into N story-ticket stubs via the stub-list-then-drill-in pattern, gating the whole list once, enforcing the individually-testable rubric, and recording parallelization analysis on the parent feature
 ---
 
-# /pf2-decompose
+# /pf3-decompose
 
 **Purpose:** Run Phase 4 of the PO flow. Read a validated `feature.md`, propose a list of stories (title + one-line scope each), enforce the **individually-testable rubric**, gate the whole list with the user once, derive story slugs, run the decomposition exit gate, then write N story-ticket-stub folders nested under `epics/{epic-folder}/features/{feature-folder}/stories/` (each carrying the scope one-liner + a `## Decomposition Context` breadth section; parentage is the folder path) and append `Target Stories` + `Sequencing & Parallelization` back onto the parent feature. Per-story deep dialog is deferred to `/e1-start-story` (stub-aware).
 
-**Recommended model:** Reasoning (Opus). Decomposition involves the individually-testable rubric, dependency analysis, parallelization callout, and global-slug discipline — all benefit from Opus's reasoning depth. Same justification as `/pe2-decompose`. See [`reference/model_selection.md`](../../../../reference/model_selection.md).
+**Recommended model:** Reasoning (Opus). Decomposition involves the individually-testable rubric, dependency analysis, parallelization callout, and global-slug discipline — all benefit from Opus's reasoning depth. Same justification as `/pe3-decompose`. See [`reference/model_selection.md`](../../../../reference/model_selection.md).
 
 ---
 
 ## Usage
 
 ```
-/pf2-decompose {slug} [--allow-unvalidated]
+/pf3-decompose {slug} [--allow-unvalidated]
 ```
 
 ## Arguments
 
 - `{slug}` (required) — feature slug. Resolved against the nested feature tree per §PO-tree resolution.
-- `--allow-unvalidated` (optional, discouraged) — proceed even if `feature.md` carries no `Validated …` footer. Use only when the PO explicitly wants to decompose a draft to test the breakdown shape; rerun `/validate-artifact` afterwards. Same semantics as `/pe2-decompose`'s flag of the same name.
+- `--allow-unvalidated` (optional, discouraged) — proceed even if `feature.md` carries no `Validated …` footer. Use only when the PO explicitly wants to decompose a draft to test the breakdown shape; rerun `/pf2-validate {slug}` after decomposition. Same semantics as `/pe3-decompose`'s flag of the same name.
 
 ## Prerequisites
 
 - The feature folder (resolved per §PO-tree resolution) must exist with a populated `feature.md`. If not, halt and direct the user to `/pf1-define {slug}` first.
-- `feature.md` should carry a `Validated …` footer. If it does not, halt with a clear message and direct the user to `/validate-artifact` on the feature's path — unless `--allow-unvalidated` is passed.
+- `feature.md` should carry a `Validated …` footer. If it does not, halt with a clear message and direct the user to `/pf2-validate {slug}` (the feature-altitude validate stage) — unless `--allow-unvalidated` is passed.
 
 ## Step-by-step
 
@@ -50,8 +50,8 @@ The single-feature resolution that follows runs only on the own-altitude branch:
 
 1. Read the last non-blank line of `feature.md`.
 2. If it matches `Validated YYYY-MM-DD — …`, proceed to Step 3.
-3. Otherwise, **halt** with: `feature.md is not validated — run /validate-artifact epics/{epic-folder}/features/{ID}-{slug}-{brief}/feature.md first, or re-invoke with --allow-unvalidated to proceed against the draft.`
-4. If `--allow-unvalidated` was passed, surface a one-line notice (`proceeding against an unvalidated feature — re-run /validate-artifact after decomposition`) and continue.
+3. Otherwise, **halt** with: `feature.md is not validated — run /pf2-validate {slug} first, or re-invoke with --allow-unvalidated to proceed against the draft.`
+4. If `--allow-unvalidated` was passed, surface a one-line notice (`proceeding against an unvalidated feature — re-run /pf2-validate after decomposition`) and continue.
 
 ### Step 3 — Re-entry detection
 
@@ -65,7 +65,7 @@ Read the parent feature. If a `Decomposed YYYY-MM-DD — N story stubs at storie
    - **New** — the slug does not match the prior list. A fresh stub is written (Step 8); the collision check applies normally (Step 7).
    - **Orphaned** — a slug in the prior list does not appear in the new list. The folder is left in place; Step 9 surfaces a warning.
 
-On first decomposition (no prior `Decomposed …` line), every approved story is **New**; the partition concepts above are inert. Same partition rule as `/pe2-decompose` Step 3.
+On first decomposition (no prior `Decomposed …` line), every approved story is **New**; the partition concepts above are inert. Same partition rule as `/pe3-decompose` Step 3.
 
 ### Step 4 — Read the feature and propose the story list
 
@@ -92,7 +92,7 @@ On first decomposition (no prior `Decomposed …` line), every approved story is
      - **ado / github** — descriptive kebab-case is allowed at the stub stage (the engineer can rename to the tracker-native form during `/e1-start-story` if a ticket is later filed). The PO flow does not create tracker work items.
      - **local / none** — any descriptive kebab-case slug.
    - `{brief}` suffix — kebab-case from the scope one-liner. Keep `{brief}` short — 2–4 words.
-   - **Re-decomposition Kept exception:** if a prior `Decomposed …` line is present (Step 3) and the derived `{story-slug}` matches one of its entries, **do not** re-derive `{brief}`. Resolve the existing folder via the both-positions slug glob `stories/{story-slug}-*/` ∪ `stories/*-{story-slug}-*/` (the latter finds an ID-prefixed Kept folder) (slugs are globally unique; the prior line records slugs only, so the actual `{brief}` is read off the existing folder name) and reuse that folder verbatim. Same Kept-exception rule as `/pe2-decompose`.
+   - **Re-decomposition Kept exception:** if a prior `Decomposed …` line is present (Step 3) and the derived `{story-slug}` matches one of its entries, **do not** re-derive `{brief}`. Resolve the existing folder via the both-positions slug glob `stories/{story-slug}-*/` ∪ `stories/*-{story-slug}-*/` (the latter finds an ID-prefixed Kept folder) (slugs are globally unique; the prior line records slugs only, so the actual `{brief}` is read off the existing folder name) and reuse that folder verbatim. Same Kept-exception rule as `/pe3-decompose`.
 
 5. Draft the **parallelization analysis**:
    - **Recommended order** — sequenced enumeration of stories by dependency; for each, a one-line "why this comes first; dependencies" note. Development-order dependencies between siblings (rubric exception above) live here.
@@ -155,7 +155,7 @@ Update `feature.md`:
 1. **Rewrite `## Target Stories` wholesale** with the approved list — one bullet per story: `` `{story-slug}` — {one-line scope} ``. If this is a re-decomposition (Step 3), replace the prior section's content entirely.
 2. **Rewrite `## Sequencing & Parallelization` wholesale** with the approved analysis (recommended order + parallelizable callout). Same wholesale-replace rule on re-decomposition.
 3. **Add (or replace) a `Decomposed YYYY-MM-DD — N story stubs at stories/{slug-1}, stories/{slug-2}, …` line** immediately **above** the `Validated …` footer, so the validation footer remains the last line of the file. Use today's date.
-   - **Slug-only format.** Record the slug portion of each folder (`{story-slug}`), not the full `{story-slug}-{brief}` path. Slugs are globally unique, so the actual folder is always recoverable via `stories/{slug}-*/` glob — recording only the slug keeps the line parseable on re-decomposition (Step 3 reads slugs directly without having to split a slug-brief concatenation, which is ambiguous because both are kebab-case). Same format as `/pe2-decompose` Step 9.
+   - **Slug-only format.** Record the slug portion of each folder (`{story-slug}`), not the full `{story-slug}-{brief}` path. Slugs are globally unique, so the actual folder is always recoverable via `stories/{slug}-*/` glob — recording only the slug keeps the line parseable on re-decomposition (Step 3 reads slugs directly without having to split a slug-brief concatenation, which is ambiguous because both are kebab-case). Same format as `/pe3-decompose` Step 9.
    - On first decomposition: insert the line.
    - On re-decomposition: replace the prior `Decomposed …` line in place. Only the latest decomposition is recorded.
 4. **Preserve the existing validation footer** as-is. The feature was validated before decomposition; decomposition does not re-invalidate it. Do not strip or duplicate the footer.
@@ -176,7 +176,7 @@ Warning: re-decomposition orphaned the following story folders
 These are NOT auto-deleted. Review each and either delete or repurpose manually.
 ```
 
-The left column is the slug as it appeared in the prior `Decomposed …` line; the right column is the actual folder path on disk (the `{brief}` suffix is recovered via glob). The user sees both so they can navigate to the folder and recognize the slug they had in mind. Same format as `/pe2-decompose`'s orphan warning.
+The left column is the slug as it appeared in the prior `Decomposed …` line; the right column is the actual folder path on disk (the `{brief}` suffix is recovered via glob). The user sees both so they can navigate to the folder and recognize the slug they had in mind. Same format as `/pe3-decompose`'s orphan warning.
 
 ### Step 9b — Refresh the parent epic STATUS.md
 
@@ -215,9 +215,9 @@ Each story stub is **independently resumable**. The engineer can drive `/e1-star
 Entered from Step 1's altitude dispatch when the slug resolves to an **epic** folder (the parent altitude) rather than a feature folder. The command then runs its own single-feature decompose logic across every feature under that epic, sequentially. This is **horizontal sibling fan-out at one altitude** — it decomposes each feature into story stubs; it does **not** then run `/ps1-define` on the resulting story stubs (that stays at the next altitude) and does **not** chain into any other altitude's command. The batch loop is a **stateless, disk-derived dispatcher of this command's own single-feature logic** — the worklist comes from the epic's on-disk decomposition output, and re-invocation is resumable (see Principle 1 reconciliation in Notes).
 
 1. **Derive the ordered worklist from disk.** Read the epic's `epic.md` and take its child features in the order given by `## Sequencing & Parallelization` (`Recommended order`), falling back to `## Target Features` list order when no sequencing is recorded. Resolve each listed slug to its feature folder per §PO-tree resolution.
-   - **Empty / un-decomposed parent.** If the epic has no children (its `## Target Features` decomposition list is empty / absent — e.g. the epic has not yet been run through `/pe2-decompose`), the worklist is empty: report `parent {slug} has no children to process — run the decompose phase (/pe2-decompose {slug}) first` and **exit cleanly** (a no-op, distinct from the Step 1 "neither own nor parent altitude → halt" dispatch case).
+   - **Empty / un-decomposed parent.** If the epic has no children (its `## Target Features` decomposition list is empty / absent — e.g. the epic has not yet been run through `/pe3-decompose`), the worklist is empty: report `parent {slug} has no children to process — run the decompose phase (/pe3-decompose {slug}) first` and **exit cleanly** (a no-op, distinct from the Step 1 "neither own nor parent altitude → halt" dispatch case).
 2. **Skip-already-decomposed-with-notice (resumability).** For each feature in worklist order, first check whether it is already decomposed — its `feature.md` carries a `Decomposed …` line (the single-slug completion signal). If so, emit a one-line notice (`skipping {feature-slug} — already decomposed`) and move to the next child. This makes re-invocation resumable: a batch interrupted partway resumes at the first incomplete child without re-prompting completed ones.
-3. **Halt-at-the-feature on a missing validation footer (Q-A1).** Before decomposing a not-yet-decomposed feature, check that its `feature.md` carries a `Validated …` footer (the single-slug prerequisite). If it does not, **halt the batch at that feature** and direct the user to `/pf1-define {feature-slug}` + `/validate-artifact` it (the same gate the single-slug path enforces in Step 2). Already-decomposed features ahead of it were skipped-with-notice; re-invoking after the user validates resumes from that feature. No implicit gate bypass — passing `--allow-unvalidated` to the batch remains the explicit escape hatch, applied uniformly to every child (the same flag the single-slug path honors).
+3. **Halt-at-the-feature on a missing validation footer (Q-A1).** Before decomposing a not-yet-decomposed feature, check that its `feature.md` carries a `Validated …` footer (the single-slug prerequisite). If it does not, **halt the batch at that feature** and direct the user to `/pf1-define {feature-slug}` + `/pf2-validate {feature-slug}` (the same gate the single-slug path enforces in Step 2). Already-decomposed features ahead of it were skipped-with-notice; re-invoking after the user validates resumes from that feature. No implicit gate bypass — passing `--allow-unvalidated` to the batch remains the explicit escape hatch, applied uniformly to every child (the same flag the single-slug path honors).
 4. **Per-child execution.** For each not-yet-decomposed, validated feature, run this command's **single-feature** Step-by-step verbatim on that feature's slug — including the whole-list gate (Step 5) and the decomposition exit gate (Step 6) per child, one feature's batch at a time per Principle 2. Each child runs its **own complete gate before the next child starts**; never bulk-bomb the union of all children's story lists across the batch.
 5. **Halt-at-child on an unresolvable outcome (Q-A2).** If any child hits a condition it cannot resolve (slug collision, ambiguous resolution, a gate that cannot converge), **stop the batch at that child** and surface its report verbatim. The user fixes it and re-invokes; resumability (step 2) resumes at that child without re-prompting the children already decomposed ahead of it.
 6. **Final summary.** When the worklist is exhausted, report a one-line-per-child summary: each child slug and its outcome (`decomposed into N stories` / `skipped — already decomposed`), then the next-command suggestion (`/clear`, then `/ps1-define {story-slug}` on each new story stub).
@@ -233,17 +233,17 @@ Entered from Step 1's altitude dispatch when the slug resolves to an **epic** fo
 ## Notes
 
 - **Fresh-agent runnable.** Every input lives on disk (`feature.md` in its nested location, the active tracker's ticket template, the existing nested `stories/` tree, `.shamt-core/shamt-config.json`). No conversation history required.
-- **Decomposition exit gate ≠ `/validate-artifact`.** The gate in Step 6 is a 2-condition stub-batch check run **before** stubs are written; `/validate-artifact` is the full Pattern 1 loop that runs against `feature.md` (already, before `/pf2-decompose`) and against each story-level artifact (later, after `/e2-define-spec`, `/e3-plan-implementation`, etc. — Engineer-flow validations). Do not conflate the two.
+- **Decomposition exit gate ≠ `/validate-artifact`.** The gate in Step 6 is a 2-condition stub-batch check run **before** stubs are written; `/validate-artifact` is the full Pattern 1 loop that runs against `feature.md` (already, via `/pf2-validate`, before `/pf3-decompose`) and against each story-level artifact (later, via the Engineer flow). Do not conflate the two.
 - **The individually-testable rubric is the hard constraint** on output. The Engineer flow can refuse a story that violates this; PO-flow enforcement at decomposition time is the contract. The rubric is reproduced in full inline in Step 4 sub-step 3 — not just by reference — so a fresh agent reading this command can apply it without external lookup.
 - **Development-order dependencies between siblings are allowed.** They live in the parallelization analysis (`Recommended order`) and are not testability violations. Do not reject candidate stories that have sibling build-order dependencies.
 - **No tracker fetch at this altitude.** This command operates entirely on the already-written `feature.md`. The tracker freeform-fallback rule does not apply at this altitude — there is no tracker payload to fall through from. The active tracker is read only to pick the **ticket template** for the stub bodies (Step 8 — `ado` vs. `github` vs. baseline).
 - **No per-story deep dialog here.** That is `/e1-start-story` (stub-aware)'s job per the stub-list-then-drill-in decomposition. Resist the urge to start drafting story acceptance criteria, spec sections, or implementation plans — it produces low-value batched dialog at this altitude and pre-empts the open-questions iterative dialog at the next altitude.
-- **Single-add alternative — `/ps0-draft`.** To add just **one** story to an already-decomposed feature, prefer `/ps0-draft {feature-slug}` (the incremental single-stub producer, which appends one story stub to this feature's `## Target Stories` without re-gating) rather than re-running this batch decompose. Re-running `/pf2-decompose` re-presents and re-gates the *entire* story list (Step 3 re-decomposition partition); the single-add path skips that.
+- **Single-add alternative — `/ps0-draft`.** To add just **one** story to an already-decomposed feature, prefer `/ps0-draft {feature-slug}` (the incremental single-stub producer, which appends one story stub to this feature's `## Target Stories` without re-gating) rather than re-running this batch decompose. Re-running `/pf3-decompose` re-presents and re-gates the *entire* story list (Step 3 re-decomposition partition); the single-add path skips that.
 - **No feature-level review phase.** Per Pattern 4, the 16-category code-review framework stays story-level. This command does not invoke `/e6-review-changes`.
 - **No `/e1-start-story` auto-invocation.** Per Principle 1, every command stays independently runnable. Chaining would force a multi-phase session and would couple resumability across altitudes.
-- **Parent-slug batch mode is horizontal fan-out, not vertical chaining — and honors Principle 1.** Passing an **epic** slug (the parent altitude) runs this command's single-feature decompose logic across every feature under the epic (`## Parent-slug batch mode`). This is **horizontal sibling fan-out at one altitude** — distinct from the vertical cross-altitude chaining the "No `/e1-start-story` auto-invocation" note above forbids: batch `/pf2-decompose` over an epic still does **not** then run `/ps1-define` on the resulting story stubs (that stays at the next altitude); it only runs the *same* decompose phase across siblings. It honors Principle 1 by the same argument `CLAUDE.md` homes for the `/f-all` / `/e-all` drivers: it is a **stateless, disk-derived dispatcher** of this command's own single-feature logic (worklist derived from the epic's on-disk `Target Features` / `Sequencing & Parallelization`, resumable by re-invocation via the skip-already-decomposed check, each child independently runnable via its own single slug) — not a state-holding mega-orchestrator.
+- **Parent-slug batch mode is horizontal fan-out, not vertical chaining — and honors Principle 1.** Passing an **epic** slug (the parent altitude) runs this command's single-feature decompose logic across every feature under the epic (`## Parent-slug batch mode`). This is **horizontal sibling fan-out at one altitude** — distinct from the vertical cross-altitude chaining the "No `/e1-start-story` auto-invocation" note above forbids: batch `/pf3-decompose` over an epic still does **not** then run `/ps1-define` on the resulting story stubs (that stays at the next altitude); it only runs the *same* decompose phase across siblings. It honors Principle 1 by the same argument `CLAUDE.md` homes for the `/f-all` / `/e-all` drivers: it is a **stateless, disk-derived dispatcher** of this command's own single-feature logic (worklist derived from the epic's on-disk `Target Features` / `Sequencing & Parallelization`, resumable by re-invocation via the skip-already-decomposed check, each child independently runnable via its own single slug) — not a state-holding mega-orchestrator.
 - **Parallelization is PO-flow output, not runtime coordination.** The `Parallelizable` callout informs the engineer; running stories concurrently is a "second terminal tab" exercise.
 - **Parentage derivation.** The parent epic is derived from the feature's folder path, which is read in Step 4. When the parent feature is standalone (no parent epic folder), stories nest under the Tech Stories epic. Parentage is the folder path; no back-ref headers are written.
 
 ---
-<!-- Managed by Shamt — do not edit. Regenerate from shamt-core/host/templates/claude/commands/pf2-decompose.md. -->
+<!-- Managed by Shamt — do not edit. Regenerate from shamt-core/host/templates/claude/commands/pf3-decompose.md. -->

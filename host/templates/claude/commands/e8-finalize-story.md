@@ -67,7 +67,7 @@ If the remote close command fails, halt and report the git/CLI output — do not
 
 ### Step 5b — Tech-story completion archive
 
-If the resolved story folder is nested under the standing **Tech Stories** epic (its path is `epics/{tech-stories-folder}/features/{bugs|quick-wins}/stories/…`), **move the finalized story folder into its feature's `archive/`** — `epics/{tech-stories-folder}/features/{f}/archive/{same-folder-name}/` (`git mv` when tracked) — within the same Step 3 commit. This keeps the standing Bugs / Quick Wins features from growing without bound (mirroring how `/pe3-finalize` archives a done epic and `/f6-archive-proposal` archives an implemented proposal). For a normal (non-Tech-Stories) story, **skip this step** — the story folder stays in place.
+If the resolved story folder is nested under the standing **Tech Stories** epic (its path is `epics/{tech-stories-folder}/features/{bugs|quick-wins}/stories/…`), **move the finalized story folder into its feature's `archive/`** — `epics/{tech-stories-folder}/features/{f}/archive/{same-folder-name}/` (`git mv` when tracked) — within the same Step 3 commit. This keeps the standing Bugs / Quick Wins features from growing without bound (mirroring how `/pe4-finalize` archives a done epic and `/f6-archive-proposal` archives an implemented proposal). For a normal (non-Tech-Stories) story, **skip this step** — the story folder stays in place.
 
 ### Step 5c — Refresh the epic STATUS.md
 
@@ -93,7 +93,7 @@ No next-phase suggestion. The Engineer flow ends at Phase 8 (Finalize).
 
 ## Notes
 
-- **Not an epic archive.** `/e8-finalize-story` finalizes a single story; it does **not** move the story folder. Epic-level archiving (moving a done epic into `epics/archive/`) is `/pe3-finalize`'s job.
+- **Not an epic archive.** `/e8-finalize-story` finalizes a single story; it does **not** move the story folder. Epic-level archiving (moving a done epic into `epics/archive/`) is `/pe4-finalize`'s job.
 - **Terminal phase.** Finalize is the last Engineer phase. The status line renders `P{N} Finalize` once `ticket.md` carries `**Status: Done**` (N = 7 on the Quick path, 8 on the Standard path — testing is a required phase).
 - **Fresh-agent runnable** — story folder, config, and working-tree state are sufficient. No conversation history required.
 - **No squash-merge.** Unlike `/f6-archive-proposal`, the story is not on a proposal branch; finalize commits the story's work on its feature branch and stops. PR creation / merge is the `pr_provider`'s concern, out of scope here.

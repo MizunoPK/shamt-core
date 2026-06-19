@@ -1,12 +1,12 @@
 ---
-description: Story stage-1 define (story altitude analogue of /pf1-define) — flesh out the planning ticket via open-questions dialog, then run an inline Pattern-1 validation loop to stamp the Validated footer; ready for /e1-start-story (stub-aware)
+description: Story stage-1 define (story altitude analogue of /pf1-define) — flesh out the planning ticket via open-questions dialog, leaving it defined-but-unvalidated; validation is the dedicated /ps2-validate stage
 ---
 
 # /ps1-define
 
-**Purpose:** Run Stage 1 of the PO flow at the **Story** altitude (the story-specific define + validation stage). Resolve a slug, branch on three input modes (ingest an existing `/ps0-draft` stub when present, create a standalone story from scratch, or seed from a tracker work-item payload when the active profile supports Story), drive an open-questions iterative dialog over the scope one-liner + spec structure, and produce the story-ticket stub under its parent feature — `epics/{epic-folder}/features/{feature-folder}/stories/{ID}-{slug}-{brief}/ticket.md`. Unlike `/pe1-define` and `/pf1-define` (which defer validation to `/validate-artifact`), `/ps1-define` runs an **inline Pattern-1 validation loop** so the command **stamps the `Validated …` footer itself**. This footer is the readiness signal `/e1-start-story` keys on.
+**Purpose:** Run Stage 1 of the PO flow at the **Story** altitude (the story-specific define stage). Resolve a slug, branch on three input modes (ingest an existing `/ps0-draft` stub when present, create a standalone story from scratch, or seed from a tracker work-item payload when the active profile supports Story), drive an open-questions iterative dialog over the scope one-liner + spec structure, and produce the story-ticket stub under its parent feature — `epics/{epic-folder}/features/{feature-folder}/stories/{ID}-{slug}-{brief}/ticket.md`. Like `/pe1-define` and `/pf1-define`, `/ps1-define` **defers validation to the dedicated validate stage** — here `/ps2-validate` — and does **not** stamp a `Validated …` footer itself. Define no longer validates at *any* altitude; validation is its own stage. The footer that `/ps2-validate` later stamps on `ticket.md` is the readiness signal `/e1-start-story` keys on.
 
-**Recommended model:** Reasoning (Opus) — design/dialog task + inline validation loop; cite [`reference/model_selection.md`](../../../../reference/model_selection.md).
+**Recommended model:** Balanced (Sonnet) — open-questions dialog / define task (no inline validation loop; validation is `/ps2-validate`'s job, escalating to Reasoning there); cite [`reference/model_selection.md`](../../../../reference/model_selection.md).
 
 ---
 
@@ -60,7 +60,7 @@ The single-story resolution that follows runs only on the own-altitude branch:
      Footer handling per branch (same rules as `/pf1-define`):
      - **Refetch** (offered only when the active profile declares Story support) — re-run the tracker fetch (Step 4 Mode C) and re-author the artifact from scratch. The file is rewritten wholesale; any prior `Validated …` footer is discarded along with the prior content. **Note:** if the existing artifact was originally drafted via Mode A (stub-ingesting) or Mode B (standalone), Refetch will replace that hand-authored content with tracker-seeded content — surface a one-line warning (`current artifact was not tracker-seeded — Refetch will replace hand-authored content with tracker payload`) before proceeding so the user can opt for Extend instead.
      - **Overwrite** — start the freeform open-questions dialog (Step 6) from a fresh template. Same wholesale rewrite; prior footer discarded.
-     - **Extend** — preserve existing content and add to it. **If a prior `Validated …` footer is present, strip it before continuing** — extension changes the artifact and invalidates the prior pass; the inline validation loop will re-stamp a new footer.
+     - **Extend** — preserve existing content and add to it. **If a prior `Validated …` footer is present, strip it before continuing** — extension changes the artifact and invalidates the prior pass; re-run `/ps2-validate {slug}` afterward to re-stamp a new footer.
      - **Exit** — leave the file untouched and return. No footer change.
 
      **Preserve the `**Ticket ID:**` header verbatim on re-entry.** The `**Ticket ID:** …` line is never rewritten by `/ps1-define` regardless of the chosen branch — it is decomposition-owned. Only the body sections are touched.
@@ -89,7 +89,7 @@ The folder exists; `ticket.md` carries the `**Status:**` marker + `## Scratch No
 1. **Read the Scratch Notes section** to seed the user's intent.
 2. **Preserve the `**Ticket ID:**` header verbatim** — decomposition-owned.
 3. **Consume the stub's existing content** (body intake area, Decomposition Context if present) as a research seed, then proceed to Step 5 (consult architecture) and Step 6 (open-questions dialog) to **deepen and flesh out** the spec structure.
-4. **On completion of the open-questions dialog** (Step 6), before running the inline validation loop (below), **strip the marker line and the `## Scratch Notes (stage-0 capture)` section** from `ticket.md`. This is the f1-style ingestion: the draft status + Scratch Notes are a temporary staging vehicle, removed once the story is defined.
+4. **On completion of the open-questions dialog** (Step 6), **strip the marker line and the `## Scratch Notes (stage-0 capture)` section** from `ticket.md`. This is the f1-style ingestion: the draft status + Scratch Notes are a temporary staging vehicle, removed once the story is defined.
 5. Leave other template sections empty (Summary, Description, Acceptance Criteria, etc.) as they appear in the template — the Engineer flow's `/e1-start-story` will flesh them out during intake.
 6. **No `## All Remaining Fields` appendix** — there was no tracker fetch in this mode.
 
@@ -120,62 +120,33 @@ Per [`templates/SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.temp
 - `## Open Questions` section empty.
 - Other template sections (Summary, Description, Acceptance Criteria, Related Work, Comments, Update History, All Remaining Fields) left as template placeholders (the Engineer flow's responsibility).
 
-**Mode A note:** After the dialog completes, before the inline validation loop runs, **strip the `**Status:** Draft (f0 — story-idea capture, unrefined)` marker line and the `## Scratch Notes (stage-0 capture)` section** from `ticket.md`. This is the f1-style ingestion: the draft overlay is removed once the story is defined.
-
-### Step 7 — Inline Pattern-1 validation loop
-
-**This is the load-bearing difference:** `/ps1-define` runs the validation loop **inline** (NOT deferred to a separate `/validate-artifact` call). The validation loop is the **same loop `/validate-artifact` runs** (cite the sibling command `validate-artifact.md` Steps 1–8 as the source of truth rather than re-deriving the dimensions; `validate-artifact.md` is a sibling in the SAME `host/templates/claude/commands/` directory, so the in-body relative-path citation is simply `validate-artifact.md` — equivalently `./validate-artifact.md`).
-
-#### Pattern-1 validation loop (inline):
-
-1. **Primary clean round** — the primary agent self-reviews `ticket.md` against the applicable Pattern-1 dimensions (per `templates/SHAMT_RULES.template.md` Pattern 1), tracking `consecutive_clean` starting at 0 (clean → +1; not clean → reset to 0 and re-draft), exactly as `/validate-artifact` Steps 1–6 do:
-   - Dimensions: read-and-investigate, identify-issues, classify-severity, fix-all-issues (immediately), update-consecutive-clean, check-exit.
-   - Pattern 1 dimensions (cite `templates/SHAMT_RULES.template.md` normatively): appropriate for story-altitude artifacts (scope clarity, spec coverage, acceptance-criteria defensibility, open-questions drained, etc.).
-2. **Standard exit (not Quick)** — story-define always takes the **Standard** path: on `consecutive_clean = 1` it spawns **one independent adversarial `validation-checker` sub-agent (Haiku tier)** that re-reads `ticket.md` from scratch with zero bias and replies `CONFIRMED: Zero issues found after adversarial review.` only if clean — mirroring `/validate-artifact` Step 7. **No one-LOW allowance**: any sub-agent finding (even a single LOW) resets `consecutive_clean = 0` and returns to the primary round.
-3. **Stamp the footer** — on `consecutive_clean = 1` primary-clean **plus** the sub-agent `CONFIRMED`, append the exact **two-line footer block** to `ticket.md`:
-
-     ```text
-     ---
-     Validated {YYYY-MM-DD} — N rounds, 1 adversarial sub-agent confirmed
-     ```
-
-     (The `---` delimiter is part of the footer, not optional. This matches `/validate-artifact` Step 8 verbatim.)
-
-The command body specifies this by **reference to `/validate-artifact`** (Steps 1–8) for the loop mechanics and **names the `ticket.md` footer** as the stamped output — it does not re-enumerate the dimensions or re-implement the checker.
-
-### Step 7b — Refresh the epic STATUS.md
-
-After the inline validation loop stamps the `Validated …` footer (Step 7), **re-derive the parent epic's `STATUS.md` from disk** per [`commands/po-status.md`](po-status.md) (resolve the epic from the story's folder path) — this story now shows as `Validated`. Re-derive the **whole table** (never patch a cell); the rollup is a derived VIEW per [`reference/epic_status_board.md`](../../../../reference/epic_status_board.md). In parent-slug batch mode, refresh once per child after that child's footer is stamped.
+**Mode A note:** After the dialog completes, **strip the `**Status:** Draft (f0 — story-idea capture, unrefined)` marker line and the `## Scratch Notes (stage-0 capture)` section** from `ticket.md`. This is the f1-style ingestion: the draft overlay is removed once the story is defined.
 
 ### Step 8 — Exit
 
-On successful inline validation (footer stamped), suggest the next command:
+On completion of the open-questions dialog (ticket defined, `## Open Questions` drained), suggest the next command:
 
 ```text
-Story ticket {slug} is defined and validated.
-Next: /e1-start-story {slug} (stub-aware) to proceed to engineering intake.
+Story ticket {slug} is defined (not yet validated).
+Next: /ps2-validate {slug} to run the validation loop and stamp the Validated footer.
 ```
 
-The `/e1-start-story` ready-ticket pickup branch keys on the `Validated …` footer's presence.
+Validation is the dedicated `/ps2-validate` stage; the `Validated …` footer it stamps is what `/e1-start-story`'s ready-ticket pickup branch keys on.
 
 ## Parent-slug batch mode (feature → all stories)
 
-Entered from Step 2's altitude dispatch when the slug resolves to a **feature** folder (the parent altitude) rather than a story folder. The command then runs its own single-story define logic — **including its inline Pattern-1 validation loop / footer stamp (Step 7)** — across every story under that feature, sequentially. This is **horizontal sibling fan-out at one altitude** — it defines + validates each story; it does **not** chain into any other altitude's command. The batch loop is a **stateless, disk-derived dispatcher of this command's own single-story logic** — the worklist comes from the feature's on-disk decomposition output, and re-invocation is resumable (see Principle 1 reconciliation in Notes).
+Entered from Step 2's altitude dispatch when the slug resolves to a **feature** folder (the parent altitude) rather than a story folder. The command then runs its own single-story define logic across every story under that feature, sequentially. This is **horizontal sibling fan-out at one altitude** — it defines each story; it does **not** validate them (that stays `/ps2-validate`) and does **not** chain into any other altitude's command. The batch loop is a **stateless, disk-derived dispatcher of this command's own single-story logic** — the worklist comes from the feature's on-disk decomposition output, and re-invocation is resumable (see Principle 1 reconciliation in Notes).
 
 1. **Derive the ordered worklist from disk.** Read the feature's `feature.md` and take its child stories in the order given by `## Sequencing & Parallelization` (`Recommended order`), falling back to `## Target Stories` list order when no sequencing is recorded. Resolve each listed slug to its story folder per §PO-tree resolution.
-   - **Empty / un-decomposed parent.** If the feature has no children (its `## Target Stories` decomposition list is empty / absent — e.g. the feature has not yet been run through `/pf2-decompose`), the worklist is empty: report `parent {slug} has no children to process — run the decompose phase (/pf2-decompose {slug}) first` and **exit cleanly** (a no-op, distinct from the Step 2 "neither own nor parent altitude → halt" dispatch case).
-2. **Skip-already-validated-with-notice (resumability).** For each story in worklist order, first check whether it is already defined + validated — its `ticket.md` carries a `Validated …` footer (the single-slug completion signal this command stamps). If so, emit a one-line notice (`skipping {story-slug} — already validated`) and move to the next child. This makes re-invocation resumable: a batch interrupted partway resumes at the first incomplete child without re-prompting completed ones.
-3. **Per-child execution.** For each not-yet-validated story, run this command's **single-story** Step-by-step verbatim on that story's slug — including the full per-child open-questions iterative dialog (Step 6), one question at a time per Principle 2, **and the inline Pattern-1 validation loop (Step 7) that stamps the child's `Validated …` footer**. Each child runs its **own complete dialog and validation before the next child starts**; never bulk-bomb the union of all children's questions across the batch.
-4. **Halt-at-child on an unresolvable outcome.** If any child hits a condition it cannot resolve (slug collision, ambiguous resolution, a dialog or validation loop that cannot converge), **stop the batch at that child** and surface its report verbatim. The user fixes it and re-invokes; resumability (step 2) resumes at that child without re-prompting the children already validated ahead of it.
-5. **Final summary.** When the worklist is exhausted, report a one-line-per-child summary: each child slug and its outcome (`validated` / `skipped — already validated`), then the next-command suggestion (`/clear`, then `/e1-start-story {story-slug}` on each newly validated story to proceed to engineering intake).
-
-## Mode A note (draft ingestion)
-
-When Mode A is detected (Step 2, draft marker + Scratch Notes present), the command's Step 6 exit and the footer-stamping step (Step 7, item 3) both happen. After the dialog drains `## Open Questions` (Step 6) **and before** entering the inline validation loop (Step 7), **strip the marker + Scratch Notes**. This is the f1-style ingestion: the draft overlay is a temporary staging vehicle for intake, removed once the story is defined (the same pattern `/f1-propose-update` uses to ingest `/f0-draft-proposal` drafts, but applied here to story-altitude ingestion).
+   - **Empty / un-decomposed parent.** If the feature has no children (its `## Target Stories` decomposition list is empty / absent — e.g. the feature has not yet been run through `/pf3-decompose`), the worklist is empty: report `parent {slug} has no children to process — run the decompose phase (/pf3-decompose {slug}) first` and **exit cleanly** (a no-op, distinct from the Step 2 "neither own nor parent altitude → halt" dispatch case).
+2. **Skip-already-defined-with-notice (resumability).** For each story in worklist order, first check whether it is already defined — its `ticket.md` body intake area + spec structure are drafted and its `## Open Questions` is drained (the single-slug completion signal this command produces; `/ps1-define` no longer stamps a footer). If so, emit a one-line notice (`skipping {story-slug} — already defined`) and move to the next child. This makes re-invocation resumable: a batch interrupted partway resumes at the first incomplete child without re-prompting completed ones.
+3. **Per-child execution.** For each not-yet-defined story, run this command's **single-story** Step-by-step verbatim on that story's slug — including the full per-child open-questions iterative dialog (Step 6), one question at a time per Principle 2. Each child runs its **own complete dialog before the next child starts**; never bulk-bomb the union of all children's questions across the batch. (Validation is the separate `/ps2-validate {feature-slug}` batch — run it after this define batch completes.)
+4. **Halt-at-child on an unresolvable outcome.** If any child hits a condition it cannot resolve (slug collision, ambiguous resolution, a dialog that cannot converge), **stop the batch at that child** and surface its report verbatim. The user fixes it and re-invokes; resumability (step 2) resumes at that child without re-prompting the children already defined ahead of it.
+5. **Final summary.** When the worklist is exhausted, report a one-line-per-child summary: each child slug and its outcome (`defined` / `skipped — already defined`), then the next-command suggestion (`/clear`, then `/ps2-validate {feature-slug}` to validate all the newly defined stories).
 
 ## Notes
 
-- **Parent-slug batch mode is horizontal fan-out, not vertical chaining — and honors Principle 1.** Passing a **feature** slug (the parent altitude) runs this command's single-story logic — dialog **and** inline validation — across every story under the feature (`## Parent-slug batch mode`). This is **horizontal sibling fan-out at one altitude** — it defines + validates each story and does **not** chain into any other altitude's command. It honors Principle 1 by the same argument `CLAUDE.md` homes for the `/f-all` / `/e-all` drivers: it is a **stateless, disk-derived dispatcher** of this command's own single-story logic (worklist derived from the feature's on-disk `Target Stories` / `Sequencing & Parallelization`, resumable by re-invocation via the skip-already-validated check, each child independently runnable via its own single slug) — not a state-holding mega-orchestrator.
+- **Parent-slug batch mode is horizontal fan-out, not vertical chaining — and honors Principle 1.** Passing a **feature** slug (the parent altitude) runs this command's single-story define logic across every story under the feature (`## Parent-slug batch mode`). This is **horizontal sibling fan-out at one altitude** — it defines each story; it does **not** validate them (that stays `/ps2-validate`) and does **not** chain into any other altitude's command. It honors Principle 1 by the same argument `CLAUDE.md` homes for the `/f-all` / `/e-all` drivers: it is a **stateless, disk-derived dispatcher** of this command's own single-story logic (worklist derived from the feature's on-disk `Target Stories` / `Sequencing & Parallelization`, resumable by re-invocation via the skip-already-defined check, each child independently runnable via its own single slug) — not a state-holding mega-orchestrator.
 
 ---
 

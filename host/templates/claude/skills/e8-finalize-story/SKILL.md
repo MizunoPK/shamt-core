@@ -32,7 +32,7 @@ Cheap (Haiku) — mechanical: evaluate guards, stage a scoped commit, run one cl
 
 ## Exit criteria
 
-The story's scoped work is committed (after the three guards held); the work item is marked done via the active tracker (or local-only); `ticket.md` carries `**Status: Done**`. Finalize does **not** move the story folder — epic archiving is `/pe3-finalize`'s job.
+The story's scoped work is committed (after the three guards held); the work item is marked done via the active tracker (or local-only); `ticket.md` carries `**Status: Done**`. Finalize does **not** move the story folder — epic archiving is `/pe4-finalize`'s job.
 
 ---
 

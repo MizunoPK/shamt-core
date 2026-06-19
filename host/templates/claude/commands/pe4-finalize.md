@@ -1,8 +1,8 @@
 ---
-description: Phase 5 (Finalize) of the Shamt PO flow at the Epic altitude — guard that every child feature/story is finalized, commit, mark the epic done via the active tracker, and move the done epic subtree into epics/archive/ (a whole-subtree move under the nested layout)
+description: Phase 4 (Finalize) of the Shamt PO flow at the Epic altitude — guard that every child feature/story is finalized, commit, mark the epic done via the active tracker, and move the done epic subtree into epics/archive/ (a whole-subtree move under the nested layout)
 ---
 
-# /pe3-finalize
+# /pe4-finalize
 
 **Purpose:** Run the terminal PO-flow command at the Epic altitude. Confirm every child feature/story of the epic has been finalized, commit, mark the epic done via the active tracker profile, and move the done epic folder into `epics/archive/` — analogous to `/f6-archive-proposal` moving an implemented proposal into `proposals/archive/`.
 
@@ -13,7 +13,7 @@ description: Phase 5 (Finalize) of the Shamt PO flow at the Epic altitude — gu
 ## Usage
 
 ```
-/pe3-finalize {slug}
+/pe4-finalize {slug}
 ```
 
 ## Arguments
@@ -85,4 +85,4 @@ No next-phase suggestion. The PO flow ends at the epic-finalize for a delivered 
 
 ---
 
-<!-- Managed by Shamt — do not edit. Regenerate from shamt-core/host/templates/claude/commands/pe3-finalize.md. -->
+<!-- Managed by Shamt — do not edit. Regenerate from shamt-core/host/templates/claude/commands/pe4-finalize.md. -->

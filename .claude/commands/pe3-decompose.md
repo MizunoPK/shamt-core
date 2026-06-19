@@ -1,10 +1,10 @@
 ---
-description: Phase 2 of the PO flow — break a validated epic into N feature stubs via the stub-list-then-drill-in pattern, gating the whole list once and recording parallelization analysis on the parent epic
+description: Phase 3 of the PO flow — break a validated epic into N feature stubs via the stub-list-then-drill-in pattern, gating the whole list once and recording parallelization analysis on the parent epic
 ---
 
-# /pe2-decompose
+# /pe3-decompose
 
-**Purpose:** Run Phase 2 of the PO flow. Read a validated `epic.md`, propose a list of features (title + one-line goal each), gate the whole list with the user once, derive feature slugs, run the decomposition exit gate, then write N feature-stub folders under `features/` and append `Target Features` + `Sequencing & Parallelization` back onto the parent epic. Per-feature deep dialog is deferred to `/pf1-define`.
+**Purpose:** Run Phase 3 of the PO flow. Read a validated `epic.md`, propose a list of features (title + one-line goal each), gate the whole list with the user once, derive feature slugs, run the decomposition exit gate, then write N feature-stub folders under `features/` and append `Target Features` + `Sequencing & Parallelization` back onto the parent epic. Per-feature deep dialog is deferred to `/pf1-define`.
 
 **Recommended model:** Reasoning (Opus). Decomposition is the highest-value design work in the PO flow — dependency analysis, parallelization callout, and global-slug discipline benefit from Opus's reasoning depth. See [`reference/model_selection.md`](../../../../reference/model_selection.md).
 
@@ -13,18 +13,18 @@ description: Phase 2 of the PO flow — break a validated epic into N feature st
 ## Usage
 
 ```
-/pe2-decompose {slug} [--allow-unvalidated]
+/pe3-decompose {slug} [--allow-unvalidated]
 ```
 
 ## Arguments
 
 - `{slug}` (required) — epic slug. Resolved against `epics/`.
-- `--allow-unvalidated` (optional, discouraged) — proceed even if `epic.md` carries no `Validated …` footer. Use only when the PO explicitly wants to decompose a draft to test the breakdown shape; rerun `/validate-artifact` afterwards. The recommended path is to validate first.
+- `--allow-unvalidated` (optional, discouraged) — proceed even if `epic.md` carries no `Validated …` footer. Use only when the PO explicitly wants to decompose a draft to test the breakdown shape; rerun `/pe2-validate {slug}` after decomposition. The recommended path is to validate first.
 
 ## Prerequisites
 
 - `epics/{slug}-*/epic.md` must exist. If not, halt and direct the user to `/pe1-define {slug}` first.
-- `epic.md` should carry a `Validated …` footer. If it does not, halt with a clear message and direct the user to `/validate-artifact epics/{slug}-*/epic.md` — unless `--allow-unvalidated` is passed.
+- `epic.md` should carry a `Validated …` footer. If it does not, halt with a clear message and direct the user to `/pe2-validate {slug}` (the epic-altitude validate stage) — unless `--allow-unvalidated` is passed.
 
 ## Step-by-step
 
@@ -42,8 +42,8 @@ Apply the global slug-resolution rule from [`SHAMT_RULES.template.md`](../../../
 
 1. Read the last non-blank line of `epic.md`.
 2. If it matches `Validated YYYY-MM-DD — …`, proceed to Step 3.
-3. Otherwise, **halt** with: `epic.md is not validated — run /validate-artifact epics/{ID}-{slug}-{brief}/epic.md first, or re-invoke with --allow-unvalidated to proceed against the draft.`
-4. If `--allow-unvalidated` was passed, surface a one-line notice (`proceeding against an unvalidated epic — re-run /validate-artifact after decomposition`) and continue.
+3. Otherwise, **halt** with: `epic.md is not validated — run /pe2-validate {slug} first, or re-invoke with --allow-unvalidated to proceed against the draft.`
+4. If `--allow-unvalidated` was passed, surface a one-line notice (`proceeding against an unvalidated epic — re-run /pe2-validate after decomposition`) and continue.
 
 ### Step 3 — Re-entry detection
 
@@ -113,8 +113,8 @@ For each approved feature entry:
   - `## Goal` — the one-liner approved by the user in Step 5.
   - `## Scope / Non-Scope` — the feature's breadth **boundary**: what it covers vs. explicitly does not, drawn from the whole-set research (the in/out line, not detailed acceptance criteria). Fill `### In Scope` / `### Out of Scope` with the boundary as understood at decomposition; `/pf1-define` refines depth later.
   - `## Decomposition Context` — the bounded breadth bullets (dependencies on siblings, shared context, boundary rationale) discovered while researching the feature set. Replace the placeholder bullets with real content, or mark "none". **NOT a depth dump** — design / acceptance / implementation detail is `/pf1-define`'s job.
-  - All other sections (`Open Questions`, `Success Criteria`, `Target Stories`, `Sequencing & Parallelization`) are **left empty** — `/pf1-define {feature-slug}` deepens `Success Criteria` + `Open Questions`; `/pf2-decompose {feature-slug}` fills `Target Stories` + `Sequencing & Parallelization` later.
-  - No `Validated …` footer — that comes from `/validate-artifact` once `/pf1-define` finishes.
+  - All other sections (`Open Questions`, `Success Criteria`, `Target Stories`, `Sequencing & Parallelization`) are **left empty** — `/pf1-define {feature-slug}` deepens `Success Criteria` + `Open Questions`; `/pf3-decompose {feature-slug}` fills `Target Stories` + `Sequencing & Parallelization` later.
+  - No `Validated …` footer — that comes from `/pf2-validate {feature-slug}` once `/pf1-define` finishes.
 - **Kept partition (re-decomposition only):** **do not touch** the existing `feature.md`. The user may have already done in-progress work inside (open questions, scope decisions, started decomposition). Preserve it untouched — Step 9 only rewrites the parent epic's references, not the feature artifacts themselves. If the user-approved goal one-liner for a Kept feature differs from the current `## Goal` of the existing `feature.md`, surface a notice (`Kept feature {feature-slug}: existing Goal differs from new one-liner — leaving existing feature.md untouched; revise it via /pf1-define {feature-slug} if intended.`) and continue without editing.
 
 ### Step 9 — Append decomposition output to the parent epic
@@ -188,13 +188,13 @@ Each feature stub is **independently resumable**. The PO can drive `/pf1-define`
 ## Notes
 
 - **Fresh-agent runnable.** Every input lives on disk (`epic.md`, `feature.template.md`, the existing `features/` tree). No conversation history required.
-- **Decomposition exit gate ≠ `/validate-artifact`.** The gate in Step 6 is a 2-condition stub-batch check run **before** stubs are written; `/validate-artifact` is the full Pattern 1 loop that runs against `epic.md` (already, before `/pe2-decompose`) and against each `feature.md` (later, after `/pf1-define` completes its dialog). Do not conflate the two.
+- **Decomposition exit gate ≠ `/validate-artifact`.** The gate in Step 6 is a 2-condition stub-batch check run **before** stubs are written; `/validate-artifact` is the full Pattern 1 loop that runs against `epic.md` (already, via `/pe2-validate`, before `/pe3-decompose`) and against each `feature.md` (later, via `/pf2-validate`, after `/pf1-define` completes its dialog). Do not conflate the two.
 - **No tracker fetch.** This command operates entirely on the already-written `epic.md`. The tracker freeform-fallback rule does not apply at this altitude — there is no tracker payload to fall through from.
 - **No per-feature deep dialog here.** That is `/pf1-define`'s job per the stub-list-then-drill-in decomposition. Resist the urge to start drafting feature scope or success criteria — it produces low-value batched dialog at this altitude and pre-empts the open-questions iterative dialog at the next altitude.
-- **Single-add alternative — `/pf0-draft`.** To add just **one** feature to an already-decomposed epic, prefer `/pf0-draft {epic-slug}` (the incremental single-stub producer, which appends one feature stub to this epic's `## Target Features` without re-gating) rather than re-running this batch decompose. Re-running `/pe2-decompose` re-presents and re-gates the *entire* feature list (Step 3 re-decomposition partition); the single-add path skips that.
+- **Single-add alternative — `/pf0-draft`.** To add just **one** feature to an already-decomposed epic, prefer `/pf0-draft {epic-slug}` (the incremental single-stub producer, which appends one feature stub to this epic's `## Target Features` without re-gating) rather than re-running this batch decompose. Re-running `/pe3-decompose` re-presents and re-gates the *entire* feature list (Step 3 re-decomposition partition); the single-add path skips that.
 - **No epic-level review phase.** Per Pattern 4, the 16-category code-review framework stays story-level. This command does not invoke `/e6-review-changes`.
 - **No `/pf1-define` auto-invocation.** Per Principle 1, every command stays independently runnable. Chaining would force a multi-phase session and would couple resumability across altitudes.
 - **Parallelization is PO-flow output, not runtime coordination.** The `Parallelizable` callout informs the PO; running features concurrently is a "second terminal tab" exercise.
 
 ---
-<!-- Managed by Shamt — do not edit. Regenerate from shamt-core/host/templates/claude/commands/pe2-decompose.md. -->
+<!-- Managed by Shamt — do not edit. Regenerate from shamt-core/host/templates/claude/commands/pe3-decompose.md. -->

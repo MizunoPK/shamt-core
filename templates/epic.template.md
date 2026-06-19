@@ -37,7 +37,7 @@
 
 ## Target Features
 
-[Populated by `/pe2-decompose`. Left empty on `/pe1-define` exit. Each line: feature slug + one-line goal.]
+[Populated by `/pe3-decompose`. Left empty on `/pe1-define` exit. Each line: feature slug + one-line goal.]
 
 - `{feature-slug}` — [one-line goal]
 
@@ -45,7 +45,7 @@
 
 ## Sequencing & Parallelization
 
-[Populated by `/pe2-decompose`. Left empty on `/pe1-define` exit.]
+[Populated by `/pe3-decompose`. Left empty on `/pe1-define` exit.]
 
 **Recommended order:**
 

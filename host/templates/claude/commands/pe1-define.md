@@ -1,5 +1,5 @@
 ---
-description: Phase 1 of the PO flow — resolve a slug, fetch the tracker payload (or fall through to freeform), and produce an epic.md ready for /validate-artifact
+description: Phase 1 of the PO flow — resolve a slug, fetch the tracker payload (or fall through to freeform), and produce an epic.md ready for /pe2-validate
 ---
 
 # /pe1-define
@@ -49,9 +49,9 @@ Apply the global slug-resolution rule from [`SHAMT_RULES.template.md`](../../../
    - **`none`:** no tracker fetch path. Offer **overwrite**, **extend**, **exit**. (Refetch is meaningless without a tracker.)
 
    Footer handling per branch:
-   - **Refetch** (fetching profiles only) — re-run the tracker fetch (Step 4) and re-author the artifact from scratch. The file is rewritten wholesale; any prior `Validated …` footer is discarded along with the prior content. `/validate-artifact` must re-run before the next phase.
+   - **Refetch** (fetching profiles only) — re-run the tracker fetch (Step 4) and re-author the artifact from scratch. The file is rewritten wholesale; any prior `Validated …` footer is discarded along with the prior content. `/pe2-validate` must re-run before the next phase.
    - **Overwrite** — start the freeform open-questions dialog (Step 6) from a fresh template. Same wholesale rewrite; prior footer discarded.
-   - **Extend** — preserve existing content and add to it (e.g., new Open Questions, expanded Scope). **If a prior `Validated …` footer is present, strip it before continuing** — extension changes the artifact and invalidates the prior pass; `/validate-artifact` must re-run before the next phase.
+   - **Extend** — preserve existing content and add to it (e.g., new Open Questions, expanded Scope). **If a prior `Validated …` footer is present, strip it before continuing** — extension changes the artifact and invalidates the prior pass; `/pe2-validate` must re-run before the next phase.
    - **Exit** — leave the file untouched and return. No footer change.
 5. **Zero matches** → continue to Step 3 (new epic).
 
@@ -119,7 +119,7 @@ Apply [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md)
 2. Surface each question to the user **one at a time** via `AskUserQuestion` (or equivalent). Never bulk-bomb.
 3. Update the epic with each answer **before** moving to the next question. The artifact is not "drafted" while `## Open Questions` is non-empty.
 4. Never proceed on a silent assumption. If an answer changes `Goal`, edit it. If it changes `Success Criteria`, edit them. If it changes `Scope / Non-Scope`, edit it (including the `**Architecture impact:** …` flag).
-5. **Do not populate `Target Features` or `Sequencing & Parallelization`** in this command. Those sections are owned by `/pe2-decompose`; leave them present-but-empty per the template.
+5. **Do not populate `Target Features` or `Sequencing & Parallelization`** in this command. Those sections are owned by `/pe3-decompose`; leave them present-but-empty per the template.
 
 ### Step 7 — Detect slug collisions
 
@@ -135,9 +135,9 @@ Verify before exiting:
 - [ ] `epics/{ID}-{slug}-{brief}/epic.md` exists and is non-empty.
 - [ ] `## Open Questions` is empty (every question resolved, with answers folded into the artifact).
 - [ ] `Goal`, `Success Criteria`, and `Scope / Non-Scope` are drafted.
-- [ ] `Target Features` and `Sequencing & Parallelization` are **left empty** (owned by `/pe2-decompose`).
+- [ ] `Target Features` and `Sequencing & Parallelization` are **left empty** (owned by `/pe3-decompose`).
 - [ ] Before exiting, write the resolved epic-folder path to `shamt-state/active-epic` (create `shamt-state/` if absent) — the status-line active-epic pointer.
-- [ ] No `Validated …` footer present yet — `/validate-artifact` appends it.
+- [ ] No `Validated …` footer present yet — `/pe2-validate` appends it.
 - [ ] User has confirmed the slug + content.
 
 If any item fails, return to the relevant step.
@@ -148,10 +148,10 @@ Surface — but do **not** auto-invoke — the next command:
 
 ```
 /clear
-/validate-artifact epics/{ID}-{slug}-{brief}/epic.md
+/pe2-validate {slug}
 ```
 
-After validation appends the footer, `/pe2-decompose {slug}` can run. This command stays independently runnable by a fresh agent off on-disk state per Principle 1 — chaining validation here would couple the two phases.
+After `/pe2-validate` appends the footer, `/pe3-decompose {slug}` can run. This command stays independently runnable by a fresh agent off on-disk state per Principle 1 — chaining validation here would couple the two phases.
 
 ## Tracker integration
 
@@ -164,14 +164,14 @@ When the fetch succeeds, raw payload data is preserved inline in `epic.md`'s **A
 - `epics/{ID}-{slug}-{brief}/epic.md` exists, is non-empty, and has `Goal`, `Success Criteria`, `Scope / Non-Scope` drafted.
 - `Target Features` and `Sequencing & Parallelization` remain empty (decomposition output).
 - `## Open Questions` is empty.
-- No validation footer yet — `/validate-artifact` adds it.
+- No validation footer yet — `/pe2-validate` (the epic-altitude validate stage) adds it.
 - The user has confirmed slug + content; the next command has been suggested in chat.
 
 ## Notes
 
 - **Fresh-agent runnable.** Every input lives on disk (`.shamt-core/shamt-config.json`, the tracker profile, `.shamt-core/project-specific-files/ARCHITECTURE.md`, the prior draft when re-entering). No conversation history required.
-- **Epic-level validation is `/validate-artifact`.** Epics have no review phase — Pattern 1 validation only. The decomposition exit gate run inside `/pe2-decompose` is a stub-batch check on that command's output and is **distinct from `/validate-artifact`**; do not conflate.
-- **No `Target Features` work here.** This command writes the epic with the decomposition sections empty; `/pe2-decompose` fills them. Two reasons: keeps single-session sizing tight (Principle 1 — single-session sizing constraint), and keeps deep dialog at the right altitude per the stub-list-then-drill-in decomposition.
+- **Epic-level validation is `/pe2-validate`** (a thin wrapper over `/validate-artifact`). Epics have no review phase — Pattern 1 validation only. The decomposition exit gate run inside `/pe3-decompose` is a stub-batch check on that command's output and is **distinct from `/validate-artifact`**; do not conflate.
+- **No `Target Features` work here.** This command writes the epic with the decomposition sections empty; `/pe3-decompose` fills them. Two reasons: keeps single-session sizing tight (Principle 1 — single-session sizing constraint), and keeps deep dialog at the right altitude per the stub-list-then-drill-in decomposition.
 - **No `.shamt-core/project-specific-files/CODING_STANDARDS.md` consult.** Coding style is irrelevant at the epic altitude. The story-level Phase 2 / 6 / 7 cycle handles coding-standards alignment for the eventual code work.
 - The `--tracker=` flag is **one-off**, not persisted. The project default in `.shamt-core/shamt-config.json` is unchanged.
 - The freeform-fallback rule means future tracker profiles that don't declare `Epic` natively still work — `/pe1-define` degrades gracefully with a one-line notice and continues into the open-questions dialog.

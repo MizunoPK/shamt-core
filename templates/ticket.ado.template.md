@@ -23,7 +23,7 @@ The sections below populate automatically when `/e1-start-story {slug}` resolves
 
 ## Decomposition Context
 
-<!-- Cataloged at decomposition (/pe2-decompose for features, /pf2-decompose for stories) — bounded breadth context discovered by researching the whole sibling set. NOT a depth dump (design/acceptance/implementation detail belongs in the depth sections, filled at start-*). /pf1-define and /e1-start-story consume this as a research seed. Leave the placeholder bullets if nothing was cataloged. -->
+<!-- Cataloged at decomposition (/pe3-decompose for features, /pf3-decompose for stories) — bounded breadth context discovered by researching the whole sibling set. NOT a depth dump (design/acceptance/implementation detail belongs in the depth sections, filled at start-*). /pf1-define and /e1-start-story consume this as a research seed. Leave the placeholder bullets if nothing was cataloged. -->
 
 - **Dependencies on siblings:** [which sibling features/stories this one depends on or blocks — "none" if independent]
 - **Shared context:** [context spanning the set this child needs — shared modules, data, infra, conventions]
