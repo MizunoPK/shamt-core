@@ -178,6 +178,10 @@ These are NOT auto-deleted. Review each and either delete or repurpose manually.
 
 The left column is the slug as it appeared in the prior `Decomposed …` line; the right column is the actual folder path on disk (the `{brief}` suffix is recovered via glob). The user sees both so they can navigate to the folder and recognize the slug they had in mind. Same format as `/pe2-decompose`'s orphan warning.
 
+### Step 9b — Refresh the parent epic STATUS.md
+
+After writing the story stubs and updating the parent feature, **re-derive the parent epic's `STATUS.md` from disk** per [`commands/po-status.md`](po-status.md) (resolve the epic from the feature's folder path) — every new story appears as `New`. Re-derive the **whole table** (never patch a cell); the rollup is a derived VIEW per [`reference/epic_status_board.md`](../../../../reference/epic_status_board.md).
+
 ### Step 10 — Exit gate
 
 Verify before exiting:

@@ -69,6 +69,10 @@ If the remote close command fails, halt and report the git/CLI output — do not
 
 If the resolved story folder is nested under the standing **Tech Stories** epic (its path is `epics/{tech-stories-folder}/features/{bugs|quick-wins}/stories/…`), **move the finalized story folder into its feature's `archive/`** — `epics/{tech-stories-folder}/features/{f}/archive/{same-folder-name}/` (`git mv` when tracked) — within the same Step 3 commit. This keeps the standing Bugs / Quick Wins features from growing without bound (mirroring how `/pe3-finalize` archives a done epic and `/f6-archive-proposal` archives an implemented proposal). For a normal (non-Tech-Stories) story, **skip this step** — the story folder stays in place.
 
+### Step 5c — Refresh the epic STATUS.md
+
+After writing the local `**Status: Done**` marker (Step 5), **re-derive the parent epic's `STATUS.md` from disk** per [`commands/po-status.md`](po-status.md) (resolve the epic from the story's folder path) — this story now shows as `Released`, and the feature rollup is recomputed (a feature becomes `Released` once all its stories are). Re-derive the **whole table** (never patch a cell); the rollup is a derived VIEW per [`reference/epic_status_board.md`](../../../../reference/epic_status_board.md). For a Tech-Stories story archived in Step 5b, resolve the epic to the standing Tech Stories epic.
+
 ### Step 6 — Exit
 
 State the exit clearly:

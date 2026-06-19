@@ -125,6 +125,7 @@ Commands form an **altitude × stage grid** — prefix by altitude (`pe` = epic,
 | `/pf2-decompose {slug}` | Feature stage-2 → story stubs (a **parent epic slug** decomposes all its features) | shipped |
 | `/ps0-draft {feature-slug \| bugs \| quick-wins}` | Story stage-0 draft (one stub; absorbs the old tech-story fast path) | shipped |
 | `/ps1-define {slug}` | Story stage-1 define (flesh-out **+ inline Pattern-1 validation** → engineer-ready ticket; a **parent feature slug** defines all its stories) | shipped |
+| `/po-status {epic-slug}` | Regenerate the epic's derived `STATUS.md` state rollup (New / Validated / Building / Released) from on-disk signals | shipped |
 
 Every command above is **ID-or-slug-first** and **fresh-agent runnable** per Principle 1: pass a **ticket ID or slug** (`{id-or-slug}` — the tables show the common `{slug}` form, but a ticket ID like `T5` works equally, resolved per §PO-tree resolution / # Ticket IDs), the command resolves the folder, reads on-disk state, executes its phase. Each one mirrors `/e1-start-story`'s tracker plumbing: when the active profile (read from `.shamt-core/shamt-config.json`) declares the matching work-item type (e.g., ADO supports Epic + Feature + Story; GitHub supports Issue only), the slug-to-ID parse and payload fetch happen — otherwise the command falls through to freeform mode with a one-line notice (`tracker profile {name} has no {Type} work-item type — proceeding freeform`).
 
@@ -137,6 +138,7 @@ Every command above is **ID-or-slug-first** and **fresh-agent runnable** per Pri
 └── epics/                                       # top-level within the work tree; globally unique slugs
     ├── {ID}-{epic-slug}-{brief}/
     │   ├── epic.md
+    │   ├── STATUS.md                            # derived state rollup (regen via /po-status; never hand-edited)
     │   └── features/                            # features nest under their epic
     │       └── {ID}-{feature-slug}-{brief}/
     │           ├── feature.md
@@ -151,7 +153,7 @@ Every command above is **ID-or-slug-first** and **fresh-agent runnable** per Pri
 > A permanent **Tech Stories** epic (`epics/tech-stories/` with standing `features/bugs/` + `features/quick-wins/`, fixed reserved names, seeded at install) is the home for one-off bugs / quick wins filed via `/ps0-draft`. Finished tech-stories archive into their feature's `archive/`. See `templates/SHAMT_RULES.template.md` §Standing Tech Stories epic.
 ```
 
-Epic and feature folders carry their own artifact (`epic.md` / `feature.md`) plus their nested children. Slugs are **globally unique at each altitude**; the global uniqueness is what lets the `{slug}-*` tail resolve unambiguously by tree-wide glob (see `templates/SHAMT_RULES.template.md` §PO-tree resolution). Pre-existing flat layouts resolve via the legacy fallback — new work is written nested.
+Epic and feature folders carry their own artifact (`epic.md` / `feature.md`) plus their nested children. Slugs are **globally unique at each altitude**; the global uniqueness is what lets the `{slug}-*` tail resolve unambiguously by tree-wide glob (see `templates/SHAMT_RULES.template.md` §PO-tree resolution). Pre-existing flat layouts resolve via the legacy fallback — new work is written nested. Each epic folder also carries a generated **`STATUS.md`** — a **derived** per-feature/per-story state rollup (New / Validated / Building / Released) re-computed from on-disk signals by `/po-status {epic-slug}` and the transition commands (`/pe2`, `/pf2`, `/ps1`, `/e4`, `/e8`); never hand-edited. It is a local state rollup, **not** the external work-item tracker. Derivation contract: `templates/SHAMT_RULES.template.md` §PO-tree resolution → `reference/epic_status_board.md`.
 
 #### Parentage is the path
 

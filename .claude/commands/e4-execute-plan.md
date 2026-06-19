@@ -52,6 +52,7 @@ The plan was validated and approved at Gate 3 specifically so the builder can ru
 1. Apply the active-artifact pointer; resolve the plan path (`implementation_plan.md` or `implementation_plan_vN.md`; or one phase file from a phase-decomposed plan).
 2. Read the plan top-to-bottom. Confirm footer + Gate 3 approval. Confirm the `## Verification` section exists.
 3. For phase-decomposed plans (per the single-session sizing constraint in [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md#principle-1-phase-per-command--slug-resumability) Principle 1), hand off **one phase at a time in deploy order**. Do not hand off `implementation_plan_phase_2.md` until phase 1 has reported `All steps completed. Verification passed.`.
+4. **Refresh the epic STATUS.md.** On Build entry, **re-derive the parent epic's `STATUS.md` from disk** per [`commands/po-status.md`](po-status.md) (resolve the epic from the story's folder path) — this story now shows as `Building`. Re-derive the **whole table** (never patch a cell); the rollup is a derived VIEW per [`reference/epic_status_board.md`](../../../../reference/epic_status_board.md).
 
 ### Step 2 — Builder handoff
 
@@ -108,6 +109,7 @@ Suggest `/e5b-write-manual-testing-plan {slug}` (orthogonal to the required Phas
 No `implementation_plan.md` exists on the Quick path — the spec's `## Build Checklist` is the executable artifact (per Pattern 5 in [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md#pattern-5-implementation-planning)). The primary agent (you) executes the checklist directly.
 
 1. Apply the active-artifact pointer; resolve the spec path.
+1b. **Refresh the epic STATUS.md.** On Build entry, **re-derive the parent epic's `STATUS.md` from disk** per [`commands/po-status.md`](po-status.md) (resolve the epic from the story's folder path) — this story now shows as `Building`. Re-derive the **whole table** (never patch a cell); the rollup is a derived VIEW per [`reference/epic_status_board.md`](../../../../reference/epic_status_board.md).
 2. Read the spec completely — `## Code Shapes`, `## Review Prevention Checklist`, `## Build Checklist`, `## Verification`.
 3. Execute the Build Checklist steps in order. Each step is a small, sequential, mechanical action — the same operation contracts apply (CREATE / EDIT / DELETE / MOVE).
 4. On ambiguity or a failed verification, **stop and investigate**. Quick-path mid-Build escalations:

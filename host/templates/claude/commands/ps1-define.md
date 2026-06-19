@@ -143,6 +143,10 @@ Per [`templates/SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.temp
 
 The command body specifies this by **reference to `/validate-artifact`** (Steps 1–8) for the loop mechanics and **names the `ticket.md` footer** as the stamped output — it does not re-enumerate the dimensions or re-implement the checker.
 
+### Step 7b — Refresh the epic STATUS.md
+
+After the inline validation loop stamps the `Validated …` footer (Step 7), **re-derive the parent epic's `STATUS.md` from disk** per [`commands/po-status.md`](po-status.md) (resolve the epic from the story's folder path) — this story now shows as `Validated`. Re-derive the **whole table** (never patch a cell); the rollup is a derived VIEW per [`reference/epic_status_board.md`](../../../../reference/epic_status_board.md). In parent-slug batch mode, refresh once per child after that child's footer is stamped.
+
 ### Step 8 — Exit
 
 On successful inline validation (footer stamped), suggest the next command:
