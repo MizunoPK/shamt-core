@@ -1,7 +1,7 @@
 # Proposal: import-flow-self-overwrite-crash
 
 **Created:** 2026-06-19
-**Status:** Draft
+**Status:** Implemented
 **Number:** 45
 **Proposed by:** FantasyFootballHelperScripts
 **Project context:** Hit during a routine `/sync-import-shamt` pull from a local-path master.
@@ -71,3 +71,6 @@ _(none — all resolved.)_
 
 - ~~Q: Should the copy-then-reexec preamble also be applied preventively to `init-shamt.sh` and/or `scripts/regenerate-framework.sh`?~~ → A: No — **fix `import-shamt.sh` only**. The diagnosis confirmed neither other script has the bug under any supported flow; the targeted fix keeps the change set at 3 files and avoids adding bootstrap boilerplate (and an env-var hand-off to init's self-host detection) to scripts that don't need it.
 - ~~Q: Should the `/sync-import-shamt` command body add explicit re-run recovery guidance for a mid-sync crash?~~ → A: Yes — **add the re-run recovery note** to `commands/sync-import-shamt.md` (folded into row 2, same file, no new row). The crossover import from a pre-fix child copy can still crash once; telling users the second run self-heals (byte-identical + idempotent) keeps the one-time failure from reading as a broken framework.
+
+---
+Validated 2026-06-20 — 1 round, 1 adversarial sub-agent confirmed

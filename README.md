@@ -294,7 +294,7 @@ Or via `/sync-import-shamt`. Behavior:
 - Preserves (with warnings) any local-only files the child added under the managed subtrees.
 - Auto-moves child-local proposals whose slugs match a file in master's `proposals/archive/` into `<child>/.shamt-core/proposals/already-merged/{slug}.md`.
 - Re-runs `regenerate-framework.sh --target <child>` after the file sync.
-- Self-updating: `import-shamt.sh` is in the sync set; a new version overwrites the on-disk copy and takes effect on the next invocation.
+- Self-updating: `import-shamt.sh` is in its own sync set, so a sync overwrites the on-disk copy mid-run; to survive that, the script copies itself to a temp file and re-execs from there (the running process reads from the stable copy, not the file being overwritten). The newly-installed version takes effect on the next invocation.
 
 ---
 

@@ -32,16 +32,38 @@
 # After the file sync, the script runs <child>/.shamt-core/scripts/
 # regenerate-framework.sh --target <child> so <child>/.claude/ stays current.
 #
-# Self-updating: import-shamt.sh is itself in the sync set, so a new version
-# overwrites the on-disk copy. The running script is already in memory and
-# continues with the previous logic; the new version takes effect on the next
-# invocation.
+# Self-updating: import-shamt.sh is itself in the sync set, so a sync overwrites
+# the on-disk copy mid-run. bash reads a script lazily by byte offset, not all at
+# once, so a length-changing self-overwrite can corrupt the running process (the
+# next read lands at a stale offset inside the new content and parses a token
+# fragment). To prevent this, on first invocation the script copies itself to a
+# temp file and re-execs from there (guarded by _SHAMT_IMPORT_REEXEC); the re-
+# execed process runs from the stable temp copy, so the in-place overwrite of the
+# installed file cannot corrupt it. The temp copy is removed by the EXIT trap, and
+# the newly-installed version takes effect on the next invocation.
 
 set -euo pipefail
 
+# ---- Copy-then-reexec preamble (survive being overwritten mid-sync) ---------
+# import-shamt.sh is in its own sync set, so a sync rewrites this file in place
+# while it runs. bash reads scripts lazily by byte offset, so a length-changing
+# overwrite of the running file corrupts execution. On first entry, copy this
+# script to a temp file and re-exec from there; the re-execed process (guard set)
+# runs from the stable copy and skips this block. _SHAMT_IMPORT_ORIG carries the
+# installed path forward so SCRIPT_DIR / TARGET_DIR / identity logic still resolve
+# the installed location, not the temp copy. A failed mktemp/cp aborts here under
+# set -e before exec — the safe outcome (nothing synced yet).
+if [ -z "${_SHAMT_IMPORT_REEXEC:-}" ]; then
+  _SHAMT_IMPORT_ORIG="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)/$(basename "${BASH_SOURCE[0]}")"
+  _SHAMT_IMPORT_TMP="$(mktemp)"
+  cp "$_SHAMT_IMPORT_ORIG" "$_SHAMT_IMPORT_TMP"
+  export _SHAMT_IMPORT_REEXEC=1 _SHAMT_IMPORT_ORIG _SHAMT_IMPORT_TMP
+  exec bash "$_SHAMT_IMPORT_TMP" "$@"
+fi
+
 # ---- Resolve script's true location (handle symlinks) ----------------------
 
-SCRIPT_PATH="${BASH_SOURCE[0]}"
+SCRIPT_PATH="${_SHAMT_IMPORT_ORIG:-${BASH_SOURCE[0]}}"
 _hops=0
 while [ -L "$SCRIPT_PATH" ]; do
   _hops=$((_hops + 1))
@@ -164,6 +186,9 @@ cleanup() {
   if [ -n "$TMPDIR_TO_CLEAN" ] && [ -d "$TMPDIR_TO_CLEAN" ]; then
     rm -rf "$TMPDIR_TO_CLEAN"
   fi
+  # Remove the copy-then-reexec temp script (this trap runs in the re-execed
+  # process — the first-entry process exec'd away before registering it).
+  rm -f "${_SHAMT_IMPORT_TMP:-}"
 }
 trap cleanup EXIT
 
