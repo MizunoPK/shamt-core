@@ -27,13 +27,14 @@ description: Stage 2 of the PO flow at the Story altitude — run the inline /va
 
 ## Step-by-step
 
-### Step 1 — Resolve the slug and dispatch on altitude (own vs. parent vs. neither)
+### Step 1 — Resolve the slug and dispatch on altitude (own vs. parent vs. grandparent vs. neither)
 
 Resolve `{slug}` per §PO-tree resolution and branch on the altitude of the folder it resolves to:
 
 - **Own altitude (the slug resolves to a *story* folder)** → run the single-story validation below (Steps 2–4).
 - **Parent altitude (the slug resolves to a *feature* folder)** → enter **[Parent-slug batch mode](#parent-slug-batch-mode-feature--all-stories)**: validate every story under that feature, sequentially. Hand off to that section.
-- **Neither (the slug resolves to no story and no feature, or to an epic)** → halt and report `slug {slug} resolves to neither a story (own altitude) nor a feature (parent altitude) — nothing to validate`.
+- **Grandparent altitude (the slug resolves to an *epic* folder)** → enter **[Grandparent-slug batch mode](#grandparent-slug-batch-mode-epic--all-stories)**: validate every story in the epic's entire story subtree, sequentially, by dispatching the existing feature→stories validate batch per feature. Hand off to that section.
+- **Neither (the slug resolves to no story, no feature, and no epic)** → halt and report `slug {slug} resolves to no story (own altitude), no feature (parent altitude), and no epic (grandparent altitude) — nothing to validate`.
 
 ### Step 2 — Inline Pattern-1 validation loop on `ticket.md`
 
@@ -78,18 +79,30 @@ Entered from Step 1's altitude dispatch when the slug resolves to a **feature** 
 4. **Halt-at-child on an unresolvable outcome.** If any child hits a condition it cannot resolve (slug collision, ambiguous resolution, a validation loop that cannot converge), **stop the batch at that child** and surface its report verbatim. The user fixes it and re-invokes; resumability (step 2) resumes at that child without re-validating the children already validated ahead of it.
 5. **Final summary.** When the worklist is exhausted, report a one-line-per-child summary: each child slug and its outcome (`validated` / `skipped — already validated`), then the next-command suggestion (`/clear`, then `/e1-start-story {story-slug}` on each newly validated story to proceed to engineering intake).
 
+## Grandparent-slug batch mode (epic → all stories)
+
+Entered from Step 1's altitude dispatch when the slug resolves to an **epic** folder (the grandparent altitude) rather than a feature or story folder. The command then processes the epic's full story subtree by dispatching the **existing feature→stories validate batch** (`## Parent-slug batch mode`) per feature, sequentially. This is **nested horizontal fan-out, still single-phase** — it validates every story under every feature of the epic; it does **not** validate the features themselves (that is `/pf2-validate`'s job) and does **not** chain into any other phase. The batch loop is a **stateless, disk-derived dispatcher** of the existing parent-batch logic — the feature worklist comes from the epic's on-disk decomposition output, and re-invocation is resumable via the parent batch's own skip-already-validated check.
+
+1. **Derive the ordered feature worklist from disk.** Read the epic's `epic.md` and take its child features in the order given by `## Sequencing & Parallelization` (`Recommended order`), falling back to `## Target Features` list order when no sequencing is recorded. Resolve each listed slug to its feature folder per §PO-tree resolution.
+   - **Empty / un-decomposed epic.** If the epic has no children (its `## Target Features` decomposition list is empty / absent — e.g. the epic has not yet been run through `/pe3-decompose`), the worklist is empty: report `epic {slug} has no features to process — run the decompose phase (/pe3-decompose {slug}) first` and **exit cleanly** (a no-op, distinct from the "neither" dispatch case).
+2. **Per-feature dispatch (resumable via child batch resumability).** For each feature in worklist order, dispatch the **existing feature→stories validate batch** (`## Parent-slug batch mode`) on that feature's slug. The parent batch handles its own skip-already-validated resumability per step 2 of that section, so stories already validated within a feature are skipped without re-running them. Run one feature batch to completion before starting the next.
+3. **Halt-at-feature on an unresolvable outcome.** If any feature's validate batch hits a condition it cannot resolve (e.g. the feature is not yet decomposed, or a child story validation cannot converge), **stop the grandparent batch at that feature** and surface its report verbatim. The user fixes it and re-invokes; the parent batch's resumability resumes within that feature without re-validating previously completed stories.
+4. **Final summary.** When all features' batches are exhausted, report a one-line-per-feature summary (each feature slug + count of stories validated / skipped), then the next-command suggestion (`/clear`, then `/e1-start-story {story-slug}` on each newly validated story to proceed to engineering intake).
+
 ## Exit criteria
 
 - (Single mode) `ticket.md` carries a `Validated …` footer stamped by this run's inline Pattern-1 loop; the epic's `STATUS.md` has been re-derived; `/e1-start-story {slug}` suggested.
-- (Batch mode) every story under the feature has been validated per the above, skipping any already-validated child and halting at the first unresolvable child, with a one-line-per-child summary reported.
+- (Parent-slug batch mode) every story under the feature has been validated per the above, skipping any already-validated child and halting at the first unresolvable child, with a one-line-per-child summary reported.
+- (Grandparent-slug batch mode) every story under every feature of the epic has been validated, skipping already-validated stories and halting at the first unresolvable feature/story, with a one-line-per-feature summary reported.
 
 ## Notes
 
 - **Thin wrapper over `/validate-artifact`.** The inline loop is the *same loop `/validate-artifact` runs* (cited by reference, not re-derived); this command resolves `ticket.md`, runs that loop, stamps the footer, and refreshes `STATUS.md`.
 - **Carries the loop moved out of `/ps1-define`.** The inline Pattern-1 validation loop + footer stamp formerly lived in `/ps1-define` Step 7; it moves here so the story altitude matches epic/feature (`define → validate`). `/ps1-define` now ends defined-but-unvalidated. `/e1-start-story`'s readiness signal still keys on the footer's *presence* on `ticket.md` (unchanged location), now stamped by this command.
 - **Parent-slug batch mode is horizontal fan-out, not vertical chaining — and honors Principle 1.** Passing a **feature** slug (the parent altitude) runs this command's single-story validation across every story under the feature (`## Parent-slug batch mode`). This is **horizontal sibling fan-out at one altitude** — it validates each story and does **not** chain into any other altitude's command. It honors Principle 1 by the same argument `CLAUDE.md` homes for the `/f-all` / `/e-all` drivers and #39 homes in `/ps1-define`: it is a **stateless, disk-derived dispatcher** of this command's own single-story logic (worklist derived from the feature's on-disk `Target Stories` / `Sequencing & Parallelization`, resumable by re-invocation via the skip-already-validated check, each child independently runnable via its own single slug) — not a state-holding mega-orchestrator.
+- **Grandparent-slug batch mode is nested horizontal fan-out, still single-phase — and honors Principle 1.** Passing an **epic** slug (the grandparent altitude) runs the existing feature→stories validate batch per feature across the epic's full story subtree (`## Grandparent-slug batch mode`). It crosses two structural levels (epic → feature → story) but remains a **single-phase, story-validate-only** dispatcher — it does **not** validate features or chain into any other phase. It honors Principle 1 by the same argument: a **stateless, disk-derived dispatcher** of the parent-batch logic (feature worklist derived from the epic's on-disk `Target Features` / `Sequencing & Parallelization`, resumable via the parent batch's own skip-already-validated check, each story independently runnable by its own single slug) — not a state-holding mega-orchestrator and not a cross-phase vertical pipeline. (`/ps1-define {epic}` defines-only and `/ps2-validate {epic}` validates-only are two **distinct single-phase commands** the user runs in sequence — neither chains into the other.)
 - **Validate is its own stage at every altitude.** Define stages no longer stamp a footer; validation is the dedicated stage.
-- **Fresh-agent runnable.** The story/feature folders + their artifacts live on disk; no conversation history required.
+- **Fresh-agent runnable.** The story/feature/epic folders + their artifacts live on disk; no conversation history required.
 
 ---
 

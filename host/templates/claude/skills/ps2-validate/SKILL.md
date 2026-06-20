@@ -8,8 +8,13 @@ description: >
   STATUS.md. Parent-slug batch mode: passing the parent feature slug
   batch-validates every story under the feature sequentially — a stateless,
   disk-derived dispatcher that is itself resumable (skips already-validated
-  children). Invoke when the user wants to validate a story, run the validate
-  stage for a story, footer a ticket, or validate all stories in the feature.
+  children). Grandparent-slug batch mode: passing a parent epic slug
+  batch-validates every story in the epic's full story subtree, sequentially,
+  by dispatching the feature→stories validate batch per feature — still a
+  single-phase (story-validate-only) stateless dispatcher. Invoke when the user
+  wants to validate a story, run the validate stage for a story, footer a
+  ticket, validate all stories in the feature, or validate all stories in
+  the epic.
 triggers:
   - "validate the story"
   - "validate story {slug}"
@@ -17,6 +22,8 @@ triggers:
   - "footer the ticket"
   - "validate all stories in the feature"
   - "validate every story under this feature"
+  - "validate all stories in the epic"
+  - "validate every story under this epic"
 ---
 
 ## Overview
@@ -33,6 +40,6 @@ Reasoning (Opus) — the Pattern-1 validation loop escalates to Reasoning per th
 
 ## Exit criteria
 
-(Single mode) `ticket.md` carries a `Validated …` footer stamped by the inline Pattern-1 loop; the epic's `STATUS.md` has been re-derived; `/e1-start-story {slug}` suggested. (Parent-slug batch mode, a feature slug is passed) every story under the feature has been validated, skipping any already-validated child and halting at the first unresolvable child, with a one-line-per-child summary reported.
+(Single mode) `ticket.md` carries a `Validated …` footer stamped by the inline Pattern-1 loop; the epic's `STATUS.md` has been re-derived; `/e1-start-story {slug}` suggested. (Parent-slug batch mode, a feature slug is passed) every story under the feature has been validated, skipping any already-validated child and halting at the first unresolvable child, with a one-line-per-child summary reported. (Grandparent-slug batch mode, an epic slug is passed) every story under every feature of the epic has been validated, skipping already-validated stories and halting at the first unresolvable feature/story, with a one-line-per-feature summary reported.
 
 <!-- Managed by Shamt — do not edit. Regenerate from shamt-core/host/templates/claude/skills/ps2-validate/SKILL.md. -->
