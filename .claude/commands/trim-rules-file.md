@@ -27,7 +27,7 @@ Two callers:
 
 ## Prerequisites
 
-- **Master / self-host only.** The rules file is master-owned; a child's `.shamt-core/templates/SHAMT_RULES.template.md` is a read-only import, and the audit that triggers this does not run in a child. Resolve the target with the self-host detection rule (a top-level `proposals/` plus canonical roots at the repo root). **In a child project, halt** and explain that the rules file is master-owned — contribute via `/f0-draft-proposal` → `/f1-propose-update` → `/sync-submit-proposal` instead.
+- **Master / self-host only.** The rules file is master-owned; a child's `.shamt-core/templates/SHAMT_RULES.template.md` is a read-only import, and the audit that triggers this does not run in a child. Resolve the target with the self-host detection rule (a top-level `proposals/` plus canonical roots at the repo root). **In a child project, halt** and explain that the rules file is master-owned — contribute via `/f0-draft-proposal` → `/f1-propose-update` → `/sync-proposals` instead.
 - `templates/SHAMT_RULES.template.md` exists.
 - A top-level `proposals/` directory and `proposals/_template.md` exist.
 

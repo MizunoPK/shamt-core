@@ -15,7 +15,7 @@ description: >
   adapted for the capture track (clean = no new auto-fix and no new draft).
   Master / self-host only — invoked in a child project it halts immediately
   and redirects to /f0-draft-proposal -> /f1-propose-update ->
-  /sync-submit-proposal. Findings are chat-only — no audit log artifacts.
+  /sync-proposals. Findings are chat-only — no audit log artifacts.
   Acts as post-implementation verification at Phase 6 of the framework-update
   flow; also runnable standalone for periodic sweeps. Invoke when the user
   wants to audit the framework, check for drift / orphans / broken links, run

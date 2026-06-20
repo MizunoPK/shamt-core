@@ -24,7 +24,7 @@
 # Already-merged proposals: walk both <child>/.shamt-core/proposals/{slug}.md
 # (locally-authored, not yet submitted) and
 # <child>/.shamt-core/proposals/submitted/{slug}.md (submitted via
-# /sync-submit-proposal, awaiting master's decision). If a master archive entry
+# /sync-proposals, awaiting master's decision). If a master archive entry
 # <master>/proposals/archive/{slug}.md matches the basename, the proposal landed
 # upstream and came back via this sync; move the local copy to
 # <child>/.shamt-core/proposals/already-merged/{slug}.md per §4.7 / §4.9.

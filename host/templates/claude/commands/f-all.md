@@ -67,7 +67,7 @@ Resolve the target via the **self-host detection rule** the rest of the framewor
   (branch creation, canonical edits, regen, squash-merge) are master-side only.
   To run a framework change from this project, use the per-phase commands by hand:
     /f1-propose-update {slug}        — author / edit the proposal
-    /sync-submit-proposal {slug}     — send it upstream to master
+    /sync-proposals                  — send them upstream to master (batch)
   Master is where the numbered / branch / merge flow runs.
   ```
 

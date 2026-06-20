@@ -36,7 +36,7 @@ Mirrors the `/f-all {slug}` slash command. Same canonical body, two host wirings
 
 ## Master / self-host only
 
-The phases `/f-all` drives — branch creation, canonical edits, regen, squash-merge — are master-side only. **Invoked in a child it halts immediately** and redirects to the per-phase commands (`/f1-propose-update {slug}` → `/sync-submit-proposal {slug}`). Mirrors `/f5-audit-framework`'s child-side behavior.
+The phases `/f-all` drives — branch creation, canonical edits, regen, squash-merge — are master-side only. **Invoked in a child it halts immediately** and redirects to the per-phase commands (`/f1-propose-update {slug}` → `/sync-proposals`). Mirrors `/f5-audit-framework`'s child-side behavior.
 
 ## Protocol
 

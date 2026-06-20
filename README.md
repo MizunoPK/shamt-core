@@ -58,7 +58,7 @@ pre-existing child `CLAUDE.md` is preserved and kept tracked). All of it is
 re-derivable — `.shamt-core/` via `import-shamt`, `.claude/` via
 `/f4-regen-framework` — so a fresh clone restores the wiring with one regen/import.
 
-The master repo has additional `proposals/` subfolders that **never appear in a child project**: `incoming/` (child-submitted proposals awaiting triage), `archive/` (implemented proposals), `rejected/` (closed with a top-of-file note), and `deferred/` (on hold). Master's presence is what `/sync-submit-proposal` and `/sync-triage-proposals` use to discriminate the two sides — child projects rely on the absence of `proposals/incoming/` as the master-side check.
+The master repo has additional `proposals/` subfolders that **never appear in a child project**: `incoming/` (child-submitted proposals awaiting triage), `archive/` (implemented proposals), `rejected/` (closed with a top-of-file note), and `deferred/` (on hold). Master's presence is what `/sync-proposals` and `/sync-triage-proposals` use to discriminate the two sides — child projects rely on the absence of `proposals/incoming/` as the master-side check.
 
 Files with a `Managed by Shamt` footer (or files in `.shamt-core/`'s master sync set) are owned by master / regen — they get overwritten by `import-shamt` and `/f4-regen-framework`. Files outside that set are user-owned and preserved.
 
@@ -70,7 +70,7 @@ Shamt is a master/child framework with deliberately constrained sync directions:
 
 | Direction | Mechanism | What moves |
 |-----------|-----------|------------|
-| Child → master | **Proposals only.** Manual copy-paste via `/sync-submit-proposal`. | A single proposal file (`proposals/incoming/{project_name}-{slug}.md` on master). |
+| Child → master | **Proposals only.** Manual copy-paste via `/sync-proposals` (batch — ships every active child-local proposal at once). | One file per proposal (`proposals/incoming/{project_name}-{slug}.md` on master). |
 | Master → child | **Framework pull only.** Scripted via `/sync-import-shamt`. Always-latest, no pinning. | Master's canonical sources under `shamt-core/`. |
 
 No bidirectional guide-editing sync. No `export.sh`. The child's project work (stories, epics, features, code reviews) never syncs to master and isn't carried by Shamt at all — it lives in the child's own git repo.
@@ -197,7 +197,7 @@ The status line surfaces PO-flow context by falling back through altitudes — f
 | `/f2-plan-update-implementation {slug}` | Phase 3 (optional, >10 file ops) — architect plan | shipped |
 | `/f3-implement-update {slug}` | Phase 4 — apply canonical edits | shipped |
 | `/f4-regen-framework` | Phase 5 — propagate canonical edits into `.claude/` | shipped |
-| `/f5-audit-framework` | Phase 6 — continuous dual-track D1–D12 sweep: auto-fix simple findings + capture intricate ones as f0 drafts (also standalone). **Master / self-host only** — in a child it halts and redirects to f0 → f1 → `/sync-submit-proposal` | shipped |
+| `/f5-audit-framework` | Phase 6 — continuous dual-track D1–D12 sweep: auto-fix simple findings + capture intricate ones as f0 drafts (also standalone). **Master / self-host only** — in a child it halts and redirects to f0 → f1 → `/sync-proposals` | shipped |
 | `/f6-archive-proposal {slug}` | Phase 7 — archive the implemented proposal | shipped |
 | `/f-all {slug}` | Meta-driver (spans Phases 2–7, not a numbered phase) — walk a proposal through every remaining phase end-to-end (validate → optional `/f2`+plan-validate → `/f3` → `/f4` → `/f5` → `/f6`; `/f5-audit-framework` runs in-chain as Phase 6, between `/f4` and `/f6`, via the driver-lifted `audit-checker` topology, its auto-fixes + f0 captures folding into the `/f6` squash commit) by dispatching one independent agent per phase, deriving the start phase from on-disk artifacts, and pausing only on a structured open question or halting on any other non-clean outcome. **Master / self-host only** — in a child it halts and redirects to the per-phase commands | shipped |
 | `/trim-rules-file [slug]` | Maintenance — analyze `SHAMT_RULES.template.md` for size-reduction opportunities and author a trim proposal (D12 budget). **Master / self-host only** | shipped |
@@ -210,7 +210,7 @@ The status line surfaces PO-flow context by falling back through altitudes — f
 
 | Command | Side | Purpose | Status |
 |---------|------|---------|--------|
-| `/sync-submit-proposal {slug}` | Child | Prepare a validated proposal for upstream manual copy. Moves local copy to `.shamt-core/proposals/submitted/`. | shipped |
+| `/sync-proposals` | Child | Batch-prepare **every active** child-local proposal (f0 / validated / in-progress) for upstream manual copy; strips any numeric ID. Moves each local copy to `.shamt-core/proposals/submitted/`. | shipped |
 | `/sync-import-shamt` | Child | Pull master HEAD via `.shamt-core/import-shamt.sh`, then regen. | shipped |
 | `/sync-triage-proposals` | Master | Walk `proposals/incoming/`, promote / reject / defer / skip each. | shipped |
 
@@ -244,7 +244,7 @@ Per-project settings live in `.shamt-core/shamt-config.json`. Initialize from `.
 
 | Key | Type | Purpose |
 |-----|------|---------|
-| `project_name` | string (`^[A-Za-z0-9._-]+$`) | Used by `/sync-submit-proposal` to namespace upstream submissions (`proposals/incoming/{project_name}-{slug}.md` on master) |
+| `project_name` | string (`^[A-Za-z0-9._-]+$`) | Used by `/sync-proposals` to namespace upstream submissions (`proposals/incoming/{project_name}-{slug}.md` on master) |
 | `work_item_tracker` | `"ado"` / `"github"` / `"local"` / `"none"` | Which tracker `/e1-start-story` (etc.) fetches from |
 | `pr_provider` | `"ado"` / `"github"` / `"none"` | Which PR provider `/e6-review-changes` formal mode uses |
 | `ai_service` | `"anthropic"` | Reserved for future multi-host |

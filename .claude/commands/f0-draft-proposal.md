@@ -71,7 +71,7 @@ State the exit clearly:
 f0 draft captured at {proposals-dir}/{final-slug}.md (Status: Draft (f0 — audit capture, unrefined)).
 {If the slug was suffixed: note the requested slug was taken and the draft was written as {final-slug}.}
 Unrefined — no open-questions dialog ran and no change list was written.
-Next: /f1-propose-update {final-slug} to flesh it out{, then /sync-submit-proposal {final-slug} to send it upstream — child only}.
+Next: /f1-propose-update {final-slug} to flesh it out{, then /sync-proposals to send it upstream (batch, slugless) — child only}.
 ```
 
 When f0 is invoked **by the audit** per intricate finding, no next-command suggestion is printed for the user — the audit reports the captured draft slug in its own loop output and continues sweeping.
@@ -87,7 +87,7 @@ When f0 is invoked **by the audit** per intricate finding, no next-command sugge
 - **No open-questions dialog.** f0 is deliberately fast and unrefined. Surfacing forks one-at-a-time and resolving them is `/f1-propose-update`'s job (Principle 2 applies there, not here).
 - **Non-destructive by construction.** The collision rule appends a numeric suffix rather than overwriting or prompting, so an audit run capturing many findings — or two runs capturing the same idea — can never clobber an existing proposal. A rare duplicate draft is a harmless, user-reviewable outcome.
 - **Addressing-draft recognition is the caller's job.** f0 does not decide whether a finding is already covered by an existing draft; the audit makes that judgment by reading `proposals/` before calling f0. f0 only guarantees non-destructive file creation.
-- **Master and child both run f0 *the command*; only the audit is master-only.** Creating a new proposal file is not editing an imported canonical copy, so a child user may run `/f0-draft-proposal` (then `/f1-propose-update`, then `/sync-submit-proposal`) directly. But `/f5-audit-framework` does **not** run in a child, so f0 is never *audit-driven* there — only user-driven.
+- **Master and child both run f0 *the command*; only the audit is master-only.** Creating a new proposal file is not editing an imported canonical copy, so a child user may run `/f0-draft-proposal` (then `/f1-propose-update`, then `/sync-proposals`) directly. But `/f5-audit-framework` does **not** run in a child, so f0 is never *audit-driven* there — only user-driven.
 - **Fresh-agent runnable** — the template and the supplied blurb are sufficient. No conversation history required.
 
 ---

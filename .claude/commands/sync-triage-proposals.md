@@ -25,7 +25,7 @@ Per phase-per-command resumability (Principle 1), triage does not invoke `/valid
 ## Prerequisites
 
 - This command runs **on the master side**. Master vs. child is decided by `proposals/incoming/` presence at the cwd: master has it; child projects never do.
-- `proposals/incoming/` exists. If absent, halt with: *"proposals/incoming/ does not exist — this looks like a child project. Use `/sync-submit-proposal {slug}` to send proposals upstream instead."*
+- `proposals/incoming/` exists. If absent, halt with: *"proposals/incoming/ does not exist — this looks like a child project. Use `/sync-proposals` to send proposals upstream instead."*
 - `proposals/incoming/` contains at least one `.md` file (excluding files whose basename starts with `_` or `.`). If empty, report and exit cleanly: *"proposals/incoming/ is empty — nothing to triage."*
 
 ## Step-by-step
@@ -57,7 +57,7 @@ For each incoming file in order, run Steps 2a through 2d.
 
 1. Extract the `Proposed by:` value from the proposal body. Strip surrounding whitespace.
 2. Compute `bare_basename = ${basename%.md}` (filename without the `.md` extension).
-3. Verify that `bare_basename` starts with `${Proposed by}-` — i.e., the filename's prefix matches the project name the child declared in the header (per `/sync-submit-proposal`'s `{project_name}-{slug}.md` naming rule).
+3. Verify that `bare_basename` starts with `${Proposed by}-` — i.e., the filename's prefix matches the project name the child declared in the header (per `/sync-proposals`'s `{project_name}-{slug}.md` naming rule).
 4. **Slug = `${bare_basename#${Proposed by}-}`** — strip the validated prefix; the remainder is the canonical slug.
 5. **Malformed cases** (any of the following) — surface a HIGH-priority warning to the user and ask via `AskUserQuestion` whether to **reject** (treat as malformed), **defer** (await child re-submission), or **promote with a user-supplied slug**:
    - `Proposed by:` is blank or absent.
@@ -169,7 +169,7 @@ Both paths run the same Pattern 1 loop per proposal — there is no rigor differ
 - **No bulk-disposition.** Each proposal gets its own decision via `AskUserQuestion`. Bulk auto-decisions risk silent acceptances of proposals the user would have rejected on a closer read.
 - **No automatic validation invocation.** Promote moves the file and stops. The user runs `/validate-artifact` next — possibly after `/clear` to start fresh. This matches every other master-side phase in the framework-update flow and keeps each phase independently runnable.
 - **Provenance preserved.** The promoted proposal still carries its `Proposed by:` and `Project context:` headers. The `Proposed by:` header drives the promote-time filename-prefix strip (the `{project}-` prefix is derived from it).
-- **Rejection notes are for the master's record.** Children are informed out-of-band (chat, email, etc.). v2 does not include a notification mechanism — `/sync-submit-proposal` warned the user that rejections require manual cleanup of `proposals/submitted/{slug}.md` on the child side.
+- **Rejection notes are for the master's record.** Children are informed out-of-band (chat, email, etc.). v2 does not include a notification mechanism — `/sync-proposals` notes that rejections require manual cleanup of `proposals/submitted/{slug}.md` on the child side.
 - **Order of files.** Alphabetical order is deterministic and lets a fresh agent resume the loop predictably across sessions if the user skipped some. There is no priority field on incoming proposals; chronological prioritization happens by hand.
 - **Fresh-agent runnable.** `proposals/incoming/` contents are sufficient. No conversation history required.
 

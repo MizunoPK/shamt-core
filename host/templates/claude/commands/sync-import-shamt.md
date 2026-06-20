@@ -114,7 +114,7 @@ Suggest:
 - **`master_url` formats.** Git URL (cloned `--depth 1`) or absolute local path (used directly with no copy). The script auto-detects via prefix.
 - **No automatic git commit.** The script does not commit on the user's behalf — the diff is the user's to review.
 - **Footer contract.** The pragmatic footer-contract rule is **subtree-level**: every path in master's sync set is master-owned (no per-file footer check). Any file the child adds under `.shamt-core/{templates,reference,host,scripts}/` outside that sync set is preserved with a warning. This is a tighter rule than the per-file footer check originally proposed, justified by the fact that most canonical files under `templates/` and `reference/` do not yet carry footers — applying the strict footer rule would leave the bulk of canonical content un-synced.
-- **No reverse direction.** This command only pulls. The reverse direction is `/sync-submit-proposal {slug}` (per-proposal, manual copy).
+- **No reverse direction.** This command only pulls. The reverse direction is `/sync-proposals` (batch, manual copy — ships every active child-local proposal upstream at once).
 - **Fresh-agent runnable.** The script + `.shamt-core/shamt-config.json` are sufficient. No conversation history required.
 
 ---

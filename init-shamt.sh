@@ -242,7 +242,7 @@ MASTER_URL=""
 DOC_STALENESS=""
 
 prompt_value PROJECT_NAME \
-  "Project name (used by /sync-submit-proposal to namespace upstream submissions)" \
+  "Project name (used by /sync-proposals to namespace upstream submissions)" \
   "$(basename "$TARGET_DIR")" \
   '^[A-Za-z0-9._-]+$'
 
