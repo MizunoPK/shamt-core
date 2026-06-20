@@ -46,7 +46,7 @@ ps0 supports **two parent modes**, both writing the **same story-ticket stub sha
 
 ### Step 2 — Allocate the ticket ID + slug
 
-1. Allocate a ticket ID `T{N}` (= `max` of the `^T([0-9]+)-` prefixes across `epics/`, `features/`, `stories/`, + 1 — per **# Ticket IDs**).
+1. Allocate a ticket ID `T{N}` per [`templates/SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md) §**# Ticket IDs** *Allocation*.
 2. Confirm the story slug (derive from the blurb if not given). The slug is globally unique — detect collisions per §PO-tree resolution; halt and ask for a different slug on collision.
 
 ### Step 3 — Write the ticket stub

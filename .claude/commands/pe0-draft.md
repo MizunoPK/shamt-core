@@ -46,7 +46,7 @@ Epics are nested folders, not flat files. pe0 resolves the epics directory (alwa
 ### Step 2 — Seed a bare-minimum pe0 draft
 
 1. Read the epic template (`templates/epic.template.md`) for the current shape.
-2. Allocate a ticket ID `T{N}` (= `max` of the `^T([0-9]+)-` prefixes across `epics/`, `features/`, `stories/`, + 1 — per **# Ticket IDs**).
+2. Allocate a ticket ID `T{N}` per [`templates/SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md) §**# Ticket IDs** *Allocation*.
 3. Ask the user for a 2–4-word **brief description** of the epic, or derive it from the blurb if supplied.
 4. Create the folder `epics/{ID}-{slug}-{brief}/` and write `epic.md` with:
    - **H1:** `# Epic {slug}`.

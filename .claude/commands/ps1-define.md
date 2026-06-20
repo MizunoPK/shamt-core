@@ -72,7 +72,7 @@ The single-story resolution that follows runs only on the own-altitude branch:
 Applies only when the slug does not yet resolve to a folder (i.e., Mode A is ruled out and we are heading into Mode B or Mode C):
 
 1. Ask the user for a 2–4-word **brief description** of the story, or derive it from the tracker payload's title once fetched (re-propose after Step 4 Mode C).
-2. **For a new (non-stub) story, allocate a ticket ID** `T{N}` (= `max` of the `^T([0-9]+)-` prefixes across `epics/`, `features/`, `stories/`, + 1 — per **# Ticket IDs**) and propose the folder path, populating the `**Ticket ID:** T{N}` header. **Mode A (stub):** the folder + its ID already exist — reuse them, do **not** allocate or re-propose. **Ask the user to confirm the brief + folder name before creating directories.**
+2. **For a new (non-stub) story, allocate a ticket ID** `T{N}` per [`templates/SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md) §**# Ticket IDs** *Allocation* and propose the folder path, populating the `**Ticket ID:** T{N}` header. **Mode A (stub):** the folder + its ID already exist — reuse them, do **not** allocate or re-propose. **Ask the user to confirm the brief + folder name before creating directories.**
 3. On confirmation, create the folder.
 
 ### Step 4 — Branch on input mode

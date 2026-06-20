@@ -60,7 +60,7 @@ Apply the global slug-resolution rule from [`SHAMT_RULES.template.md`](../../../
 When the slug does not yet resolve to a folder:
 
 1. Ask the user for a 2–4-word **brief description** of the epic, or derive it from the tracker payload's title once fetched (re-propose after Step 4).
-2. Allocate a ticket ID `T{N}` (= `max` of the `^T([0-9]+)-` prefixes across `epics/`, `features/`, and `stories/`, + 1 — per **# Ticket IDs**); propose `epics/{ID}-{slug}-{brief-description-kebab}/` and ask the user to confirm before creating the directory; populate the epic's `**Ticket ID:** T{N}` header. Lowercase, hyphen-separated.
+2. Allocate a ticket ID `T{N}` per [`templates/SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md) §**# Ticket IDs** *Allocation*; propose `epics/{ID}-{slug}-{brief-description-kebab}/` and ask the user to confirm before creating the directory; populate the epic's `**Ticket ID:** T{N}` header. Lowercase, hyphen-separated.
 3. On confirmation, create the folder.
 
 ### Step 4 — Fetch (or fall through to freeform)

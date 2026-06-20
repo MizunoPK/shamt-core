@@ -108,7 +108,7 @@ Feature slug uniqueness is **global** (nested layout). Before writing:
 
 For each approved feature entry:
 
-- **New partition (per Step 3) — and every feature on first decomposition:** allocate a ticket ID `T{N}` for the feature (= `max` of the `^T([0-9]+)-` prefixes across `epics/`, `features/`, `stories/`, + 1 — per **# Ticket IDs**) and create `epics/{epic-folder}/features/{ID}-{feature-slug}-{brief}/feature.md` from [`templates/feature.template.md`](../../../../templates/feature.template.md) (nested under the resolved parent epic folder). Populate **only** these fields:
+- **New partition (per Step 3) — and every feature on first decomposition:** allocate a ticket ID `T{N}` for the feature per [`templates/SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md) §**# Ticket IDs** *Allocation* and create `epics/{epic-folder}/features/{ID}-{feature-slug}-{brief}/feature.md` from [`templates/feature.template.md`](../../../../templates/feature.template.md) (nested under the resolved parent epic folder). Populate **only** these fields:
   - `**Ticket ID:** T{N}` — the feature's allocated ID; a header line directly under the H1.
   - `## Goal` — the one-liner approved by the user in Step 5.
   - `## Scope / Non-Scope` — the feature's breadth **boundary**: what it covers vs. explicitly does not, drawn from the whole-set research (the in/out line, not detailed acceptance criteria). Fill `### In Scope` / `### Out of Scope` with the boundary as understood at decomposition; `/pf1-define` refines depth later.
