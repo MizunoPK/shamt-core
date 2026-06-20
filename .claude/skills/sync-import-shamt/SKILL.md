@@ -42,7 +42,7 @@ Subtree-level, not per-file. Every path in master's sync set (`CLAUDE.md`, `READ
 
 ## Why no reverse direction
 
-This skill only pulls. To send proposals upstream, use `/sync-proposals` — batch, manual copy per the manual-copy sync design.
+This skill only pulls. To send proposals upstream, use `/sync-proposals` — batch direct-write into the local master's `proposals/incoming/` (assumes a local `master_url`; halts on a git URL), the symmetric mirror of this skill's local-path read.
 
 ---
 Validated 2026-05-28 — 8 rounds (4 primary + 4 adversarial), final adversarial sub-agent confirmed (Phase 9 implementation re-validation). No changes to this file in this round.

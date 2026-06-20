@@ -5,13 +5,17 @@ description: >
   child-local proposal under .shamt-core/proposals/ for upstream submission to
   master. Iterates all top-level *.md proposals regardless of status (f0 draft,
   validated, or in-progress Draft — no validation-footer gate), strips any
-  numeric ID, reads project_name from .shamt-core/shamt-config.json, prints one
-  copy-paste block per proposal with its master-side target path
-  (proposals/incoming/{project}-{slug}.md) for manual copy-paste, and moves each
-  local copy to .shamt-core/proposals/submitted/{slug}.md to mark "awaiting
-  decision". Does NOT push to master, open PRs, or file issues — the submission
-  is manual copy. Invoke when the user wants to send proposals upstream, ship
-  proposals to master, submit framework changes, or push proposals up.
+  numeric ID, reads project_name + master_url from .shamt-core/shamt-config.json,
+  and direct-writes each proposal into the local master's
+  proposals/incoming/{project}-{slug}.md behind an overwrite guard (prompt on a
+  differing target, no-op if identical), then moves each written/unchanged local
+  copy to .shamt-core/proposals/submitted/{slug}.md to mark "awaiting decision"
+  (a skipped proposal stays active). Assumes a local master_url and halts with
+  actionable guidance when it is a git URL or other non-local path — no
+  copy-paste fallback. Does NOT push to a remote master, open PRs, or file
+  issues; the user reviews / commits / pushes the written files by hand. Invoke
+  when the user wants to send proposals upstream, ship proposals to master,
+  submit framework changes, or push proposals up.
 triggers:
   - "sync proposals"
   - "submit the proposals"
@@ -35,9 +39,9 @@ Cheap (Haiku) — list files, read them, print, move. Mechanical. See [`referenc
 
 ## Exit criteria
 
-- Each active proposal now lives at `.shamt-core/proposals/submitted/{slug}.md` with its numeric ID stripped, and no longer at its original top-level location.
-- One fenced copy-paste block per proposal has been printed to chat with the master-side target path stated above it.
-- The top-level active proposal set is now empty.
+- Each **written** or **unchanged** proposal now lives at `.shamt-core/proposals/submitted/{slug}.md` with its numeric ID stripped, and no longer at its original top-level location; a **skipped** proposal stays active for retry.
+- Each written/unchanged proposal has been direct-written to (or confirmed identical at) the local master's `proposals/incoming/{project}-{slug}.md`, behind the overwrite guard.
+- The top-level active proposal set contains only the skipped proposals (empty when none were skipped).
 
 ## Re-submission
 

@@ -70,7 +70,7 @@ Shamt is a master/child framework with deliberately constrained sync directions:
 
 | Direction | Mechanism | What moves |
 |-----------|-----------|------------|
-| Child → master | **Proposals only.** Manual copy-paste via `/sync-proposals` (batch — ships every active child-local proposal at once). | One file per proposal (`proposals/incoming/{project_name}-{slug}.md` on master). |
+| Child → master | **Proposals only.** Direct local-FS write via `/sync-proposals` (batch — ships every active child-local proposal at once; assumes a local `master_url`, halts on a git URL). | One file per proposal (`proposals/incoming/{project_name}-{slug}.md` on master). |
 | Master → child | **Framework pull only.** Scripted via `/sync-import-shamt`. Always-latest, no pinning. | Master's canonical sources under `shamt-core/`. |
 
 No bidirectional guide-editing sync. No `export.sh`. The child's project work (stories, epics, features, code reviews) never syncs to master and isn't carried by Shamt at all — it lives in the child's own git repo.
@@ -210,7 +210,7 @@ The status line surfaces PO-flow context by falling back through altitudes — f
 
 | Command | Side | Purpose | Status |
 |---------|------|---------|--------|
-| `/sync-proposals` | Child | Batch-prepare **every active** child-local proposal (f0 / validated / in-progress) for upstream manual copy; strips any numeric ID. Moves each local copy to `.shamt-core/proposals/submitted/`. | shipped |
+| `/sync-proposals` | Child | Batch-prepare **every active** child-local proposal (f0 / validated / in-progress) and direct-write each into the local master's `proposals/incoming/` (strips any numeric ID; halts on a git-URL `master_url`). Moves each written/unchanged local copy to `.shamt-core/proposals/submitted/`. | shipped |
 | `/sync-import-shamt` | Child | Pull master HEAD via `.shamt-core/import-shamt.sh`, then regen. | shipped |
 | `/sync-triage-proposals` | Master | Walk `proposals/incoming/`, promote / reject / defer / skip each. | shipped |
 
