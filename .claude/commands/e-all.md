@@ -1,5 +1,5 @@
 ---
-description: Driver — walk a single story through every remaining Engineer-flow phase (e1 → e2 → optional e3+e3b → e4 → e5 → e6 → e7 → e8) by dispatching one independent agent per phase, deriving the start phase from on-disk artifacts, pausing on each interactive gate or structured open question via AskUserQuestion, and halting on any failure it cannot resolve
+description: Driver — walk a single story through every remaining Engineer-flow phase up to and including Review (e1 → e2 → optional e3+e3b → e4 → e5 → e6, opening the PR when pr_provider == github) by dispatching one independent agent per phase, deriving the start phase from on-disk artifacts, pausing on each interactive gate or structured open question via AskUserQuestion, and halting on any failure it cannot resolve. Polish (/e7, iterative) and Finalize (/e8) are operator-driven — not auto-run
 ---
 
 # /e-all
@@ -10,7 +10,7 @@ description: Driver — walk a single story through every remaining Engineer-flo
 
 The driver runs in the main agent loop and dispatches **one independent `Agent` sub-agent per phase, in order**, in the **shared working tree** (never with worktree isolation — `/e4`'s build edits must be visible to `/e5` test, `/e6` review, `/e7` polish, and `/e8` commit). After each phase agent returns, the driver inspects its report and either **advances** (clean exit), **pauses** (the phase surfaced an interactive gate or a structured open question — lift it to the user via `AskUserQuestion`, feed the answer back, re-dispatch the same phase against its on-disk artifact), or **halts** (any other non-clean outcome — failure, ambiguity it cannot frame as a user question, inconsistent state — surfaced verbatim, no retry).
 
-`/e-all` is **gate-heavy.** The Engineer flow has genuine interactive judgment gates — `/e2` Gate 2a design dialog and Gate 2b approval, `/e3` Gate 3 approval, `/e7` polish dialog, `/e8`'s explicit finalize confirmation — where `/f-all`'s chain mostly auto-advanced. So `/e-all` **pauses far more often** than `/f-all`: each gate is a structured pause surfaced to the user and re-dispatched on the answer. The driver never makes a design call itself; it only sequences phases and relays the gate.
+`/e-all` is **gate-heavy.** The phases `/e-all` dispatches (through Review) carry genuine interactive judgment gates — `/e2` Gate 2a design dialog and Gate 2b approval, `/e3` Gate 3 approval — where `/f-all`'s chain mostly auto-advanced. So `/e-all` **pauses far more often** than `/f-all`: each gate is a structured pause surfaced to the user and re-dispatched on the answer. The driver never makes a design call itself; it only sequences phases and relays the gate. (The later `/e7` polish dialog and `/e8` finalize confirmation are gates too, but they belong to the operator-driven Polish / Finalize phases `/e-all` does not auto-run — so `/e-all` never pauses on them.)
 
 **Recommended model:** Balanced (Sonnet) — the driver sequences phases, dispatches sub-agents, inspects results, and halts/pauses; the heavy per-phase reasoning lives in the dispatched agents at their own tiers (a spec/plan-validation primary at Reasoning, `plan-executor` at Cheap, `user-simulator` at Balanced, `test-executor` / `validation-checker` at Cheap, the story-review primary at Balanced). See [`reference/model_selection.md`](../../../../reference/model_selection.md).
 
@@ -44,9 +44,9 @@ Phase 3  /e3-plan-implementation + validate           [Standard path only]
          /e3b-write-testing-plan + validate           [Standard path AND TESTING_STANDARDS declares suites]
 Phase 4  /e4-execute-plan                             [always]
 Phase 5  /e5-execute-tests                            [always — required]
-Phase 6  /e6-review-changes                           [always]
-Phase 7  /e7-resolve-feedback                          [always]
-Phase 8  /e8-finalize-story                            [always — terminal, user-gated commit]
+Phase 6  /e6-review-changes                           [always — terminal for /e-all; opens the PR when pr_provider == github]
+         /e7-resolve-feedback (Polish, iterative)     [operator-driven — NOT auto-run by /e-all]
+         /e8-finalize-story  (Finalize)               [operator-driven — NOT auto-run by /e-all]
 ```
 
 **Quick-path stories skip `/e3` / `/e3b`** — the build (`/e4`) runs the spec's Build Checklist directly. The spec's `Path:` header (Quick vs Standard), read off `spec.md`, selects this for the rest of the chain.
@@ -71,10 +71,8 @@ Phase resolution is at **phase-boundary granularity** — the driver dispatches 
 | Standard, `implementation_plan.md` footed; TESTING_STANDARDS declares suites and the testing plan (`testing_plan.md` footed / spec inline checklist validated) **not** yet present | Testing plan not done | Phase 3 (`/e3b`) |
 | Plan done (Standard: `implementation_plan.md` footed; Quick: spec footed) and `/e3b` done/non-applicable; **build gate** does **not** walk clean | Build not done | Phase 4 (`/e4`) |
 | Build gate walks clean; `agent_test_session.md` verdict **not** `Session PASS` (or, when suites exist, `testing_plan.md` Results Log not all PASS) | Test not done | Phase 5 (`/e5`) |
-| Tests pass; `feedback/review_vN.md` **not** footed (and no Quick-path `## Post-Build Review` block on the footed spec) | Review not done | Phase 6 (`/e6`) |
-| Review done; `feedback/addressed_feedback.md` **not** dispositioned | Polish not done | Phase 7 (`/e7`) |
-| Polish done; `ticket.md` does **not** carry `**Status: Done**` | Finalize not done | Phase 8 (`/e8`) |
-| `ticket.md` carries `**Status: Done**` | Finalized | Nothing — report already-complete and exit |
+| Tests pass; `feedback/review_vN.md` **not** footed (and no Quick-path `## Post-Build Review` block on the footed spec) | Review not done | Phase 6 (`/e6`) — **terminal** for `/e-all` |
+| Review done (`feedback/review_vN.md` footed; PR opened when `pr_provider == github`) | `/e-all` is complete — Polish (`/e7`) and Finalize (`/e8`) are **operator-driven** | Nothing — `/e-all` exits at the end of Review; direct the user to `/e7-resolve-feedback {slug}` (iterative) then `/e8-finalize-story {slug}` |
 
 **`/e4` done is gate-derived, not artifact-derived.** `/e4-execute-plan` writes **no** "build complete" marker — its output is working-tree edits + commits per the plan's convention. So the `/e4` discriminator is the **build gate**: the plan's `## Verification` section (Standard) or the spec's Build Checklist (Quick) walks clean against the working tree, mirroring `/f-all`'s diff-coverage gate.
 
@@ -130,9 +128,7 @@ Unlike `/f-all`'s `/f3` (which both plans and hands off within one phase), the E
 
 **Phase 6 — `/e6-review-changes`.** Story mode. Run `/e6`'s **inline** steps in the phase agent (the 16-category sweep against the story's own diff, writing `feedback/review_vN.md`) up to the validation hand-off; the driver lifts `validation-checker` on the review, re-converging to `CONFIRMED`. (`/e-all` always runs `/e6` in **story mode** against the story's own diff — the `--branch=` / `--pr=` formal modes are not part of the per-story chain.)
 
-**Phase 7 — `/e7-resolve-feedback`.** Run `/e7`'s **inline** steps in the phase agent: apply each comment from `feedback/review_vN.md`, log dispositions in `feedback/addressed_feedback.md`, perform any flagged ARCHITECTURE / CODING_STANDARDS / TESTING_STANDARDS updates, and route generalizable root causes to `.shamt-core/proposals/`. The `/e7` polish dialog is a **pause**.
-
-**Phase 8 — `/e8-finalize-story`.** Self-contained — dispatch one `Agent` to run `/e8-finalize-story {slug}`. **Before this (irreversible) commit + tracker-close**, the driver re-confirms `/e8`'s **own three guards** are evaluated, not bypassed: prior phases complete; scoped clean-tree commit; **explicit user confirmation**. `/e8`'s built-in explicit-confirm guard means the irreversible step is **always user-gated** — the driver surfaces that confirm via `AskUserQuestion` (a Step-3 pause) rather than performing it unattended. This is **softer** than `/f-all`'s autonomous squash-merge: the terminal step here is never autonomous.
+**`/e-all` stops here — Polish and Finalize are operator-driven.** `/e-all` terminates at the end of Phase 6 (Review). Because Polish (`/e7-resolve-feedback`) is now an **iterative** human-in-the-loop PR cycle (each run pulls the latest PR comments and pushes fix commits) and Finalize (`/e8-finalize-story`) merges the PR, neither is auto-run by the driver — the operator invokes `/e7-resolve-feedback {slug}` (N times, as comments arrive) and then `/e8-finalize-story {slug}` by hand. Both remain independently runnable per-phase commands.
 
 ---
 
@@ -147,14 +143,14 @@ The driver branches on the **dispatched agent's own already-shipped report contr
 - A self-contained phase agent reporting its `/eX` command completed at its documented exit (`/e1` ticket captured; `/e8` committed + tracker-closed).
 
 **Pause** (lift the question to the user via `AskUserQuestion`, feed the answer back, **re-dispatch** the same phase with the answer):
-- An **interactive gate** — Gate 2a design dialog (`/e2`), Gate 2b approval (`/e2`), Gate 3 plan approval (`/e3`), `/e7` polish dialog, `/e8` finalize confirmation. Gate 2a's 1–3 design options and the 2b / 3 / `/e8` approvals each map cleanly onto **one** `AskUserQuestion` round-trip; **multi-round** design dialog is handled by **successive re-dispatches off the now-updated on-disk artifact**.
+- An **interactive gate** — Gate 2a design dialog (`/e2`), Gate 2b approval (`/e2`), Gate 3 plan approval (`/e3`). (Polish `/e7` and Finalize `/e8` carry their own gates — the `/e7` polish dialog, the `/e8` finalize confirmation — but `/e-all` stops at Review and never dispatches them, so those gates are surfaced only when the operator runs `/e7` / `/e8` by hand.) Gate 2a's 1–3 design options and the 2b / 3 approvals each map cleanly onto **one** `AskUserQuestion` round-trip; **multi-round** design dialog is handled by **successive re-dispatches off the now-updated on-disk artifact**.
 - `plan-executor` → `Step [N] is ambiguous: …` (its contract states what would disambiguate — surface that as the question).
 - `test-executor` → `Step [N] is ambiguous: …` — a structured open question lifted to the user as a pause (mirroring `plan-executor`'s identically-named ambiguous exit, and **distinct from a test failure** that halts). The driver surfaces it via `AskUserQuestion` and re-dispatches Phase 5 against the on-disk testing artifact on the answer, exactly as the gate-pause cases do.
 - An inline-instruction primary surfacing an unresolved Principle-2 open question.
 
 **Sentinel contract (two row-authoring details, both inherited from `/f-all`'s sentinel mechanics — not a persona edit):**
 
-1. The gate-bearing phases (`/e2`, `/e3`, `/e7`) run as **inline-instruction** sub-agents that **cannot** prompt the user themselves (only a top-level invocation of `/eX` would). So the driver's **dispatch prompt** for every inline-instruction phase must instruct that agent to **return** any gate prompt / unresolved open question to the driver rather than prompting the user itself, using a **verbatim sentinel** the driver matches — mirroring `plan-executor`'s `Step [N] is ambiguous: …` shape:
+1. The gate-bearing phases `/e-all` dispatches (`/e2`, `/e3`) run as **inline-instruction** sub-agents that **cannot** prompt the user themselves (only a top-level invocation of `/eX` would). So the driver's **dispatch prompt** for every inline-instruction phase must instruct that agent to **return** any gate prompt / unresolved open question to the driver rather than prompting the user itself, using a **verbatim sentinel** the driver matches — mirroring `plan-executor`'s `Step [N] is ambiguous: …` shape:
 
    ```text
    Open question: {the question} | To resolve: {what input is needed}
@@ -179,21 +175,21 @@ The driver branches on the **dispatched agent's own already-shipped report contr
 
 ## Step 4 — Exit
 
-When `/e8` reports the story committed + tracker-closed, state the exit clearly:
+When `/e6` reports the validated review (and, when `pr_provider == github`, the opened PR), state the exit clearly:
 
 ```text
-/e-all complete for {slug}. Phases run: {list, e.g. e2 → e3 → e4 → e5 → e6 → e7 → e8}.
-The story is committed and its work item is marked done.
+/e-all complete for {slug}. Phases run: {list, e.g. e2 → e3 → e4 → e5 → e6}.
+The review is validated{, and the PR is open at <url> when pr_provider == github}.
+Next (operator-driven): /e7-resolve-feedback {slug} (iterative — re-run as PR comments arrive), then /e8-finalize-story {slug}.
 ```
 
-If the run **paused**, the pause is not an exit — it is one round-trip through `AskUserQuestion`; the driver resumes automatically after the answer. If the run **halted**, report the halting phase's verbatim message and the per-phase command to resume from; do not present the run as complete.
+`/e-all` ends at the end of Review. Polish (`/e7`, iterative) and Finalize (`/e8`) are **operator-driven** — the driver does not auto-run them. If the run **paused**, the pause is not an exit — it is one round-trip through `AskUserQuestion`; the driver resumes automatically after the answer. If the run **halted**, report the halting phase's verbatim message and the per-phase command to resume from; do not present the run as complete.
 
 ## Exit criteria
 
-- The story walked from its derived start phase through `/e8-finalize-story` (committed + tracker-closed), **or** the run paused on an interactive gate / structured open question (resumed in-place) / halted on a non-clean outcome with the verbatim report surfaced.
+- The story walked from its derived start phase through `/e6-review-changes` (review validated; PR opened when `pr_provider == github`), **or** the run paused on an interactive gate / structured open question (resumed in-place) / halted on a non-clean outcome with the verbatim report surfaced. Polish (`/e7`) and Finalize (`/e8`) are operator-driven and not part of the `/e-all` chain.
 - Every phase ran as an independent `Agent` in the **shared working tree** (no worktree isolation).
 - Exactly one nesting level throughout (driver → phase agent; driver → inner persona); no sub-agent invoked an `/eX` command that would auto-spawn a second-level sub-agent.
-- The terminal `/e8` commit + tracker-close ran behind `/e8`'s own three guards (prior phases complete; scoped clean tree; explicit user confirmation surfaced via `AskUserQuestion`), never bypassed.
 
 ## Notes
 
@@ -203,7 +199,7 @@ If the run **paused**, the pause is not an exit — it is one round-trip through
 - **One nesting level (per `reference/batch_validation_handoff.md`).** Phases that internally need a sub-agent run inline steps and halt at the hand-off; the driver lifts the `validation-checker` / `plan-executor` / `user-simulator` / `test-executor` spawn up to itself. Dispatching a sub-agent to *run the `/eX` command* and expecting it to halt is the infeasible reading and is explicitly ruled out.
 - **Gate-heavy — pauses far more than `/f-all`.** The Engineer flow's many interactive gates mean `/e-all` pauses often. Each gate is a structured pause surfaced to the user via `AskUserQuestion` and re-dispatched on the answer — the driver never makes a design call itself, it only sequences and relays.
 - **Strict halt on test failure (no autonomous `/e7` loop).** On any Phase-5 *failure* exit the driver halts and surfaces the verbatim report; the `/e5` → `/e7` → re-`/e5` loop stays a manual operation. The lone Phase-5 *ambiguous* exit is a user-gated pause, not an autonomous retry. The driver never autonomously edits code to chase a green.
-- **Terminal `/e8` is user-gated.** `/e-all` ends at `/e8-finalize-story`, whose own explicit-confirm guard means the irreversible commit + tracker-close is always user-gated — surfaced via `AskUserQuestion`, with `/e8`'s other two guards (prior phases complete; scoped clean tree) re-confirmed. Strictly safer than `/f-all`'s autonomous squash-merge.
+- **Terminal at Review — Polish + Finalize are operator-driven.** `/e-all` ends at `/e6-review-changes` (Review), opening the PR when `pr_provider == github`. It does **not** auto-run Polish (`/e7`) or Finalize (`/e8`), because Polish is now an **iterative** human-in-the-loop PR cycle (re-run as comments arrive) and Finalize merges the PR — both operator-driven, invoked by hand. The PR open at the end of Review is itself confirm-gated (a Step-3 pause). This makes `/e-all` strictly safer than `/f-all`'s autonomous squash-merge: it never autonomously merges or closes anything.
 - **Never revert parallel work.** Unrelated in-tree work — new `.shamt-core/proposals/` files from a parallel session, **or** the *other* proposals sitting alongside the one this story's `/e7-resolve-feedback` writes — is expected and accepted: it folds into the landing and is **never** reverted, renamed-back, or deleted by the driver or any phase agent it dispatches. This is the driver-level expression of the live `/f3`/`/f6` accept-and-fold rule (`/f3-implement-update.md:34` and `:125`, `/f6-archive-proposal.md`) and the now-live cross-cutting **Principle 3 — disk-authoritative cross-session work** (`CLAUDE.md` / the rules file). The disambiguator is provenance + timing — already-present-on-entry / another session = accepted; this-dispatch own off-task edit = revertable — and the **load-bearing** carrier is the Step 2 / Step 3 dispatch-prompt clause every phase agent reads, not this Notes bullet (a dispatched agent never reads Notes). The rule is self-standing — anchored on the live `/f3`/`/f6` rules — so it holds regardless of Principle 3's landing order.
 - **Fresh-agent runnable.** Story folder artifacts + working-tree state are sufficient inputs; the start phase is re-derived from disk. No conversation history required.
 

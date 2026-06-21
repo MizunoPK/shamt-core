@@ -112,9 +112,50 @@ gh pr diff {id} --repo <org>/<repo>
 
 ---
 
+## PR create
+
+Used by `/e6-review-changes` (story mode) at the end of the Review stage when `pr_provider == github`: push the story branch and open the PR. Confirm-gated by the consuming command (outward action).
+
+```bash
+# Push the story's current (feature) branch and open the PR
+git push -u origin HEAD
+gh pr create --repo <org>/<repo> --base <base> --head <head> \
+  --title "<title>" --body "<markdown body>" --json number,url
+```
+
+`gh pr create` prints the new PR URL; pass `--json number,url` (or follow with `gh pr view --json number,url`) to capture the PR number the consuming command records in the story folder.
+
+## PR comment fetch
+
+Used by `/e7-resolve-feedback` when a PR is recorded for the story and `pr_provider == github`: fetch the latest PR comments + review threads to fold into the feedback inventory. Pull-only — `/e7` never posts back (see `## PR comment posting`).
+
+```bash
+# Conversation comments + review summaries
+gh pr view {id} --repo <org>/<repo> --json comments,reviews
+
+# Review-thread comments (per-line / per-file), keyed by comment id for dedup
+gh api repos/<org>/<repo>/pulls/{id}/comments --paginate
+```
+
+Each returned comment carries a stable `id` — the consuming command dedups against `addressed_feedback.md` by that comment-ID so a re-run never re-processes an already-resolved comment.
+
+## PR merge
+
+Used by `/e8-finalize-story` when `pr_provider == github`: merge the story's PR. Confirm-gated by the consuming command (outward, irreversible action), and preceded by a mergeability check.
+
+```bash
+# Mergeability guard — halt if not mergeable (unresolved reviews / failing checks)
+gh pr view {id} --repo <org>/<repo> --json mergeable,mergeStateStatus,reviewDecision,statusCheckRollup
+
+# Squash-merge and delete the branch
+gh pr merge {id} --repo <org>/<repo> --squash --delete-branch
+```
+
+`mergeable` (`MERGEABLE` / `CONFLICTING` / `UNKNOWN`) plus `reviewDecision` (`APPROVED` / `REVIEW_REQUIRED` / `CHANGES_REQUESTED`) and `statusCheckRollup` let the consuming command halt before merging an un-mergeable PR.
+
 ## PR comment posting
 
-**Not invoked by v2.** Documented for future use only — `/e6-review-changes` produces a local artifact at `code_reviews/` and does not post upstream (resolved open question).
+**Not invoked by v2.** Documented for future use only — `/e6-review-changes` produces a local artifact at `code_reviews/` and does not post upstream (resolved open question). `/e7-resolve-feedback` is **pull-only** (see `## PR comment fetch`): it fetches comments and pushes fix commits, but never replies to or resolves threads.
 
 For reference, the command shapes are:
 

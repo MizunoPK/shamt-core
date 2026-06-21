@@ -111,6 +111,32 @@ The PR `id` here is the ADO Pull Request ID, distinct from the work-item ID. `pr
 
 ---
 
+## PR create
+
+`/e6-review-changes` / `/e7-resolve-feedback` / `/e8-finalize-story` invoke `## PR create` / `## PR comment fetch` / `## PR merge` **only when `pr_provider == github`**. On ADO these are **not yet wired** — the consuming commands take no PR action for `pr_provider == ado`. The `az repos pr` command shapes below are recorded for when ADO PR support is added; declaring the sections keeps this profile contract-conformant.
+
+```bash
+# Open a PR (forward-looking — not invoked by v2)
+az repos pr create --source-branch <head> --target-branch <base> \
+  --title "<title>" --description "<markdown body>" --output json
+```
+
+## PR comment fetch
+
+**Not yet wired** — see `## PR create`. Forward-looking shape:
+
+```bash
+az repos pr show --id {id} --output json   # plus thread fetch via az rest .../pullRequests/{id}/threads
+```
+
+## PR merge
+
+**Not yet wired** — see `## PR create`. Forward-looking shape:
+
+```bash
+az repos pr update --id {id} --status completed --delete-source-branch true --squash true --output json
+```
+
 ## PR comment posting
 
 **Not invoked by v2.** Documented for future use only — `/e6-review-changes` produces a local artifact at `code_reviews/` and does not post upstream (resolved open question).

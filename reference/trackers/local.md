@@ -54,6 +54,18 @@ None — `local` is a work-item-tracker mode only. PR fetching is governed indep
 
 ---
 
+## PR create
+
+`n/a — local has no PR.` PR creation is governed independently by `pr_provider`; `local` is a work-item-tracker mode only.
+
+## PR comment fetch
+
+`n/a — local has no PR.`
+
+## PR merge
+
+`n/a — local has no PR.`
+
 ## PR comment posting
 
 None. Not applicable.

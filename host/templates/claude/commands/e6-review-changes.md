@@ -130,11 +130,22 @@ Invoke `/validate-artifact stories/{slug}/feedback/review_vN.md`. Uses the **7 d
 
 If `active_artifacts.md` exists, add `Baseline reviewed: vN` to the review's header — confirms which spec/plan baseline this review evaluated.
 
+### Step 6b — Open the PR when `pr_provider == github`
+
+After the review artifact validates (Step 6), read `.shamt-core/shamt-config.json` → `pr_provider`.
+
+- **`pr_provider == github`** — push the story branch and open the PR so human review happens on the PR:
+  1. **Confirm.** Present, in one message: the branch that will be pushed, the resolved base, and the PR title/body — then **wait for an explicit "yes."** Pushing a branch and opening a PR are outward-facing; never run them without confirmation.
+  2. On confirmation, run the github profile's `## PR create` (`reference/trackers/github.md`): push the story's current feature branch and `gh pr create`. Resolve the base per the project default branch (or `.shamt-core/project-specific-files/ARCHITECTURE.md`'s declared base).
+  3. **Record the PR number** into the story folder so `/e7-resolve-feedback` and `/e8-finalize-story` can resolve it without conversation history: write `stories/{slug}/feedback/pr.md` with the PR number and URL (e.g. `PR: #1234` / `URL: <pr url>`). This is the single source for the fetch + dedup in `/e7` and the merge in `/e8`.
+- **`pr_provider != github`** (`ado` / `none` / unset) — **no-op.** No branch push, no PR; today's local-only behavior is unchanged.
+
 ### Step 7 — Exit
 
 Present the validated `review_vN.md` to the user. Suggest:
 
-- **Findings present** → `/clear`, then `/e7-resolve-feedback {slug}` (Phase 7 — Polish).
+- **Findings present, `pr_provider == github`, PR opened** → `/clear`, then `/e7-resolve-feedback {slug}` (Phase 7 — Polish), which now also pulls the PR's comments. Re-runnable N times as new comments arrive.
+- **Findings present, `pr_provider != github`** → `/clear`, then `/e7-resolve-feedback {slug}` (Phase 7 — Polish).
 - **No findings** (Quick-path inline `## Post-Build Review`) → user-driven next step (Polish is usually a no-op).
 
 ---
@@ -185,7 +196,7 @@ Surface the artifact paths and the verdict / risk to the user. The user posts ba
 
 ## Exit criteria
 
-- **Story mode:** `stories/{slug}/feedback/review_vN.md` exists with validation footer (or, on a Quick-path no-issue review, `## Post-Build Review` appended to the active spec); `## Documentation Impact` block populated; `Baseline reviewed: vN` set when multiple baselines exist.
+- **Story mode:** `stories/{slug}/feedback/review_vN.md` exists with validation footer (or, on a Quick-path no-issue review, `## Post-Build Review` appended to the active spec); `## Documentation Impact` block populated; `Baseline reviewed: vN` set when multiple baselines exist. When `pr_provider == github`, the story branch is pushed and the PR opened (confirm-gated), with the PR number recorded at `stories/{slug}/feedback/pr.md`; when `pr_provider != github` no PR action is taken.
 - **Formal mode:** `code_reviews/<sanitized-branch>/overview.md` + `review_vN.md` exist, each with a validation footer.
 
 ## Notes

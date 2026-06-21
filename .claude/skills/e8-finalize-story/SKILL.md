@@ -5,9 +5,11 @@ description: >
   the story's work as a scoped unit and mark the originating work item done via
   the active tracker profile (ADO state / GitHub close / local Status flip),
   behind three guards: prior phases complete, scoped clean-tree commit, and
-  explicit user confirmation. Writes the local Status: Done marker the status
-  line reads. Invoke when the user wants to finalize a story, close it out,
-  commit and mark it done, wrap up the story, or run phase 8.
+  explicit user confirmation. When pr_provider == github, also merges the story's
+  PR (gh pr merge --squash --delete-branch, behind the same confirm + a
+  mergeable-guard) — independent of the work_item_tracker-routed close. Writes the
+  local Status: Done marker the status line reads. Invoke when the user wants to
+  finalize a story, close it out, commit and mark it done, wrap up the story, or run phase 8.
 triggers:
   - "finalize the story"
   - "finalize {slug}"
@@ -32,7 +34,7 @@ Cheap (Haiku) — mechanical: evaluate guards, stage a scoped commit, run one cl
 
 ## Exit criteria
 
-The story's scoped work is committed (after the three guards held); the work item is marked done via the active tracker (or local-only); `ticket.md` carries `**Status: Done**`. Finalize does **not** move the story folder — epic archiving is `/pe4-finalize`'s job.
+The story's scoped work is committed (after the three guards held); the work item is marked done via the active tracker (or local-only), independent of `pr_provider`; `ticket.md` carries `**Status: Done**`. When `pr_provider == github`, the story's PR is merged (`gh pr merge --squash --delete-branch`, behind the Step-3 confirm + a mergeable-guard). Finalize does **not** move the story folder — epic archiving is `/pe4-finalize`'s job.
 
 ---
 

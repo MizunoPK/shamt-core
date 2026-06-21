@@ -18,7 +18,10 @@ Every profile file must include the following sections, in this order, using h2 
 | `## Auxiliary fetches` | Commands for any payloads the primary fetch does not include — typically comments, update events / revisions / timeline, relations / linked items, attachments. One command per endpoint, each writing to its own `raw/<endpoint>.json`. Failures in auxiliary fetches do not abort the command (see fallback rule below); they are recorded in the corresponding raw file. |
 | `## Field mapping` | A table mapping the tracker's raw field names to the unified output sections. At minimum: Title, Type, State, Assignee, Project, Iteration/Milestone, Description, Acceptance Criteria, URL. The same mapping is reused across `ticket.md` / `epic.md` / `feature.md` — the consuming command picks which target sections to populate. |
 | `## PR fetch` | CLI to retrieve PR metadata and diff for a given PR ID, parameterized on `{id}`. Used by `/e6-review-changes` when `pr_provider` is set to this tracker. |
-| `## PR comment posting` | CLI to post a Markdown comment to a PR. **Documented for future use only — `/e6-review-changes` does not post back to external trackers in v2.** A profile is still required to declare this so the contract surface stays complete for future use. |
+| `## PR create` | CLI to push a branch and open a PR. Used by `/e6-review-changes` (story mode) at the end of Review when `pr_provider == github`. Required of every profile so the contract surface stays complete; a profile with no PR concept (`local`) declares `n/a`, and a profile not yet wired (`ado`) may declare the command shape or a not-yet-wired note. |
+| `## PR comment fetch` | CLI to fetch the latest PR comments + review threads (keyed by comment-ID). Used by `/e7-resolve-feedback` when a PR is recorded and `pr_provider == github`. Required of every profile (same may-be-stubbed rule as `## PR create`). |
+| `## PR merge` | CLI to merge a PR (squash + delete branch), with a mergeability check. Used by `/e8-finalize-story` when `pr_provider == github`. Required of every profile (same may-be-stubbed rule as `## PR create`). |
+| `## PR comment posting` | CLI to post a Markdown comment to a PR. **Documented for future use only — `/e6-review-changes` does not post back to external trackers in v2, and `/e7-resolve-feedback` is pull-only (it fetches comments but never replies).** A profile is still required to declare this so the contract surface stays complete for future use. |
 | `## Auth failure modes` | The exact error strings or HTTP status patterns that indicate auth failure for the listed CLIs, and what fallback the consuming command should take (typically: skip the fetch and fall through to manual capture, with a one-line notice). |
 | `## Supported work-item types` | A bullet list naming which of `Story`, `Feature`, `Epic` (or other agile types this profile recognizes) the tracker supports as native work-item types. This drives the freeform-fallback rule below. Use `Any` for tracker-agnostic profiles (e.g., `local`). |
 
@@ -53,7 +56,9 @@ Each profile file should document the `--tracker={name}` form near the top of it
 | `/e1-start-story {slug}` | `## Slug resolution`, `## Primary fetch`, `## Auxiliary fetches`, `## Field mapping`, `## Auth failure modes`, `## Supported work-item types` (filter on `Story`) | Phase 1 (Intake) |
 | `/pe1-define {slug}` | Same as above, filtered on `Epic` | PO flow |
 | `/pf1-define {slug}` | Same as above, filtered on `Feature` | PO flow |
-| `/e6-review-changes {slug}` | `## PR fetch`, `## Auth failure modes`. Driven by `pr_provider` (which may differ from `work_item_tracker`). | Phase 6 (Review) |
+| `/e6-review-changes {slug}` | `## PR fetch`, `## Auth failure modes`; `## PR create` (story mode, when `pr_provider == github`). Driven by `pr_provider` (which may differ from `work_item_tracker`). | Phase 6 (Review) |
+| `/e7-resolve-feedback {slug}` | `## PR comment fetch` (when a PR is recorded and `pr_provider == github`). Driven by `pr_provider`. | Phase 7 (Polish) |
+| `/e8-finalize-story {slug}` | `## PR merge` (when `pr_provider == github`). Driven by `pr_provider`. The work-item close stays `work_item_tracker`-routed, independent of `pr_provider`. | Phase 8 (Finalize) |
 
 `## PR comment posting` is declared but not invoked by any v2 consumer. It is present so the contract is complete for downstream automation that may want to post review summaries upstream.
 

@@ -34,12 +34,13 @@ See [`reference/model_selection.md`](../../../../reference/model_selection.md).
 
 ## Step-by-step
 
-### Step 1 — Inventory feedback
+### Step 1 — Inventory feedback (union of all sources, rebuilt every run)
 
-1. Walk `stories/{slug}/feedback/` and pick the **latest** `review_vN.md` (highest N). Older `review_v*.md` files are historical — do not re-resolve closed comments.
-2. Read its `## Plan Alignment`, leadership sections (`## Blockers`, `## Required Changes`, `## Suggestions`), `## Monitoring Checklist`, `## Security Checklist`, and `## Documentation Impact`.
-3. Build a working list of every finding, keyed by section (BLOCKING → CONCERN → SUGGESTION → NITPICK).
-4. If `stories/{slug}/feedback/addressed_feedback.md` already exists from a prior Polish pass, read it — comments already marked `Resolved` stay closed; comments marked `Pending` or `Needs user decision` go into this pass.
+The inventory is a **union of every feedback source, rebuilt on each run** — this command is **re-runnable N times** as new PR comments arrive. The two sources:
+
+1. **Local self-review findings (unchanged).** Walk `stories/{slug}/feedback/` and pick the **latest** `review_vN.md` (highest N). Older `review_v*.md` files are historical — do not re-resolve closed comments. Read its `## Plan Alignment`, leadership sections (`## Blockers`, `## Required Changes`, `## Suggestions`), `## Monitoring Checklist`, `## Security Checklist`, and `## Documentation Impact`. Build a working list of every finding, keyed by section (BLOCKING → CONCERN → SUGGESTION → NITPICK).
+2. **PR comments (additive — only when a PR is recorded and `pr_provider == github`).** If `stories/{slug}/feedback/pr.md` exists (written by `/e6-review-changes`) **and** `.shamt-core/shamt-config.json` → `pr_provider == github`, fetch the **latest** PR comments + review threads via the github profile's `## PR comment fetch` (`reference/trackers/github.md`). Each comment carries a stable **comment-ID**. This source is **additive** to the local findings, never a replacement; when no PR is recorded or `pr_provider != github`, skip this source entirely (the local-only path is exactly today's behavior). **Pull-only — never reply to or resolve PR threads** (Pattern 4 no-postback stance preserved on the write side; the pushed fix commits are the response, and the human resolves threads on GitHub).
+3. **Dedup against the durable ledger.** `addressed_feedback.md` is the durable dedup ledger. If `stories/{slug}/feedback/addressed_feedback.md` already exists from a prior Polish pass, read it. An item already marked `Resolved` stays closed and is **not** re-processed; any **new** item from **either** source — a new PR comment keyed by its comment-ID, or a newer local `review_v{N+1}.md` finding — is added as `Pending` and worked this pass. Items marked `Pending` or `Needs user decision` also go into this pass.
 
 ### Step 2 — Open or update `addressed_feedback.md`
 
@@ -65,7 +66,7 @@ Per comment:
 
 1. **Understand** — re-read the finding and the file/line it cites. If unclear, surface a one-question dialog to the user via `AskUserQuestion` (open-questions iterative dialog, Principle 2). Update `addressed_feedback.md`'s `Notes` with the answer.
 2. **Decide disposition**:
-   - **Fix in-story** — apply the change; commit per the project's commit convention (the same one the plan used, e.g., `#{slug}: address review BLOCKING <category>`); update `Action taken` with the commit SHA.
+   - **Fix in-story** — apply the change; commit per the project's commit convention (the same one the plan used, e.g., `#{slug}: address review BLOCKING <category>`); update `Action taken` with the commit SHA. **When a PR is recorded + `pr_provider == github`, push the fix commits to the PR branch** (`git push`) so the human reviewer sees them on the PR — this push **is** the response (pull-only; no thread reply / no thread-resolve).
    - **Defer** — only when the user explicitly accepts deferral. Capture the reason and a forward link (e.g., `Deferred — captured at .shamt-core/proposals/<slug>.md` or `Deferred — tracker work-item <id>`).
    - **Needs user decision** — when a comment cannot be dispositioned without product/platform input. Surface the question to the user; do not leave the comment dangling on `Needs user decision` past the end of the pass.
 3. **Verify** — re-run the relevant part of the active plan's `## Verification` section (Standard) or the spec's `## Verification` (Quick) for any code path the fix touched. For Standard path, if a fix is non-trivial, re-hand off to the `plan-executor` builder for the modified step.
@@ -113,7 +114,8 @@ Polish completes when:
 
 Present the populated `addressed_feedback.md` to the user. Wait for the user to explicitly signal complete — Polish has no automatic completion gate; the user calls it done.
 
-Suggest the user push and open a PR (manual — no tracker postback from any v2 command). When a re-review is requested, re-run `/e6-review-changes {slug}` (produces `review_v{N+1}.md`) and re-invoke this command.
+- **`pr_provider == github` + a PR recorded** — the fix commits have been pushed to the PR branch. Polish is **iterative**: as new human reviewer comments arrive on the PR, **re-run `/e7-resolve-feedback {slug}`** — each run re-inventories the latest PR comments (Step 1) and works any new ones, deduped against `addressed_feedback.md`. Pull-only: the command never replies to or resolves threads; the human resolves them on GitHub. When all feedback is addressed and the PR is approved, proceed to `/e8-finalize-story {slug}` (which merges the PR).
+- **`pr_provider != github`** — unchanged: suggest the user push and open a PR manually (no tracker postback from any v2 command). When a re-review is requested, re-run `/e6-review-changes {slug}` (produces `review_v{N+1}.md`) and re-invoke this command.
 
 ## Exit criteria
 
@@ -127,7 +129,7 @@ Suggest the user push and open a PR (manual — no tracker postback from any v2 
 
 - This command is **fresh-agent runnable**: the latest `review_vN.md`, `addressed_feedback.md`, active spec/plan, and `active_artifacts.md` all live on disk. Resume from any point by re-reading them.
 - **Re-baseline trigger.** If applying a comment would make the active spec or plan misleading (e.g., the comment reveals a design gap, not just a code defect), stop and invoke the **Re-baseline Protocol** per [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md#requirement-re-baseline-protocol). Do not silently rewrite the active artifact.
-- **No tracker postback.** Polish does not push, open PRs, or post to the tracker. The user does those manually.
+- **Pull-only PR participation (Pattern 4 no-postback preserved on the write side).** When `pr_provider == github` and a PR is recorded, Polish **pulls** the latest PR comments and **pushes** fix commits to the PR branch — neither is "postback" in the Pattern 4 sense (it never replies to, resolves, or posts review content to PR threads; the human resolves threads on GitHub). When `pr_provider != github`, Polish does not push, open PRs, or post to the tracker — the user does those manually.
 - **No `Pending` rows at exit.** A comment left as `Pending` blocks the exit gate. `Deferred` with an explicit reason and forward link is fine.
 - **Root cause is required** for every comment, including SUGGESTION / NITPICK. Step 5's proposal synthesis depends on it.
 - **Quick-path no-issue Polish** is mostly a no-op — TODO scan + Documentation Impact pass + (rarely) a forward proposal from a noted lesson. `addressed_feedback.md` is not required when there are no findings.

@@ -50,9 +50,21 @@ If any guard fails, halt with the specific remediation command — do not procee
 2. **Wait for an explicit "yes."** The remote tracker close (Step 4, ado/github) is outward-facing — never perform it without confirmation.
 3. On confirmation, stage the scoped path list and commit on the story's current (feature) branch. Commit subject: `{ticket-id-or-slug}: finalize — {one-line summary}`. The user's signing / hook setup applies.
 
+### Step 3b — Merge the PR when `pr_provider == github`
+
+Read `pr_provider` from `.shamt-core/shamt-config.json`. This step is **independent of** the work-item close (Step 4, `work_item_tracker`-routed) — a `pr_provider: github` + `work_item_tracker: ado` project merges the GitHub PR here and still closes its ADO work item via `az boards` in Step 4.
+
+- **`pr_provider == github`** — the **only** `pr_provider == github`-gated addition:
+  1. **Resolve the PR.** Read the PR number from `stories/{slug}/feedback/pr.md` (written by `/e6-review-changes`). If absent, halt and direct the user to open the PR first via `/e6-review-changes {slug}`.
+  2. **Mergeable guard.** Run the github profile's mergeability check (`reference/trackers/github.md` `## PR merge`). If the PR is **not** mergeable (unresolved reviews / failing checks / conflicts), **halt** and report — do not merge.
+  3. **Merge** under the **existing Step-3 explicit-confirm guard** (already obtained for the commit): `gh pr merge {pr} --squash --delete-branch`. Outward, irreversible — never run without the Step-3 confirmation.
+- **`pr_provider != github`** (`ado` / `none` / unset) — **no-op.** No PR merge; today's commit-on-branch behavior is unchanged.
+
+Sequence when `pr_provider == github`: mergeable-guard → confirm-gated PR merge (this step) → existing `work_item_tracker`-routed close (Step 4, unchanged) → write `**Status: Done**` (Step 5).
+
 ### Step 4 — Mark the work item done (active tracker profile)
 
-Read `work_item_tracker` from `.shamt-core/shamt-config.json` (or the `--tracker=` override). Then, per profile:
+Read `work_item_tracker` from `.shamt-core/shamt-config.json` (or the `--tracker=` override). This is **independent of `pr_provider`** — do not gate it on `pr_provider` or hardcode a PR-merge close here. Then, per profile:
 
 - **ado** — set the work item's state to the project's done state: `az boards work-item update --id {id} --state "Done"` (or `Closed` per the project's process). Outward-facing — gated by Step 3 confirmation.
 - **github** — close the issue: `gh issue close {id} --repo <org>/<repo>`. Outward-facing — gated by Step 3 confirmation.
@@ -96,7 +108,7 @@ No next-phase suggestion. The Engineer flow ends at Phase 8 (Finalize).
 - **Not an epic archive.** `/e8-finalize-story` finalizes a single story; it does **not** move the story folder. Epic-level archiving (moving a done epic into `epics/archive/`) is `/pe4-finalize`'s job.
 - **Terminal phase.** Finalize is the last Engineer phase. The status line renders `P{N} Finalize` once `ticket.md` carries `**Status: Done**` (N = 7 on the Quick path, 8 on the Standard path — testing is a required phase).
 - **Fresh-agent runnable** — story folder, config, and working-tree state are sufficient. No conversation history required.
-- **No squash-merge.** Unlike `/f6-archive-proposal`, the story is not on a proposal branch; finalize commits the story's work on its feature branch and stops. PR creation / merge is the `pr_provider`'s concern, out of scope here.
+- **PR merge is `pr_provider`-gated.** When `pr_provider == github`, Finalize merges the story's PR (`gh pr merge --squash --delete-branch`, behind the Step-3 confirm + a mergeable-guard — Step 3b); this is the **only** `pr_provider == github`-gated addition. The **work-item close (Step 4) stays `work_item_tracker`-routed** (ado / github / local), independent of `pr_provider`. When `pr_provider != github`, finalize commits the story's work on its feature branch and stops — no PR merge.
 
 ---
 

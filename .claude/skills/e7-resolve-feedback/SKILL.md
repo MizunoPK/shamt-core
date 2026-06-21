@@ -1,8 +1,11 @@
 ---
 name: e7-resolve-feedback
 description: >
-  Run Phase 7 (Polish) of the Shamt Engineer flow. Apply each comment from the
-  latest review_vN.md, log dispositions in addressed_feedback.md, perform the
+  Run Phase 7 (Polish) of the Shamt Engineer flow. Apply each comment from a
+  union of feedback sources rebuilt every run — the latest local review_vN.md
+  plus, when a PR is recorded and pr_provider == github, the latest PR comments
+  (pull-only; deduped by comment-ID) — log dispositions in addressed_feedback.md,
+  push fix commits to the PR branch, perform the
   .shamt-core/project-specific-files/ARCHITECTURE.md / .shamt-core/project-specific-files/CODING_STANDARDS.md / .shamt-core/project-specific-files/TESTING_STANDARDS.md updates the Review phase flagged, and
   route generalizable root causes to .shamt-core/proposals/ rather than patching framework
   files in-story. Invoke when the user wants to address review feedback,
@@ -34,7 +37,7 @@ See [`reference/model_selection.md`](../../../../../reference/model_selection.md
 
 ## Exit criteria
 
-`addressed_feedback.md` fully dispositioned; `Required` doc updates applied + re-validated; TODO gate passes; generalizable root causes filed under `.shamt-core/proposals/`; user has signalled complete. No `Pending` rows remain.
+`addressed_feedback.md` fully dispositioned (union of local `review_vN.md` findings + — when `pr_provider == github` and a PR is recorded — the latest PR comments, deduped by comment-ID); fix commits pushed to the PR branch (pull-only — no thread reply / resolve); `Required` doc updates applied + re-validated; TODO gate passes; generalizable root causes filed under `.shamt-core/proposals/`; user has signalled complete. No `Pending` rows remain. Re-runnable N times as new PR comments arrive.
 
 ## Re-baseline trigger
 
