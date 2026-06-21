@@ -1,10 +1,10 @@
 ---
-description: Phase 3 of the PO flow — break a validated epic into N feature stubs via the stub-list-then-drill-in pattern, gating the whole list once and recording parallelization analysis on the parent epic
+description: Stage 3 of the PO flow — break a validated epic into N feature stubs via the stub-list-then-drill-in pattern, gating the whole list once and recording parallelization analysis on the parent epic
 ---
 
 # /pe3-decompose
 
-**Purpose:** Run Phase 3 of the PO flow. Read a validated `epic.md`, propose a list of features (title + one-line goal each), gate the whole list with the user once, derive feature slugs, run the decomposition exit gate, then write N feature-stub folders under `features/` and append `Target Features` + `Sequencing & Parallelization` back onto the parent epic. Per-feature deep dialog is deferred to `/pf1-define`.
+**Purpose:** Run Stage 3 of the PO flow. Read a validated `epic.md`, propose a list of features (title + one-line goal each), gate the whole list with the user once, derive feature slugs, run the decomposition exit gate, then write N feature-stub folders under `features/` and append `Target Features` + `Sequencing & Parallelization` back onto the parent epic. Per-feature deep dialog is deferred to `/pf1-define`.
 
 **Recommended model:** Reasoning (Opus). Decomposition is the highest-value design work in the PO flow — dependency analysis, parallelization callout, and global-slug discipline benefit from Opus's reasoning depth. See [`reference/model_selection.md`](../../../../reference/model_selection.md).
 

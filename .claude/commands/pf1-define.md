@@ -1,10 +1,10 @@
 ---
-description: Phase 3 of the PO flow — flesh out a feature (stub from /pe3-decompose, standalone, or tracker-seeded) into a feature.md ready for /pf2-validate
+description: Stage 1 of the PO flow — flesh out a feature (stub from /pe3-decompose, standalone, or tracker-seeded) into a feature.md ready for /pf2-validate
 ---
 
 # /pf1-define
 
-**Purpose:** Run Phase 3 of the PO flow at the **Feature** altitude. Resolve a slug, branch on three input modes (flesh out an existing stub written by `/pe3-decompose`, create a standalone feature from scratch, or seed from a tracker work-item payload), drive an open-questions iterative dialog over `Goal`, `Success Criteria`, and `Scope / Non-Scope`, and produce the feature under its parent epic — `epics/{epic-folder}/features/{ID}-{slug}-{brief}/feature.md` (the parent epic is the stub's epic, or the Tech Stories epic for standalone work). Leaves `Target Stories` and `Sequencing & Parallelization` empty — `/pf3-decompose` fills them later.
+**Purpose:** Run Stage 1 of the PO flow at the **Feature** altitude. Resolve a slug, branch on three input modes (flesh out an existing stub written by `/pe3-decompose`, create a standalone feature from scratch, or seed from a tracker work-item payload), drive an open-questions iterative dialog over `Goal`, `Success Criteria`, and `Scope / Non-Scope`, and produce the feature under its parent epic — `epics/{epic-folder}/features/{ID}-{slug}-{brief}/feature.md` (the parent epic is the stub's epic, or the Tech Stories epic for standalone work). Leaves `Target Stories` and `Sequencing & Parallelization` empty — `/pf3-decompose` fills them later.
 
 **Recommended model:** Reasoning (Opus). Feature drafting is a design / multi-dimensional scoping task — same justification as `/pe1-define`. See [`reference/model_selection.md`](../../../../reference/model_selection.md).
 

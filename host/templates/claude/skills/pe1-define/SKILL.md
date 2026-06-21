@@ -1,7 +1,7 @@
 ---
 name: pe1-define
 description: >
-  Run Phase 1 of the Shamt PO flow at the Epic altitude. Resolves a slug to an
+  Run Stage 1 of the Shamt PO flow at the Epic altitude. Resolves a slug to an
   epic folder, fetches the work-item payload via the active tracker profile
   when the profile declares Epic support (ADO does; GitHub does not — falls
   through to freeform), consults .shamt-core/project-specific-files/ARCHITECTURE.md for architectural impact, and

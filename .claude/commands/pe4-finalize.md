@@ -1,5 +1,5 @@
 ---
-description: Phase 4 (Finalize) of the Shamt PO flow at the Epic altitude — guard that every child feature/story is finalized, commit, mark the epic done via the active tracker, and move the done epic subtree into epics/archive/ (a whole-subtree move under the nested layout)
+description: Stage 4 (Finalize) of the Shamt PO flow at the Epic altitude — guard that every child feature/story is finalized, commit, mark the epic done via the active tracker, and move the done epic subtree into epics/archive/ (a whole-subtree move under the nested layout)
 ---
 
 # /pe4-finalize

@@ -1,7 +1,7 @@
 ---
 name: pe3-decompose
 description: >
-  Run Phase 3 of the Shamt PO flow at the Epic altitude. Reads a validated
+  Run Stage 3 of the Shamt PO flow at the Epic altitude. Reads a validated
   epic.md, proposes a list of features (title + one-line goal each), gates the
   whole list with the user once, produces a parallelization analysis
   (recommended development order + concurrent-work callout), checks the

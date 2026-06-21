@@ -1,10 +1,10 @@
 ---
-description: Phase 4 of the PO flow — break a validated feature into N story-ticket stubs via the stub-list-then-drill-in pattern, gating the whole list once, enforcing the individually-testable rubric, and recording parallelization analysis on the parent feature
+description: Stage 3 of the PO flow — break a validated feature into N story-ticket stubs via the stub-list-then-drill-in pattern, gating the whole list once, enforcing the individually-testable rubric, and recording parallelization analysis on the parent feature
 ---
 
 # /pf3-decompose
 
-**Purpose:** Run Phase 4 of the PO flow. Read a validated `feature.md`, propose a list of stories (title + one-line scope each), enforce the **individually-testable rubric**, gate the whole list with the user once, derive story slugs, run the decomposition exit gate, then write N story-ticket-stub folders nested under `epics/{epic-folder}/features/{feature-folder}/stories/` (each carrying the scope one-liner + a `## Decomposition Context` breadth section; parentage is the folder path) and append `Target Stories` + `Sequencing & Parallelization` back onto the parent feature. Per-story deep dialog is deferred to `/e1-start-story` (stub-aware).
+**Purpose:** Run Stage 3 of the PO flow. Read a validated `feature.md`, propose a list of stories (title + one-line scope each), enforce the **individually-testable rubric**, gate the whole list with the user once, derive story slugs, run the decomposition exit gate, then write N story-ticket-stub folders nested under `epics/{epic-folder}/features/{feature-folder}/stories/` (each carrying the scope one-liner + a `## Decomposition Context` breadth section; parentage is the folder path) and append `Target Stories` + `Sequencing & Parallelization` back onto the parent feature. Per-story deep dialog is deferred to `/e1-start-story` (stub-aware).
 
 **Recommended model:** Reasoning (Opus). Decomposition involves the individually-testable rubric, dependency analysis, parallelization callout, and global-slug discipline — all benefit from Opus's reasoning depth. Same justification as `/pe3-decompose`. See [`reference/model_selection.md`](../../../../reference/model_selection.md).
 

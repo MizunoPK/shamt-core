@@ -1,7 +1,7 @@
 ---
 name: pf3-decompose
 description: >
-  Run Phase 5 of the Shamt PO flow at the Feature altitude. Reads a validated
+  Run Stage 3 of the Shamt PO flow at the Feature altitude. Reads a validated
   feature.md, proposes a list of stories (title + one-line scope each),
   enforces the individually-testable rubric, gates the whole list with the user
   once, produces a parallelization analysis (recommended development order +

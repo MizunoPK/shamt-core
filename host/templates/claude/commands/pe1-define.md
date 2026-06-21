@@ -1,10 +1,10 @@
 ---
-description: Phase 1 of the PO flow — resolve a slug, fetch the tracker payload (or fall through to freeform), and produce an epic.md ready for /pe2-validate
+description: Stage 1 of the PO flow — resolve a slug, fetch the tracker payload (or fall through to freeform), and produce an epic.md ready for /pe2-validate
 ---
 
 # /pe1-define
 
-**Purpose:** Run Phase 1 of the PO flow at the **Epic** altitude. Resolve a slug, fetch the work-item payload from the active tracker profile when the profile declares Epic support (or fall through to freeform capture), drive an open-questions iterative dialog over `Goal`, `Success Criteria`, and `Scope / Non-Scope`, and produce `epics/{ID}-{slug}-{brief}/epic.md`.
+**Purpose:** Run Stage 1 of the PO flow at the **Epic** altitude. Resolve a slug, fetch the work-item payload from the active tracker profile when the profile declares Epic support (or fall through to freeform capture), drive an open-questions iterative dialog over `Goal`, `Success Criteria`, and `Scope / Non-Scope`, and produce `epics/{ID}-{slug}-{brief}/epic.md`.
 
 **Recommended model:** Reasoning (Opus). Epic drafting is a design / multi-dimensional scoping task — defining the outcome, the success criteria, and the in/out scope warrants the deeper reasoning tier. See [`reference/model_selection.md`](../../../../reference/model_selection.md).
 
