@@ -60,7 +60,7 @@ re-derivable — `.shamt-core/` via `import-shamt`, `.claude/` via
 
 The master repo has additional `proposals/` subfolders that **never appear in a child project**: `incoming/` (child-submitted proposals awaiting triage), `archive/` (implemented proposals), `rejected/` (closed with a top-of-file note), and `deferred/` (on hold). Master's presence is what `/sync-proposals` and `/sync-triage-proposals` use to discriminate the two sides — child projects rely on the absence of `proposals/incoming/` as the master-side check.
 
-Files with a `Managed by Shamt` footer (or files in `.shamt-core/`'s master sync set) are owned by master / regen — they get overwritten by `import-shamt` and `/f4-regen-framework`. Files outside that set are user-owned and preserved.
+Files with a `Managed by Shamt` footer (or files in `.shamt-core/`'s master sync set) are owned by master / regen — they get overwritten by `import-shamt` and `/f4-regen-framework`. The master-owned subtrees (`scripts/`, `templates/`, `reference/`, `host/`) are **mirrored**: child files there that master no longer ships are removed. Files **outside** the managed subtrees are user-owned and preserved.
 
 ---
 
@@ -291,7 +291,7 @@ Or via `/sync-import-shamt`. Behavior:
 - Git URL → `git clone --depth 1` to a temp dir. Local path → used directly with no copy.
 - Locates master's `shamt-core/` (top-level or one-level-down, depending on whether the master is the extracted repo or the v2-dev container).
 - Overwrites every file in master's sync set into `<child>/.shamt-core/` (subtree-level master-wins; not per-file footer-checked — see `commands/sync-import-shamt.md` Notes).
-- Preserves (with warnings) any local-only files the child added under the managed subtrees.
+- Removes any child file under the managed subtrees (`scripts/`, `templates/`, `reference/`, `host/`) that master no longer ships (mirror-with-delete); logs `removed (no longer in master): <path>` and a `removed: N` count. Files outside the managed subtrees are untouched.
 - Auto-moves child-local proposals whose slugs match a file in master's `proposals/archive/` into `<child>/.shamt-core/proposals/already-merged/{slug}.md`.
 - Re-runs `regenerate-framework.sh --target <child>` after the file sync.
 - Self-updating: `import-shamt.sh` is in its own sync set, so a sync overwrites the on-disk copy mid-run; to survive that, the script copies itself to a temp file and re-execs from there (the running process reads from the stable copy, not the file being overwritten). The newly-installed version takes effect on the next invocation.
@@ -318,7 +318,7 @@ PowerShell-style aliases (`-Check`, `-BootstrapTemplates`) are accepted for pari
 
 Every file the regen script writes ends with a `Managed by Shamt` comment. The script will only **overwrite or prune** files under `.claude/` that carry that marker. Files without it are user-authored and preserved (the `--check` output flags them as `UNMANAGED <path> (preserved)`).
 
-`import-shamt.sh` uses a different, simpler rule for the `.shamt-core/` subtree: subtree-level master-wins for the explicit sync set, preserve everything else. The per-file footer check is `regenerate-framework.sh`'s discipline for `.claude/`, not `import-shamt.sh`'s for `.shamt-core/`. See `commands/sync-import-shamt.md` Notes.
+`import-shamt.sh` uses a different rule for `.shamt-core/`: subtree-level master-wins with mirror. Files master ships are copied to the child (master wins on every diff). Child files under the managed subtrees (`scripts/`, `templates/`, `reference/`, `host/`) that master no longer ships are **removed**. Files the child owns **outside** those subtrees are never touched by import. The per-file footer check is `regenerate-framework.sh`'s discipline for `.claude/`, not `import-shamt.sh`'s for `.shamt-core/`. See `commands/sync-import-shamt.md` Notes.
 
 ### Status-line registration
 

@@ -9,17 +9,16 @@
 # to a temp dir. Otherwise master_url is treated as an absolute local path and
 # used directly with no copy.
 #
-# Sync rule (Phase 9): every path in the explicit MASTER_SYNC_PATHS set is
-# master-owned. Master wins on every diff. Anything under <child>/.shamt-core/
-# that is NOT in the sync set is preserved with a warning.
-#
-# This is a pragmatic interpretation of an earlier proposed per-file
-# "Managed by Shamt" footer contract: most canonical files under
-# shamt-core/ do not currently carry that footer, so a strict reading would
-# leave the bulk of canonical content un-synced. The subtree-level
-# interpretation — "anything in the sync set is master-owned" — gives child
-# projects working updates today and can be tightened by a follow-up proposal
-# that backfills footers across templates/ and reference/.
+# Sync contract: two sync-set variables drive the pull:
+#   MASTER_SYNC_FILES — top-level files individually owned by master (CLAUDE.md,
+#     README.md, shamt-config.example.json, init-shamt.sh, import-shamt.sh,
+#     proposals/_template.md). Master wins on every diff; unchanged files are
+#     left untouched.
+#   MASTER_SYNC_DIRS — wholly-master-owned subtrees (scripts/, templates/,
+#     reference/, host/). Every file master ships under these dirs is copied to
+#     the child (master wins on every diff). Any child file under these dirs that
+#     master no longer ships is **removed** (mirror-with-delete): these subtrees
+#     are fully master-owned, so "absent from master" means master deleted it.
 #
 # Already-merged proposals: walk both <child>/.shamt-core/proposals/{slug}.md
 # (locally-authored, not yet submitted) and
@@ -252,7 +251,7 @@ MASTER_SYNC_DIRS=(
 NEW_COUNT=0
 UPDATED_COUNT=0
 UNCHANGED_COUNT=0
-PRESERVED_COUNT=0
+REMOVED_COUNT=0
 PROMOTED_PROPOSAL_COUNT=0
 
 apply_one() {
@@ -310,9 +309,10 @@ for sub in "${MASTER_SYNC_DIRS[@]}"; do
   done < <( cd "$MASTER_SHAMT_CORE/$sub" && find . -type f -print0 )
 done
 
-# Pass 2: warn about child-local files inside the managed subtrees that are
-# NOT in master's sync set (and aren't covered by an in-progress file). These
-# are user-authored additions; we preserve them.
+# Pass 2: mirror-with-delete — remove any child file under a managed subtree
+# that master no longer ships. These subtrees are wholly master-owned; a child
+# file absent from master is unambiguously a master-deletion. Prune now-empty
+# parent directories after removal.
 for sub in "${MASTER_SYNC_DIRS[@]}"; do
   [ -d "$CHILD_SHAMT_CORE/$sub" ] || continue
   while IFS= read -r -d '' f; do
@@ -320,8 +320,19 @@ for sub in "${MASTER_SYNC_DIRS[@]}"; do
     local_path="$CHILD_SHAMT_CORE/$sub/$rel"
     master_path="$MASTER_SHAMT_CORE/$sub/$rel"
     if [ ! -e "$master_path" ]; then
-      warn "preserving local file not in master sync set: .shamt-core/$sub/$rel"
-      PRESERVED_COUNT=$((PRESERVED_COUNT + 1))
+      rm -f "$local_path"
+      log "  removed (no longer in master): .shamt-core/$sub/$rel"
+      REMOVED_COUNT=$((REMOVED_COUNT + 1))
+      # Prune now-empty parent directories (stop at the subtree root).
+      parent_dir="$(dirname "$local_path")"
+      while [ "$parent_dir" != "$CHILD_SHAMT_CORE/$sub" ] && [ -d "$parent_dir" ]; do
+        if [ -z "$(ls -A "$parent_dir" 2>/dev/null)" ]; then
+          rmdir "$parent_dir"
+          parent_dir="$(dirname "$parent_dir")"
+        else
+          break
+        fi
+      done
     fi
   done < <( cd "$CHILD_SHAMT_CORE/$sub" && find . -type f -print0 )
 done
@@ -432,7 +443,7 @@ log "import-shamt complete:"
 log "  new:        $NEW_COUNT"
 log "  updated:    $UPDATED_COUNT"
 log "  unchanged:  $UNCHANGED_COUNT"
-log "  preserved:  $PRESERVED_COUNT  (local files outside master sync set)"
+log "  removed:    $REMOVED_COUNT  (local files no longer in master)"
 log "  proposals → already-merged: $PROMOTED_PROPOSAL_COUNT"
 log ""
 log "Review changes with: git -C $TARGET_DIR status"

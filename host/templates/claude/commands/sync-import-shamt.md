@@ -1,5 +1,5 @@
 ---
-description: Child-side. Pull master HEAD canonical sources into <child>/.shamt-core/ via import-shamt.sh, then re-run regen so <child>/.claude/ stays current. Reports new / updated / unchanged / preserved counts and any already-merged proposals auto-moved into .shamt-core/proposals/already-merged/.
+description: Child-side. Pull master HEAD canonical sources into <child>/.shamt-core/ via import-shamt.sh, then re-run regen so <child>/.claude/ stays current. Reports new / updated / unchanged / removed counts and any already-merged proposals auto-moved into .shamt-core/proposals/already-merged/.
 ---
 
 # /sync-import-shamt
@@ -58,7 +58,7 @@ The script handles:
 - Reading `master_url` from `.shamt-core/shamt-config.json` (jq when available; tolerant sed fallback otherwise).
 - Cloning master (`git clone --depth 1`) when `master_url` is a git URL (`https://`, `http://`, `git@`, `ssh://`, `git://`); using `master_url` directly when it is an absolute local filesystem path.
 - Overwriting every file in master's sync set (`CLAUDE.md`, `README.md`, `shamt-config.example.json`, `init-shamt.sh`, `import-shamt.sh`, `proposals/_template.md`, plus the `scripts/`, `templates/`, `reference/`, `host/` subtrees).
-- Preserving (with warnings) any local-only files the child added under the managed subtrees.
+- Removing any child file under the managed subtrees that master no longer ships (mirror-with-delete).
 - Auto-moving child-local proposals whose slugs match a file in master's `proposals/archive/` into `.shamt-core/proposals/already-merged/`.
 - Re-running `regenerate-framework.sh --target <target>` after the file sync.
 
@@ -73,13 +73,13 @@ import-shamt complete:
   new:        N    (files added that didn't exist before)
   updated:    N    (files whose content changed)
   unchanged:  N    (files identical to master)
-  preserved:  N    (local files outside master's sync set)
+  removed:    N    (local files no longer in master)
   proposals → already-merged: N
 ```
 
 Reproduce that summary in chat verbatim, then list:
 
-- Each `WARN: preserving local file not in master sync set: …` line verbatim so the user can decide whether to keep, remove, or upstream the local content.
+- Each `removed (no longer in master): …` line verbatim so the user can see which files were cleaned up.
 - Each `moved .shamt-core/proposals/{slug}.md → .shamt-core/proposals/already-merged/…` line so the user can see which of their submissions landed upstream.
 
 ### Step 5 — Surface regen output
@@ -98,12 +98,12 @@ Suggest:
 1. Review the diff: `git diff .shamt-core/ .claude/`.
 2. Run drift check independently: `/f4-regen-framework` (verifies zero drift after the import).
 3. Optionally `/f5-audit-framework` if the user wants a deeper post-import sweep (D1 will run the drift check; D4 may flag dangling references introduced by canonical edits the user hasn't yet noticed).
-4. To see what this import pulled in, review the per-file new / updated / unchanged / preserved counts surfaced above (also listed under Exit criteria). For the full upstream history, browse `git log` against `master_url` directly (the clone temp dir, or the source repo for a local-path `master_url`).
+4. To see what this import pulled in, review the per-file new / updated / unchanged / removed counts surfaced above (also listed under Exit criteria). For the full upstream history, browse `git log` against `master_url` directly (the clone temp dir, or the source repo for a local-path `master_url`).
 
 ## Exit criteria
 
 - `import-shamt.sh` exited 0.
-- Per-file counts (new / updated / unchanged / preserved / already-merged-moved) have been surfaced.
+- Per-file counts (new / updated / unchanged / removed / already-merged-moved) have been surfaced.
 - Regen ran (or its absence has been called out) and any warnings are visible.
 - The user has been told how to review the diff.
 
@@ -114,7 +114,7 @@ Suggest:
 - **Mid-sync crash recovery.** If a sync crashes mid-run with a token-not-found / `command not found` (exit 127) error, simply re-run `/sync-import-shamt` once — the second pass completes cleanly. This is only possible on the *crossover* import that first pulls the fix into a pre-fix child copy (the still-running old script lacks the re-exec guard); once the fixed `import-shamt.sh` is installed, subsequent imports re-exec from a stable copy and never hit this. The retry is safe because by then the on-disk copy is byte-identical to master (no length change → offsets stay valid) and the sync is idempotent (`cmp`-first, rewrites only changed files).
 - **`master_url` formats.** Git URL (cloned `--depth 1`) or absolute local path (used directly with no copy). The script auto-detects via prefix.
 - **No automatic git commit.** The script does not commit on the user's behalf — the diff is the user's to review.
-- **Footer contract.** The pragmatic footer-contract rule is **subtree-level**: every path in master's sync set is master-owned (no per-file footer check). Any file the child adds under `.shamt-core/{templates,reference,host,scripts}/` outside that sync set is preserved with a warning. This is a tighter rule than the per-file footer check originally proposed, justified by the fact that most canonical files under `templates/` and `reference/` do not yet carry footers — applying the strict footer rule would leave the bulk of canonical content un-synced.
+- **Footer contract.** The sync rule is **subtree-level master-wins with mirror**: every path in master's sync set (`MASTER_SYNC_FILES` — individually-owned top-level files; `MASTER_SYNC_DIRS` — wholly-master-owned subtrees `scripts/`, `templates/`, `reference/`, `host/`) is master-owned (no per-file footer check). Files master ships are copied to the child; child files under the managed subtrees that master no longer ships are **removed** (mirror-with-delete). Files the child owns **outside** the managed subtrees (project-specific-files, the work tree, proposals, shamt-state) are never touched by import and remain user-owned.
 - **No reverse direction.** This command only pulls. The reverse direction is `/sync-proposals` (batch — ships every active child-local proposal upstream at once). `/sync-proposals` **direct-writes** each proposal into a *local* `master_url`'s `proposals/incoming/`, the symmetric mirror of this command's local-path read on the import side (both resolve `master_url` as a local checkout and read/write the filesystem directly with no remote tooling) — keeping the two halves of the sync surface conceptually paired against future drift. Like this command, it has no remote-push automation; unlike this command, it assumes a local `master_url` and halts on a git URL.
 - **Fresh-agent runnable.** The script + `.shamt-core/shamt-config.json` are sufficient. No conversation history required.
 

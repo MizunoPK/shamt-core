@@ -7,7 +7,7 @@ description: >
   .shamt-core/ from master's sync set, auto-moves child-local proposals whose
   slugs match master's proposals/archive/ into .shamt-core/proposals/already-merged/, and
   re-runs regenerate-framework.sh so <child>/.claude/ stays current. Reports
-  new / updated / unchanged / preserved counts plus any preserved-unmanaged or
+  new / updated / unchanged / removed counts plus any preserved-unmanaged or
   jq-missing warnings. Always-latest (no version pinning). Invoke when the user
   wants to pull master updates, sync the framework,
   upgrade shamt in this project, refresh canonical sources, or run import-shamt.
@@ -38,7 +38,7 @@ Cheap (Haiku) — script wrapper, output parsing, no design. See [`reference/mod
 
 ## Footer contract
 
-Subtree-level, not per-file. Every path in master's sync set (`CLAUDE.md`, `README.md`, `shamt-config.example.json`, `init-shamt.sh`, `import-shamt.sh`, `proposals/_template.md`, `scripts/`, `templates/`, `reference/`, `host/`) is master-owned and overwritten on import. Files the child adds under `.shamt-core/{templates,reference,host,scripts}/` outside that set are preserved with a warning. This is the practical interpretation of the subtree-level sync rule, justified in `commands/sync-import-shamt.md` Notes.
+Subtree-level, not per-file. Every path in master's sync set (`CLAUDE.md`, `README.md`, `shamt-config.example.json`, `init-shamt.sh`, `import-shamt.sh`, `proposals/_template.md`, `scripts/`, `templates/`, `reference/`, `host/`) is master-owned. The wholly-master-owned subtrees (`templates/`, `reference/`, `host/`, `scripts/`) are **mirrored**: master wins on every diff, and a child file under those subtrees that master no longer ships is removed (logged per-file + counted as `removed`). This is the practical interpretation of the subtree-level sync rule, justified in `commands/sync-import-shamt.md` Notes.
 
 ## Why no reverse direction
 
