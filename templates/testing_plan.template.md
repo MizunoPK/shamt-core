@@ -1,13 +1,12 @@
 # Testing Plan: {slug}
 
-**Note:** Produced during Phase 3 (Plan) when `.shamt-core/project-specific-files/TESTING_STANDARDS.md` declares automated suites. On the Quick path, when test scope is small (≤5 steps, no new test file), the inline checklist in `spec.md` replaces this artifact. Executed during Phase 5 (Test) by the `test-executor` persona (see `reference/model_selection.md` — Haiku tier).
+**Note:** Produced during Phase 4 (Test Plan) when `.shamt-core/project-specific-files/TESTING_STANDARDS.md` declares automated suites — the automated half of the mandatory Test Plan stage (the agent-as-user `user_test_plan.md` is the always-produced half). Executed during Phase 6 (Test) by the `test-executor` persona (see `reference/model_selection.md` — Haiku tier).
 
 **Created:** [Date]
 **Story:** stories/{slug}/
 <!-- Paths are relative to the resolved story folder (located per templates/SHAMT_RULES.template.md §PO-tree resolution; the folder nests under epics/.../features/.../). -->
 **Spec:** stories/{slug}/spec.md (or `spec_vN.md` for re-baselined stories)
-**Implementation Plan:** stories/{slug}/implementation_plan.md (or N/A on Quick path)
-**Path:** Quick path | Standard path
+**Implementation Plan:** stories/{slug}/implementation_plan.md
 **Baseline:** v1
 **Baseline status:** Active
 
@@ -65,14 +64,14 @@ Each step is one runnable test or test group, with the exact invocation and a bi
 
 ## Results Log
 
-Populated by the `test-executor` during Phase 5. Each step records pass/fail, evidence, and (if failed) the failure-diagnosis pointer.
+Populated by the `test-executor` during Phase 6. Each step records pass/fail, evidence, and (if failed) the failure-diagnosis pointer.
 
 | Step | Status | Run at | Evidence | Notes |
 |------|--------|--------|----------|-------|
 | 1 | PENDING | — | — | — |
 | 2 | PENDING | — | — | — |
 
-**Status values:** `PENDING`, `PASS`, `FAIL`, `BLOCKED`. Phase 5 blocks until every step is `PASS` (the Phase-5 blocking rule — no exceptions or documented deferrals).
+**Status values:** `PENDING`, `PASS`, `FAIL`, `BLOCKED`. Phase 6 blocks until every step is `PASS` (the Phase-6 blocking rule — no exceptions or documented deferrals).
 
 ---
 
@@ -101,9 +100,9 @@ This plan is validated via Pattern 1 (Validation Loops) before execution. Dimens
 
 - **Step clarity** — Each step has an unambiguous invocation and a binary pass criterion.
 - **Executability** — Commands resolve in the project's test environment; pre-existing state is documented under Shared Setup.
-- **Verification completeness** — Every spec requirement and every approval-relevant plan step maps to at least one test step, or has an explicit `Not testable here — covered by manual_test_plan.md` reason.
+- **Verification completeness** — Every spec requirement and every approval-relevant plan step maps to at least one test step, or has an explicit `Not testable here — covered by user_test_plan.md` reason.
 
-Severity ladder for findings: see `reference/severity_classification.md`. Exit: primary clean round + (on Standard path or risk-triggered) one adversarial sub-agent confirmation.
+Severity ladder for findings: see `reference/severity_classification.md`. Exit: one primary clean round + one adversarial sub-agent confirmation (uniform Pattern 1 exit — always).
 
 ---
 [Append the validation footer only after Pattern 1 completes for the testing plan.]

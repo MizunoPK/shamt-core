@@ -20,8 +20,8 @@ A work item is in exactly one of four states, in lifecycle order:
 
 1. **New** — the artifact exists (a stub from decomposition, or defined) but carries **no** `Validated …` footer.
 2. **Validated** — the artifact carries a `Validated …` footer.
-3. **Building** — Engineer-flow artifacts are present under the story folder (e.g. `spec.md`, `implementation_plan.md`) and the story is **not** yet finalized.
-4. **Released** — the story's `ticket.md` carries `**Status: Done**` (written by `/e8-finalize-story`).
+3. **Building** — Engineer-flow artifacts are present under the story folder (e.g. `spec.md`, `implementation_plan.md`, `user_test_plan.md`) and the story is **not** yet finalized.
+4. **Released** — the story's `ticket.md` carries `**Status: Done**` (written by `/e9-finalize-story`).
 
 ## Story state derivation
 
@@ -46,7 +46,7 @@ For a feature row, aggregate its child stories with this precedence (first match
 `STATUS.md` is refreshed two ways, both of which **re-derive the whole table from disk** (never patch a cell):
 
 - **On demand** — `/po-status {epic-slug}` regenerates the epic's `STATUS.md` from the current subtree.
-- **Auto-refresh hooks** — transition commands re-derive the parent epic's `STATUS.md` after their own work, so the rollup stays live: `/pe3-decompose` (new features → New), `/pf3-decompose` (new stories → New), the `-validate` stage `/pe2-validate` / `/pf2-validate` / `/ps2-validate` (epic / feature / story → Validated), `/e4-execute-plan` (story → Building), `/e8-finalize-story` (story → Released; feature rollup recomputed).
+- **Auto-refresh hooks** — transition commands re-derive the parent epic's `STATUS.md` after their own work, so the rollup stays live: `/pe3-decompose` (new features → New), `/pf3-decompose` (new stories → New), the `-validate` stage `/pe2-validate` / `/pf2-validate` / `/ps2-validate` (epic / feature / story → Validated), `/e5-execute-plan` (story → Building), `/e9-finalize-story` (story → Released; feature rollup recomputed).
 
 ## Place in the PO tree
 

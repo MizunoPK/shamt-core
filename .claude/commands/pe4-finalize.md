@@ -34,8 +34,8 @@ description: Stage 4 (Finalize) of the Shamt PO flow at the Epic altitude — gu
 The epic finalizes only after all its work is done.
 
 1. Find the epic's children by walking the **nested tree inside the epic folder** (parentage is the path, per `templates/SHAMT_RULES.template.md` §PO-tree resolution): features at `epics/{epic-folder}/features/*/feature.md`, stories at `epics/{epic-folder}/features/*/stories/*/ticket.md`.
-2. For each child, confirm it is finalized: its artifact carries `**Status: Done**` (written by `/e8-finalize-story` for stories; features close implicitly when all their stories are done — confirm each child story of each child feature is `**Status: Done**`).
-3. If any child is not finalized, **halt** and list the unfinished children with their remediation (`/e8-finalize-story {story-slug}` for each). Do not proceed.
+2. For each child, confirm it is finalized: its artifact carries `**Status: Done**` (written by `/e9-finalize-story` for stories; features close implicitly when all their stories are done — confirm each child story of each child feature is `**Status: Done**`).
+3. If any child is not finalized, **halt** and list the unfinished children with their remediation (`/e9-finalize-story {story-slug}` for each). Do not proceed.
 
 ### Step 2 — Guard: explicit confirmation
 
@@ -58,7 +58,7 @@ Read `work_item_tracker` from `.shamt-core/shamt-config.json` (or `--tracker=`).
 
 ### Step 5 — Commit
 
-Stage the epic finalize (the `epic.md` status flip + the archive move) and commit. Commit subject: `{ticket-id-or-slug}: finalize epic — {one-line summary}`. The user's signing / hook setup applies. (Like `/e8-finalize-story`, this commits but does not squash-merge a branch.)
+Stage the epic finalize (the `epic.md` status flip + the archive move) and commit. Commit subject: `{ticket-id-or-slug}: finalize epic — {one-line summary}`. The user's signing / hook setup applies. (Like `/e9-finalize-story`, this commits but does not squash-merge a branch.)
 
 ### Step 6 — Exit
 
@@ -80,7 +80,7 @@ No next-phase suggestion. The PO flow ends at the epic-finalize for a delivered 
 
 - **Whole-subtree archive (nested layout).** Moving the epic folder carries its nested features/stories with it in one move — parentage is the path, so nothing dangles. (Legacy flat-layout folders, if any predate the nested rework, would need manual child relocation; new work is nested.)
 - **Status-line exclusion.** `epics/archive/` is excluded from active-epic resolution (see `statusline.sh`), so an archived epic does not surface as the active `EPIC {slug}`.
-- **Epic only.** There is no per-feature finalize command; features close implicitly when their stories are finalized. Stories finalize via `/e8-finalize-story`.
+- **Epic only.** There is no per-feature finalize command; features close implicitly when their stories are finalized. Stories finalize via `/e9-finalize-story`.
 - **Fresh-agent runnable** — epic folder, its children, config, and working-tree state are sufficient. No conversation history required.
 
 ---

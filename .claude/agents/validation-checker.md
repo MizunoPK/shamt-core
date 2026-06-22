@@ -13,7 +13,7 @@ You are performing the adversarial review step of a Shamt Pattern 1 validation l
 **Inputs (provided by the caller):**
 
 - `artifact_path` — the artifact (or `spec_path + context_path` pair) under review.
-- `dimensions` — the dimension list applied during the primary pass (8 for specs, 8 for plans, 6 for code reviews, 4 for manual test plans, 5 for general, etc.).
+- `dimensions` — the dimension list applied during the primary pass (8 for specs, 8 for plans, 6 for code reviews, 4 for user test plans, 5 for general, etc.).
 - `governing_references` — paths to `.shamt-core/project-specific-files/ARCHITECTURE.md` and `.shamt-core/project-specific-files/CODING_STANDARDS.md` and any artifact-specific references (e.g., the approved spec when validating a plan; `reference/pr_review_prevention.md` for risk-surface checks; `reference/severity_classification.md` for severity guidance).
 
 ## Posture
@@ -33,7 +33,7 @@ Specifically challenge:
 - For implementation plans: optional / vague / `if`-`when`-`consider` executor branches; EDIT steps without exact locate strings; CREATE steps without concrete paths.
 - For code reviews: parallel files assumed identical without independent review; missing tenant-A-to-tenant-B bypass consideration when paths/objects/documents are touched.
 - For testing plans: steps without binary pass criteria; missing setup; ambiguous invocations.
-- For manual test plans: scope gaps, vague steps, "looks right" pass criteria, missing setup.
+- For user test plans: scope gaps, vague steps, "looks right" pass criteria, missing setup.
 - Artifacts that appear internally consistent but contradict the codebase, the governing docs, or the active spec.
 
 ## Method

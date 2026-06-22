@@ -182,6 +182,6 @@ erDiagram
 
 ## Putting recipes into specs
 
-In a Standard-path `spec.md`, every architectural / data-shape claim that travels through multiple nodes warrants a Mermaid diagram in its own code block. Place the diagram immediately after the prose that introduces it. Keep the prose explanatory; let the diagram carry the structure.
+In a `spec.md`, every architectural / data-shape claim that travels through multiple nodes warrants a Mermaid diagram in its own code block. Place the diagram immediately after the prose that introduces it. Keep the prose explanatory; let the diagram carry the structure.
 
-In a Quick-path `spec.md`, prefer ASCII for narrow flows. Escalate to Mermaid the moment a boundary crosses or the node count exceeds ~8.
+Prefer ASCII for narrow flows; escalate to Mermaid the moment a boundary crosses or the node count exceeds ~8 (see `mermaid_diagram_standards.md`).

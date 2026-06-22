@@ -104,16 +104,16 @@ Expanded guidance for Pattern 4's 16 mandatory review categories. `SHAMT_RULES.t
 
 ---
 
-## Quick Path No-Artifact Reviews
+## No-Issue Reviews
 
-In the **Quick path**, when no issues are found, creating a separate `review_v1.md` is not required. Instead, document the review directly in chat or append a `## Post-Build Review` section to `spec.md` matching this format:
+When no issues are found, creating a separate `review_v1.md` is not required. Instead, document the review directly in chat or append a `## Post-Build Review` section to `spec.md` matching this format:
 
 ```markdown
 ## Post-Build Review
 
-**Plan Alignment:** N/A — Quick path used the spec Build Checklist instead of `implementation_plan.md`.
+**Plan Alignment:** Verified against `implementation_plan.md` — all steps executed as planned.
 
-**Findings:** No issues found. Verified all Build Checklist steps sequentially.
+**Findings:** No issues found. Verified all plan steps sequentially.
 ```
 
 If issues are found, the reviewer should create a durable review artifact at `stories/{slug}/feedback/review_v1.md` (the resolved story folder, located per `templates/SHAMT_RULES.template.md` §PO-tree resolution — nested under `epics/.../features/...`) following the standard template and categories.

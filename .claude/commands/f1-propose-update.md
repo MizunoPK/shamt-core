@@ -85,10 +85,10 @@ The discovering command does the mechanical edit and then **halts for re-validat
 
 This step runs **only when the proposal is incident-originated**; proactive / clean-slate proposals (a new recipe, an unprompted improvement) skip it entirely and go straight to Step 3.
 
-1. **Detect incident origin.** The proposal is incident-originated when its trigger is a **bug, a piece of feedback, or an issue** rather than a clean-slate idea — concretely: a Phase-5 test failure routed here by `/e7-resolve-feedback`, a recurring review finding, a child-submitted issue, or an audit capture (an f0 draft ingested via Input Mode 3). If the origin is genuinely unclear, treat it as incident-originated (the diagnosis is cheap insurance); a clearly proactive idea skips this step.
+1. **Detect incident origin.** The proposal is incident-originated when its trigger is a **bug, a piece of feedback, or an issue** rather than a clean-slate idea — concretely: a Phase-6 test failure routed here by `/e8-resolve-feedback`, a recurring review finding, a child-submitted issue, or an audit capture (an f0 draft ingested via Input Mode 3). If the origin is genuinely unclear, treat it as incident-originated (the diagnosis is cheap insurance); a clearly proactive idea skips this step.
 2. **Adopt the default stance** (command-local — stated here, not in the rules file): an incident is presumed to indicate a **genuine framework gap requiring a Shamt update**, not a one-off to paper over. The question you are answering is *what canonical change would prevent this class of incident?* — not *what local patch makes this one instance go away?*
 3. **Drive an independent, adversarial, zero-bias root-cause diagnosis.** Do **not** let the agent that drafted the Problem also be the sole judge of what went wrong. Spawn the `root-cause-diagnoser` persona (Reasoning / Opus tier — root-cause analysis is Opus-tier per [`reference/model_selection.md`](../../../../reference/model_selection.md); see [`agents/root-cause-diagnoser.md`](../agents/root-cause-diagnoser.md)) and provide:
-   - `incident` — the triggering bug / review finding / issue / audit capture and its context (e.g., the `/e7` phase-attributed root cause, the f0 Scratch Notes).
+   - `incident` — the triggering bug / review finding / issue / audit capture and its context (e.g., the `/e8` phase-attributed root cause, the f0 Scratch Notes).
    - `seed_explanation` — your current best guess at the root cause and fix (the conclusion it must distrust, not adopt).
    - `canonical_root` — `shamt-core/` (master / self-host).
 

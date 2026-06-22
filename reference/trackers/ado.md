@@ -100,7 +100,7 @@ Unified target sections follow the field-mapping contract (Title, Type, State, A
 az repos pr show --id {id} --output json
 ```
 
-For the diff (used by `/e6-review-changes` when needed):
+For the diff (used by `/e7-review-changes` when needed):
 
 ```bash
 az repos pr show --id {id} --query "lastMergeSourceCommit.commitId" --output tsv
@@ -113,7 +113,7 @@ The PR `id` here is the ADO Pull Request ID, distinct from the work-item ID. `pr
 
 ## PR create
 
-`/e6-review-changes` / `/e7-resolve-feedback` / `/e8-finalize-story` invoke `## PR create` / `## PR comment fetch` / `## PR merge` **only when `pr_provider == github`**. On ADO these are **not yet wired** — the consuming commands take no PR action for `pr_provider == ado`. The `az repos pr` command shapes below are recorded for when ADO PR support is added; declaring the sections keeps this profile contract-conformant.
+`/e7-review-changes` / `/e8-resolve-feedback` / `/e9-finalize-story` invoke `## PR create` / `## PR comment fetch` / `## PR merge` **only when `pr_provider == github`**. On ADO these are **not yet wired** — the consuming commands take no PR action for `pr_provider == ado`. The `az repos pr` command shapes below are recorded for when ADO PR support is added; declaring the sections keeps this profile contract-conformant.
 
 ```bash
 # Open a PR (forward-looking — not invoked by v2)
@@ -139,7 +139,7 @@ az repos pr update --id {id} --status completed --delete-source-branch true --sq
 
 ## PR comment posting
 
-**Not invoked by v2.** Documented for future use only — `/e6-review-changes` produces a local artifact at `code_reviews/` and does not post upstream (resolved open question).
+**Not invoked by v2.** Documented for future use only — `/e7-review-changes` produces a local artifact at `code_reviews/` and does not post upstream (resolved open question).
 
 For reference, the command shape is:
 
@@ -147,7 +147,7 @@ For reference, the command shape is:
 az repos pr comment create --id {pr_id} --content "<markdown body>" --output json
 ```
 
-Threaded replies use `--parent-comment-id`. When `/e6-review-changes` (or any downstream automation) gains a post-back feature, this is the entry point.
+Threaded replies use `--parent-comment-id`. When `/e7-review-changes` (or any downstream automation) gains a post-back feature, this is the entry point.
 
 ---
 

@@ -102,7 +102,7 @@ State the derived starting phase in one line before dispatching anything (e.g. `
 
 ## Step 2 — Dispatch topology (exactly one nesting level)
 
-A sub-agent cannot spawn another sub-agent, yet `/validate-artifact` (Standard) needs `validation-checker` and `/f3` may hand off to `plan-executor`. This is the **same** constraint `reference/batch_validation_handoff.md` already solves, and `/f-all` adopts its solution verbatim — keeping the topology at **exactly one nesting level**: driver → phase agent, and separately driver → inner persona.
+A sub-agent cannot spawn another sub-agent, yet `/validate-artifact` needs `validation-checker` and `/f3` may hand off to `plan-executor`. This is the **same** constraint `reference/batch_validation_handoff.md` already solves, and `/f-all` adopts its solution verbatim — keeping the topology at **exactly one nesting level**: driver → phase agent, and separately driver → inner persona.
 
 There are two kinds of phase:
 

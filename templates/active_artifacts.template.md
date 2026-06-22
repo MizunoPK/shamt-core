@@ -1,7 +1,6 @@
 # Active Story Artifacts
 
 **Story:** {slug}
-**Path:** Quick path | Standard path
 **Active baseline:** vN
 **Updated:** YYYY-MM-DD
 **Reason:** [Why the re-baseline occurred — e.g., "Requirements changed after build/checklist execution."]
@@ -15,10 +14,10 @@
 | Artifact | Path |
 |---|---|
 | Spec | `stories/{slug}/spec_vN.md` |
-| Context | `stories/{slug}/context_vN.md` (or `N/A — Quick path`) |
-| Implementation Plan | `stories/{slug}/implementation_plan_vN.md` (or `N/A — Quick path`) |
-| Testing Plan | `stories/{slug}/testing_plan_vN.md` (or `N/A — no automated suites` / `N/A — Quick path inline checklist`) |
-| Manual Test Plan | `stories/{slug}/manual_test_plan_vN.md` (or `N/A — not produced`) |
+| Context | `stories/{slug}/context_vN.md` |
+| Implementation Plan | `stories/{slug}/implementation_plan_vN.md` |
+| Testing Plan | `stories/{slug}/testing_plan_vN.md` (or `N/A — no automated suites`) |
+| User Test Plan | `stories/{slug}/user_test_plan_vN.md` |
 | Agent Test Session | `stories/{slug}/agent_test_session_vN.md` |
 | Mermaid Diagram | `stories/{slug}/diagram_vN.md` (optional supporting metadata; use `N/A — not generated`) |
 

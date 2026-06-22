@@ -3,7 +3,7 @@ name: e2-define-spec
 description: >
   Run Phase 2 (Spec) of the Shamt Engineer flow on a story whose ticket has
   been captured. Targeted research; design dialog at Gate 2a with 1–3 option
-  comparisons; spec/context drafting (Standard) or compact spec (Quick);
+  comparisons; spec.md + context.md drafting (always full — no path selection);
   validation; and Gate 2b approval. Invoke when the user wants to spec a
   story, design the approach, run the spec protocol, write a spec, draft
   spec/context, or work through the design dialog for an intaken ticket.
@@ -36,7 +36,7 @@ See [`reference/model_selection.md`](../../../../../reference/model_selection.md
 
 ## Exit criteria
 
-Validated `spec.md` (and `context.md` on Standard) approved by the user at Gate 2b; Open Questions empty or deferred with reason.
+Validated `spec.md` and `context.md` approved by the user at Gate 2b; Open Questions empty or deferred with reason.
 
 ---
 Validated 2026-05-28 — 2 rounds, 1 adversarial sub-agent confirmed (Phase 5 implementation loop)

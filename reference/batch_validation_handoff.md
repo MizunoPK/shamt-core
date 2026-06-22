@@ -27,15 +27,15 @@ For each artifact in the manifest, the orchestrator runs this loop:
 
 1. **Spawn a per-artifact primary validation sub-agent.** It reads and fixes the artifact in its own isolated context, running the standard **Pattern 1 primary loop — Steps 1–6 as defined by `/validate-artifact`** (dimension-selection-by-artifact-type, fresh-eyes rounds, in-place fixes, `consecutive_clean` tracking) at the standard primary tier (Reasoning). The primary is driven by the **inline instructions in the handoff prompt** — it does **not** invoke the `/validate-artifact` command itself (that would auto-proceed to the Step 7 adversarial pass and spawn its own checker, the second nesting level this design avoids). The primary **halts after Step 6**, at `consecutive_clean = 1`, **without spawning a checker**, and returns a short verdict.
 
-2. **Apply `/validate-artifact`'s path selection.** Spawn the adversarial checker for a **Standard-path or risk-triggered** artifact; **skip** it for a **Quick-path artifact with no risk trigger** (that artifact exits after the primary's clean pass, per `/validate-artifact` Step 6 → Step 8). The two producers wired today emit only non-story framework artifacts, which default to Standard, so the checker always runs there; path-awareness matters for a future Quick-capable producer that adopts this reference.
+2. **Spawn the adversarial checker (always).** Validation is uniform — every artifact gets the adversarial checker after its primary clean pass; there is no path-based skip. (The two producers wired today emit non-story framework artifacts; the checker runs on every artifact a batch carries.)
 
 3. **The orchestrator — not the primary sub-agent — spawns the checker.** Use the existing `validation-checker` persona at its fixed Haiku tier (do not override). This is the key difference from single-artifact `/validate-artifact`, where the primary validator (itself the top-level session agent) spawns its own checker at Step 7. In the batch case the primary *is* a sub-agent, so the checker-spawn is lifted up to the orchestrator to keep the whole flow at **one nesting level**. Never instruct a sub-agent to spawn the checker — that would attempt a second nesting level.
 
 4. **On any checker finding, re-spawn a fresh primary** for that artifact (new context, `consecutive_clean` back to 0 — mirroring single-artifact Pattern 1's "fix and return to Step 1"), then re-run the checker. Repeat until a checker pass is clean. Clean exit is the only terminator — no separate retry cap, matching the base primitive. **Sub-agents have no one-LOW allowance:** any checker finding, even a single LOW, resets that artifact's loop.
 
-5. **Stamp the footer.** Each artifact gets its own `/validate-artifact` footer on clean exit (Quick: `Validated YYYY-MM-DD — 1 round (Quick path)`; Standard: `Validated YYYY-MM-DD — N rounds, 1 adversarial sub-agent confirmed`), written by the agent that finished it.
+5. **Stamp the footer.** Each artifact gets its own `/validate-artifact` footer on clean exit (`Validated YYYY-MM-DD — N rounds, 1 adversarial sub-agent confirmed`), written by the agent that finished it.
 
-After all artifacts are done, the orchestrator reports an aggregate result: per artifact, the path taken and whether it exited clean.
+After all artifacts are done, the orchestrator reports an aggregate result: per artifact, whether it exited clean.
 
 The topology is exactly one nesting level: **orchestrator → per-artifact primary sub-agent**, and separately **orchestrator → `validation-checker`**. Both legs are expressible via the Claude Code Task tool.
 
@@ -62,22 +62,18 @@ For EACH artifact, in order:
          each round; classify severity per Pattern 2; fix every issue in place.
        - HALT after Step 6 at consecutive_clean = 1. Do NOT spawn a checker.
          Do NOT invoke the /validate-artifact command. Return a short verdict
-         (path taken — Quick or Standard — and consecutive_clean reached).
+         (consecutive_clean reached).
 
-  B. Apply /validate-artifact path selection. If the artifact is Standard-path
-     or risk-triggered, continue to C. If it is Quick-path with no risk
-     trigger, skip C: have the primary stamp the Quick-path footer and move on.
-
-  C. YOU (the orchestrator) spawn the validation-checker persona (Haiku) for
+  B. YOU (the orchestrator) spawn the validation-checker persona (Haiku) for
      {path}, with its dimension list and governing references. The checker
      re-reads cold and reports ANY issue (no one-LOW allowance). On any
      finding: re-spawn a fresh primary for {path} (Step A), then re-run the
      checker. Repeat until the checker replies
      "CONFIRMED: Zero issues found after adversarial review."
-     Then stamp the Standard footer.
+     Then stamp the footer.
 
-After every artifact exits clean, report an aggregate: per artifact, the path
-taken and clean/needs-work status.
+After every artifact exits clean, report an aggregate: per artifact, the
+clean/needs-work status.
 ```
 
 ## Sequential-list fallback

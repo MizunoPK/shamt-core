@@ -1,10 +1,10 @@
 ---
-description: Run a Shamt Pattern 1 validation loop on any artifact — spec, plan, code review, testing plan, manual test plan, proposal, or general document
+description: Run a Shamt Pattern 1 validation loop on any artifact — spec, plan, code review, testing plan, user test plan, proposal, or general document
 ---
 
 # /validate-artifact
 
-**Purpose:** Run a Shamt Pattern 1 validation loop on a named artifact. The same primitive validates specs, implementation plans, code reviews, testing plans, manual test plans, framework-update proposals, and general documents.
+**Purpose:** Run a Shamt Pattern 1 validation loop on a named artifact. The same primitive validates specs, implementation plans, code reviews, testing plans, user test plans, framework-update proposals, and general documents.
 
 **Recommended model:** Reasoning (Opus) for the primary loop. Adversarial sub-agent confirmations always use Cheap (Haiku) — see [`reference/model_selection.md`](../../../../reference/model_selection.md) and [`reference/validation_exit_criteria.md`](../../../../reference/validation_exit_criteria.md).
 
@@ -23,7 +23,7 @@ description: Run a Shamt Pattern 1 validation loop on any artifact — spec, pla
   - `stories/42-add-export/context.md` (pass alongside `spec.md` as a pair using `+`: `stories/42-add-export/spec.md + stories/42-add-export/context.md`)
   - `stories/42-add-export/implementation_plan.md`
   - `stories/42-add-export/testing_plan.md`
-  - `stories/42-add-export/manual_test_plan.md`
+  - `stories/42-add-export/user_test_plan.md`
   - `stories/42-add-export/feedback/review_v1.md`
   - `proposals/<slug>.md`
   - any other Markdown artifact (uses 5 general dimensions)
@@ -33,22 +33,9 @@ description: Run a Shamt Pattern 1 validation loop on any artifact — spec, pla
 - The artifact must exist and be non-empty. If not, halt and report.
 - If `stories/{slug}/active_artifacts.md` exists in the artifact's story folder, read it first and validate the file named under **Active Files**, not the unversioned baseline. Halt if the artifact passed in conflicts with the active pointer.
 
-## Path selection (Quick vs Standard)
+## Exit shape (uniform)
 
-Pattern 1 has two exit shapes (see [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md) Pattern 1 and [`reference/validation_exit_criteria.md`](../../../../reference/validation_exit_criteria.md)):
-
-- **Quick path:** a single primary self-review pass. No adversarial sub-agent required unless a risk trigger applies.
-- **Standard path (or risk-triggered):** primary clean round + 1 independent adversarial sub-agent confirmation via the `validation-checker` persona. **Sub-agents have no one-LOW allowance** — any finding by the sub-agent (including a single LOW) resets `consecutive_clean` to 0.
-
-Determine the path:
-
-1. If the artifact lives under `stories/{slug}/` and the active spec declares **Path: Quick path**, use Quick.
-2. If the artifact lives under `stories/{slug}/` and the active spec declares **Path: Standard path**, use Standard.
-3. If the artifact is not story-scoped (e.g., `proposals/<slug>.md`), default to Standard.
-4. Regardless of the declared path, if any **risk trigger** from Pattern 1 applies to the artifact's subject matter (security / auth / tenant isolation / permissions; DB schema, migrations, backfills; new service or significant module creation; public API or event contracts; multi-repo or multi-deploy ordering; irreversible deletes; payment / regulated / safety-critical behavior), upgrade to the Standard exit even if the spec said Quick.
-5. If the user explicitly requested adversarial confirmation, use Standard.
-
-State the chosen path and the reason in one line before the first round.
+Pattern 1 has a single, uniform exit shape (see [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md) Pattern 1 and [`reference/validation_exit_criteria.md`](../../../../reference/validation_exit_criteria.md)): **one primary clean round + 1 independent adversarial sub-agent confirmation** via the `validation-checker` persona — always, for every artifact. There is no Quick/Standard rigor selector and no single-pass / one-LOW-allowance shortcut. **Sub-agents have no one-LOW allowance** — any finding by the sub-agent (including a single LOW) resets `consecutive_clean` to 0.
 
 ## The 8-step process (per round)
 
@@ -68,11 +55,10 @@ Pick the dimension set that matches the artifact. First check alignment with `.s
 
 | Artifact | Dimensions |
 |----------|-----------|
-| Spec (alone, Quick path) | 8 spec dimensions — see Pattern 1 in [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md) |
-| Spec + context pair (Standard path) | 8 spec dimensions + 5 pair-consistency checks |
+| Spec + context pair | 8 spec dimensions + 5 pair-consistency checks (every spec is validated alongside its always-produced `context.md` — see Pattern 1 in [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md)) |
 | Implementation plan | 8 plan dimensions |
 | Testing plan | mirror plan dimensions — Step clarity, Executability, Verification completeness (see [`templates/testing_plan.template.md`](../../../../templates/testing_plan.template.md)) |
-| Manual test plan | 4 scenario-specific dimensions — Scope coverage, Step reproducibility, Observable pass/fail, Setup completeness (see [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md#optional-post-build-artifact)) |
+| User test plan | 4 scenario-specific dimensions — Scope coverage, Step reproducibility, Observable pass/fail, Setup completeness (see [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md#test-plan-phase-4--required)) |
 | Code review (story-mode) | 7 dimensions — 6 review dimensions + Plan Alignment |
 | Code review (formal-mode) | 6 review dimensions |
 | Phase index file | 4 phase-index dimensions — Phase Coverage, Deploy Ordering, Cross-phase Dependencies, Completeness |
@@ -108,8 +94,7 @@ State `consecutive_clean` explicitly at the end of each round.
 ### Step 6 — Check exit
 
 - `consecutive_clean = 0` → return to Step 1.
-- `consecutive_clean = 1` on the **Quick path** with no risk trigger → skip to Step 8 (no sub-agent required).
-- `consecutive_clean = 1` on the **Standard path** or **risk-triggered Quick** → continue to Step 7.
+- `consecutive_clean = 1` → continue to Step 7 (the adversarial sub-agent is always required).
 
 ### Step 7 — Adversarial sub-agent
 
@@ -144,25 +129,18 @@ prompt: |
 
 ### Step 8 — Stamp the validation footer
 
-When the artifact exits cleanly (Quick: primary clean pass; Standard: primary clean + sub-agent CONFIRMED), append a single-line footer to the artifact. For spec/context pairs, append the footer to both files.
+When the artifact exits cleanly (primary clean round + sub-agent CONFIRMED), append a single-line footer to the artifact. For spec/context pairs, append the footer to both files.
 
 ```text
 ---
 Validated {YYYY-MM-DD} — N rounds, 1 adversarial sub-agent confirmed
 ```
 
-On Quick-path single-pass exit, drop the "1 adversarial sub-agent confirmed" suffix:
-
-```text
----
-Validated {YYYY-MM-DD} — 1 round (Quick path)
-```
-
 The footer is the **only** persistent record of validation. Do not create separate `_VALIDATION_LOG.md` artifacts.
 
 ## Exit criteria
 
-- The relevant `consecutive_clean` threshold reached (Quick: 1 primary clean pass; Standard / risk-triggered: 1 primary clean + 1 sub-agent CONFIRMED).
+- `consecutive_clean = 1` (one primary clean round) + the adversarial sub-agent returned `CONFIRMED`.
 - The validation footer appended.
 
 ## Batch handoff (≥2 artifacts)
@@ -174,8 +152,8 @@ The handoff is a convenience helper, not a new phase: it runs the identical per-
 ## Notes
 
 - This command is **fresh-agent runnable**: every input lives on disk (the artifact, its governing references, the active-artifacts pointer when present). State is determined by artifact presence; no conversation history required.
-- This command is reused across the framework — Engineer flow phases (Spec, Plan, Testing Plan, Manual Test Plan, Review), and the framework-update flow (proposal validation). Keep its body story-agnostic — do not bake story-specific assumptions in.
-- **Manual test plans** validate under this command's standard Pattern 1 exit — `/validate-artifact` is the source of truth for the validation exit. `/e5b-write-manual-testing-plan` runs the same 4-dimension loop inline (for Author / Patch / Re-validate mode cohesion) but defers to this exit; it does **not** use a bespoke "2 consecutive clean rounds" rule.
+- This command is reused across the framework — Engineer flow phases (Spec, Plan, Test Plan, Review), and the framework-update flow (proposal validation). Keep its body story-agnostic — do not bake story-specific assumptions in.
+- **User test plans** validate under this command's uniform Pattern 1 exit — `/validate-artifact` is the source of truth for the validation exit. `/e4-write-test-plan` invokes this command on `user_test_plan.md` (the 4 scenario dimensions) and on `testing_plan.md` (the plan dimensions); both use this exit.
 - The validation footer is the **only** persistent record. There is no `_VALIDATION_LOG.md` artifact in v2.
 - Sub-agent tier is fixed at Haiku via the `validation-checker` persona. Do not override at the call site without a strong reason; mis-tiering is a configuration finding (per [`reference/model_selection.md`](../../../../reference/model_selection.md)).
 - See [`reference/validation_exit_criteria.md`](../../../../reference/validation_exit_criteria.md) for extended counter-logic examples and common mistakes.

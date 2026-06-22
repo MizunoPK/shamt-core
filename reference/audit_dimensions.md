@@ -39,14 +39,13 @@ The audit exists to keep the framework **complete** (it covers what it should, w
 | D9 | Duplication / contradiction | No two canonical files give conflicting instructions for the same protocol. (Host ↔ host, reference ↔ reference — the contradiction neither side of which is the rules file; that case is D2's.) |
 | D11 | Scope-clarity | Each command/skill states its scope unambiguously near its heading; no leftover migration notes or stale "(was X)" parentheticals inline in the instruction path (including the managed shell-script comments / validation-footer lines under `host/templates/claude/` and `scripts/`). |
 
-**D2 vs D7/D9 — the clean boundary.** D2 is vertical: does the *host body* faithfully implement the *rules-file pattern*? D7 is lexical: is each concept *named* one way everywhere? D9 is horizontal: do two *non-rules* files contradict each other? A command body that says "2 consecutive clean rounds" while the rules file's Pattern 1 says "1 primary clean + sub-agent" is **D2**. Two command bodies that disagree with *each other* about whether the audit needs a sub-agent is **D9**. The word "Implement" used where the canonical phase name is "Build" is **D7**. A host body using a write-path placeholder that diverges from the rules-pinned §PO-tree write-vocabulary (e.g. a PO-tree producer writing the collapsed `epics/{parent-feature-folder}/stories/…` where §PO-tree resolution pins the full nested `epics/{epic-folder}/features/{feature-folder}/stories/…`) is **D2**, not D7 — the rules-side §PO-tree statement makes the relationship vertical (the host fails to implement a rules-file statement), not a lexical synonym. No finding should be counted under more than one dimension — classify by the relationship it breaks.
+**D2 vs D7/D9 — the clean boundary.** D2 is vertical: does the *host body* faithfully implement the *rules-file pattern*? D7 is lexical: is each concept *named* one way everywhere? D9 is horizontal: do two *non-rules* files contradict each other? A command body that says "2 consecutive clean rounds" while the rules file's Pattern 1 says "1 primary clean + sub-agent" is **D2**. Two command bodies that disagree with *each other* about whether the audit needs a sub-agent is **D9**. The word "Implement" used where the canonical Phase-5 name is "Build" is **D7**. A host body using a write-path placeholder that diverges from the rules-pinned §PO-tree write-vocabulary (e.g. a PO-tree producer writing the collapsed `epics/{parent-feature-folder}/stories/…` where §PO-tree resolution pins the full nested `epics/{epic-folder}/features/{feature-folder}/stories/…`) is **D2**, not D7 — the rules-side §PO-tree statement makes the relationship vertical (the host fails to implement a rules-file statement), not a lexical synonym. No finding should be counted under more than one dimension — classify by the relationship it breaks.
 
 ### The canonical-term table (D7)
 
 | Concept | Canonical term | Never |
 |---------|----------------|-------|
-| Story complexity tier | Quick / Standard | Small / Full (those are v1 lane names) |
-| Phase 4 | Build | Implement |
+| Phase 5 | Build | Implement |
 | Role flows | Engineer flow / Product Owner (PO) flow | "lite mode" / "full mode" |
 | An audit observation | finding (audit) / issue (Pattern 1) | *interchangeable by design — not a violation* |
 
@@ -68,7 +67,7 @@ The audit runs **only** on a master / self-host target — a child invocation ha
 |---------|-----------|
 | D4: a markdown link points at `reference/audit_dimension.md` but the file is `audit_dimensions.md` | Mechanical, single-file, the correct target is unambiguous on disk. |
 | D10: a skill `description` says "six dimensions" after the table grew to twelve | Mechanical; the table is the source of truth, so the number is uniquely determined. |
-| D7: one body writes "Small Story Lane" where every other body says "Quick path" | Normalizing to the single canonical term; no judgment. |
+| D7: one body writes "Implement" where every other body says "Build" | Normalizing to the single canonical term; no judgment. |
 | D8: a stray `TODO: fill in later` left in a reference body | Removal (or completion if the surrounding text determines it) is mechanical and single-file. |
 
 After any auto-fix, **re-run that finding's dimension** to confirm it clears. If the edited file is under `host/templates/claude/`, follow with `/f4-regen-framework` (or re-run D1) — an unsynced auto-fix is itself a D1 finding.
@@ -116,7 +115,7 @@ These are intentional patterns. The expanded audit must recognize them and recor
 - **"finding" vs "issue".** The audit says "finding"; Pattern 1 says "issue". They are interchangeable by design (stated in the command body) — **not** a D7 terminology violation.
 - **`local` tracker profile has no ticket template.** D5 records no finding for the absence of a `ticket.local.template.md` — the `local` ticket is hand-authored or PO-flow-produced.
 - **`SHAMT_RULES.template.md` is not an artifact template.** It is the canonical rules file (rendered into every child `CLAUDE.md`), checked by D2 (cross-doc consistency) and D12 (size budget) — not a producer/consumer artifact template. D5 records no finding for it (it has no producing/consuming protocol that writes or reads an artifact shaped by it).
-- **Phase count varies by path.** Testing is a required phase, so the count is 7 on the Quick path and 8 on the Standard path (Standard adds Phase 3 Plan; the terminal phase is Finalize, `/e8-finalize-story`). D10 treats both as correct — a body must match the count *for the path it describes*, not a single fixed number, and there is no `testing` config flag.
+- **Fixed nine-phase flow.** The Engineer flow has a single uniform nine-phase sequence — Intake, Spec, Plan, Test Plan, Build, Test, Review, Polish, Finalize (terminal phase `/e9-finalize-story`) — all mandatory for story completion. D10 treats "9 phases" / "e1–e9" as the correct count everywhere; there is no path-dependent count, no Quick/Standard tier, and no `testing` config flag.
 
 When a genuinely-new intentional pattern emerges that the audit keeps re-flagging, add it here through `/f1-propose-update` rather than weakening a dimension.
 

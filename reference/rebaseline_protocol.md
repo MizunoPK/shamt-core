@@ -20,8 +20,8 @@ Use a re-baseline when a large requirement change arrives after Gate 2b, Gate 3,
 4. Create `spec_vN.md` and `context_vN.md`, carrying forward only still-valid material.
 5. Record prior baseline and current code state in `context_vN.md`.
 6. Validate the new spec/context pair.
-7. Create `implementation_plan_vN.md` and any phase files needed.
-8. Validate the new plan.
+7. Create `implementation_plan_vN.md` and any phase files needed, plus the mandatory spec-derived test plans: `user_test_plan_vN.md` always, and `testing_plan_vN.md` when `TESTING_STANDARDS.md` declares automated suites.
+8. Validate the new plan and test plan(s).
 9. Create or update `active_artifacts.md` from `templates/active_artifacts.template.md`.
 10. Resume at Gate 2b, then Gate 3, then continue the workflow.
 

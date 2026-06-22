@@ -85,18 +85,17 @@ No bidirectional guide-editing sync. No `export.sh`. The child's project work (s
 |---------|-------|--------|
 | `/e1-start-story {slug}` | 1. Intake | shipped |
 | `/e2-define-spec {slug}` | 2. Spec | shipped |
-| `/e3-plan-implementation {slug}` | 3. Plan (Standard only) | shipped |
-| `/e3b-write-testing-plan {slug}` | 3 sub-phase (automated suites present) | shipped |
-| `/e4-execute-plan {slug}` | 4. Build | shipped |
-| `/e5-execute-tests {slug}` | 5. Test (required) | shipped |
-| `/e6-review-changes [{slug}\|--branch=<name>\|--pr=<id>]` | 6. Review — story mode also opens the PR when `pr_provider == github` (push branch + `gh pr create`, confirm-gated) | shipped |
-| `/e7-resolve-feedback {slug}` | 7. Polish — iterative: re-pulls the latest PR comments each run + pushes fix commits when `pr_provider == github` (pull-only) | shipped |
-| `/e8-finalize-story {slug}` | 8. Finalize | shipped |
-| `/e5b-write-manual-testing-plan {slug}` | Post-Build (optional) | shipped |
-| `/e-all {slug}` | Meta-driver (spans Phases 1–6, not a numbered phase) — walk a story through every remaining phase up to and including Review (`/e1` → `/e2` → optional `/e3`+`/e3b` on Standard → `/e4` → `/e5` → `/e6`, opening the PR when `pr_provider == github`) by dispatching one independent agent per phase, deriving the start phase from on-disk artifacts, pausing on each interactive gate (Gate 2a design dialog, Gate 2b / Gate 3 approvals) via `AskUserQuestion`, and halting on any failure it cannot resolve. **Stops at the end of Review** — Polish (`/e7`, iterative) and Finalize (`/e8`) are operator-driven, not auto-run. **Child-facing** — runs wherever the Engineer flow runs (every child, and master self-host); no master-only guard | shipped |
+| `/e3-plan-implementation {slug}` | 3. Plan | shipped |
+| `/e4-write-test-plan {slug}` | 4. Test Plan — authors `user_test_plan.md` always + `testing_plan.md` when `TESTING_STANDARDS.md` declares suites | shipped |
+| `/e5-execute-plan {slug}` | 5. Build | shipped |
+| `/e6-execute-tests {slug}` | 6. Test — `user-simulator` executes `user_test_plan.md`; `test-executor` runs `testing_plan.md` when suites exist | shipped |
+| `/e7-review-changes [{slug}\|--branch=<name>\|--pr=<id>]` | 7. Review — story mode also opens the PR when `pr_provider == github` (push branch + `gh pr create`, confirm-gated) | shipped |
+| `/e8-resolve-feedback {slug}` | 8. Polish — iterative: re-pulls the latest PR comments each run + pushes fix commits when `pr_provider == github` (pull-only) | shipped |
+| `/e9-finalize-story {slug}` | 9. Finalize | shipped |
+| `/e-all {slug}` | Meta-driver (spans Phases 1–7, not a numbered phase) — walk a story through every remaining phase up to and including Review (`/e1` → `/e2` → `/e3` → `/e4` → `/e5` → `/e6` → `/e7`, opening the PR when `pr_provider == github`) by dispatching one independent agent per phase, deriving the start phase from on-disk artifacts, pausing on each interactive gate (Gate 2a design dialog, Gate 2b / Gate 3 approvals) via `AskUserQuestion`, and halting on any failure it cannot resolve. **Stops at the end of Review** — Polish (`/e8`, iterative) and Finalize (`/e9`) are operator-driven, not auto-run. **Child-facing** — runs wherever the Engineer flow runs (every child, and master self-host); no master-only guard | shipped |
 | `/validate-artifact <path>` | any | shipped |
 
-> **`/e-all` and Principle 1.** `/e-all` is an **optional** one-shot driver over the Engineer-flow phases through Review (`/e1` … `/e6`) — a convenience layer, not a replacement. It **stops at the end of Review** (opening the PR when `pr_provider == github`); Polish (`/e7`, an iterative human-in-the-loop PR-comment loop) and Finalize (`/e8`, which merges the PR) are operator-driven, invoked by hand. The per-phase commands remain the supported manual path and each stays independently runnable. It honors Principle 1's "no single mega-orchestrator / no state file" because it is a **stateless, disk-derived dispatcher**: it holds no state of its own (it derives its start phase from on-disk artifacts and advances on each dispatched phase agent's report), and it dispatches the canonical phase commands rather than reimplementing them. Unlike master-only `/f-all`, it is **child-facing** (runs wherever the Engineer flow runs) and **gate-heavy** (it pauses on the flow's many interactive gates). The authoritative reconciliation lives beside `/f-all`'s in `CLAUDE.md` §"How changes land".
+> **`/e-all` and Principle 1.** `/e-all` is an **optional** one-shot driver over the Engineer-flow phases through Review (`/e1` … `/e7`) — a convenience layer, not a replacement. It **stops at the end of Review** (opening the PR when `pr_provider == github`); Polish (`/e8`, an iterative human-in-the-loop PR-comment loop) and Finalize (`/e9`, which merges the PR) are operator-driven, invoked by hand. The per-phase commands remain the supported manual path and each stays independently runnable. It honors Principle 1's "no single mega-orchestrator / no state file" because it is a **stateless, disk-derived dispatcher**: it holds no state of its own (it derives its start phase from on-disk artifacts and advances on each dispatched phase agent's report), and it dispatches the canonical phase commands rather than reimplementing them. Unlike master-only `/f-all`, it is **child-facing** (runs wherever the Engineer flow runs) and **gate-heavy** (it pauses on the flow's many interactive gates). The authoritative reconciliation lives beside `/f-all`'s in `CLAUDE.md` §"How changes land".
 
 > **Batch handoff (≥2 artifacts).** When a phase leaves two or more artifacts to validate at once — a phase-decomposed framework-update plan (`/f2-plan-update-implementation`: index + N phase files) or several proposals promoted in one `/sync-triage-proposals` run — the producing command emits a copy-paste **batch-validation handoff prompt** (recommended) alongside the sequential `/clear` + `/validate-artifact` fallback. The pasted orchestrator fans out one validation sub-agent per artifact, each running the same Pattern 1 loop in its own context. See [`reference/batch_validation_handoff.md`](reference/batch_validation_handoff.md).
 
@@ -156,7 +155,7 @@ Every command above is **ID-or-slug-first** and **fresh-agent runnable** per Pri
 > A permanent **Tech Stories** epic (`epics/tech-stories/` with standing `features/bugs/` + `features/quick-wins/`, fixed reserved names, seeded at install) is the home for one-off bugs / quick wins filed via `/ps0-draft`. Finished tech-stories archive into their feature's `archive/`. See `templates/SHAMT_RULES.template.md` §Standing Tech Stories epic.
 ```
 
-Epic and feature folders carry their own artifact (`epic.md` / `feature.md`) plus their nested children. Slugs are **globally unique at each altitude**; the global uniqueness is what lets the `{slug}-*` tail resolve unambiguously by tree-wide glob (see `templates/SHAMT_RULES.template.md` §PO-tree resolution). Pre-existing flat layouts resolve via the legacy fallback — new work is written nested. Each epic folder also carries a generated **`STATUS.md`** — a **derived** per-feature/per-story state rollup (New / Validated / Building / Released) re-computed from on-disk signals by `/po-status {epic-slug}` and the transition commands (`/pe3-decompose`, `/pf3-decompose`, the `-validate` stage `/pe2-validate` / `/pf2-validate` / `/ps2-validate`, `/e4`, `/e8`); never hand-edited. It is a local state rollup, **not** the external work-item tracker. Derivation contract: `templates/SHAMT_RULES.template.md` §PO-tree resolution → `reference/epic_status_board.md`.
+Epic and feature folders carry their own artifact (`epic.md` / `feature.md`) plus their nested children. Slugs are **globally unique at each altitude**; the global uniqueness is what lets the `{slug}-*` tail resolve unambiguously by tree-wide glob (see `templates/SHAMT_RULES.template.md` §PO-tree resolution). Pre-existing flat layouts resolve via the legacy fallback — new work is written nested. Each epic folder also carries a generated **`STATUS.md`** — a **derived** per-feature/per-story state rollup (New / Validated / Building / Released) re-computed from on-disk signals by `/po-status {epic-slug}` and the transition commands (`/pe3-decompose`, `/pf3-decompose`, the `-validate` stage `/pe2-validate` / `/pf2-validate` / `/ps2-validate`, `/e5`, `/e9`); never hand-edited. It is a local state rollup, **not** the external work-item tracker. Derivation contract: `templates/SHAMT_RULES.template.md` §PO-tree resolution → `reference/epic_status_board.md`.
 
 #### Parentage is the path
 
@@ -174,7 +173,7 @@ The rubric is the contract between PO flow and Engineer flow. The Engineer flow 
 
 #### Architecture-impact flag
 
-Both `/pe1-define` and `/pf1-define` consult `.shamt-core/project-specific-files/ARCHITECTURE.md` while drafting. If the epic/feature implies architectural change (new service, new boundary, new data store, new external integration, auth/tenant boundary shift, etc.), the agent flags it **inline** in `Scope / Non-Scope` as `**Architecture impact:** {one-line description}`. Omitted entirely otherwise. **Neither command consults `.shamt-core/project-specific-files/CODING_STANDARDS.md`** — coding style is irrelevant at these altitudes; the story-level Phase 6 / Phase 7 cycle handles coding-standards alignment for any eventual code changes.
+Both `/pe1-define` and `/pf1-define` consult `.shamt-core/project-specific-files/ARCHITECTURE.md` while drafting. If the epic/feature implies architectural change (new service, new boundary, new data store, new external integration, auth/tenant boundary shift, etc.), the agent flags it **inline** in `Scope / Non-Scope` as `**Architecture impact:** {one-line description}`. Omitted entirely otherwise. **Neither command consults `.shamt-core/project-specific-files/CODING_STANDARDS.md`** — coding style is irrelevant at these altitudes; the story-level Phase 7 / Phase 8 cycle handles coding-standards alignment for any eventual code changes.
 
 #### Status-line PO modes (STORY > FEATURE > EPIC > idle)
 
@@ -220,12 +219,12 @@ The status line surfaces PO-flow context by falling back through altitudes — f
 
 | Persona | Tier | Used by | Status |
 |---------|------|---------|--------|
-| `plan-executor` | Haiku | `/e4-execute-plan` (Standard) and `/f3-implement-update` (architect/builder path) | shipped |
+| `plan-executor` | Haiku | `/e5-execute-plan` and `/f3-implement-update` (architect/builder path) | shipped |
 | `validation-checker` | Haiku | Pattern 1 adversarial sub-agent | shipped |
 | `audit-checker` | Haiku | `/f5-audit-framework` clean-round adversarial sweep | shipped |
-| `test-executor` | Haiku | `/e5-execute-tests` (automated suites) | shipped |
-| `user-simulator` | Sonnet | `/e5-execute-tests` agent-as-user execution | shipped |
-| `review-executor` | Opus | `/e6-review-changes` formal mode | shipped |
+| `test-executor` | Haiku | `/e6-execute-tests` (automated suites) | shipped |
+| `user-simulator` | Sonnet | `/e6-execute-tests` — executes `user_test_plan.md` (agent-as-user) | shipped |
+| `review-executor` | Opus | `/e7-review-changes` formal mode | shipped |
 | `root-cause-diagnoser` | Opus | `/f1-propose-update` incident-origin root-cause diagnosis | shipped |
 
 ---
@@ -246,7 +245,7 @@ Per-project settings live in `.shamt-core/shamt-config.json`. Initialize from `.
 |-----|------|---------|
 | `project_name` | string (`^[A-Za-z0-9._-]+$`) | Used by `/sync-proposals` to namespace upstream submissions (`proposals/incoming/{project_name}-{slug}.md` on master) |
 | `work_item_tracker` | `"ado"` / `"github"` / `"local"` / `"none"` | Which tracker `/e1-start-story` (etc.) fetches from |
-| `pr_provider` | `"ado"` / `"github"` / `"none"` | Which PR provider the PR-aware Engineer phases use. `/e6-review-changes` formal mode uses it for `--pr` fetch; when `pr_provider == github`, story-mode `/e6` opens the PR, `/e7-resolve-feedback` pulls PR comments + pushes fixes (iterative), and `/e8-finalize-story` merges the PR. Independent of `work_item_tracker` (which routes the work-item close). |
+| `pr_provider` | `"ado"` / `"github"` / `"none"` | Which PR provider the PR-aware Engineer phases use. `/e7-review-changes` formal mode uses it for `--pr` fetch; when `pr_provider == github`, story-mode `/e7` opens the PR, `/e8-resolve-feedback` pulls PR comments + pushes fixes (iterative), and `/e9-finalize-story` merges the PR. Independent of `work_item_tracker` (which routes the work-item close). |
 | `ai_service` | `"anthropic"` | Reserved for future multi-host |
 | `master_url` | string | Where `import-shamt` pulls from. Git URL (`https://…` / `git@…` / `ssh://…`) → cloned `--depth 1`; absolute local path → used directly |
 | `doc_staleness_threshold_days` | integer (default 60) | `/f5-audit-framework` D6: how stale the three project-specific docs (`.shamt-core/project-specific-files/ARCHITECTURE.md` / `.shamt-core/project-specific-files/CODING_STANDARDS.md` / `.shamt-core/project-specific-files/TESTING_STANDARDS.md`) can be |
@@ -335,19 +334,20 @@ Status-line output formats (live, computed cheaply from filesystem state — no 
 
 The `.active` override file works the same way at every altitude: a single line containing the active folder's name; if the pinned folder exists, it wins; otherwise the renderer falls back to the most-recently-modified subdirectory. Useful when mtime is misleading (e.g., after a sweeping `git restore`).
 
-Phase detection (story altitude only) cascades from latest-stage artifact. Numbers depend on the **path** — Standard (an implementation plan is present) is 8 phases; Quick (no plan) is 7. Test is a required phase on both:
+Phase detection (story altitude only) cascades from the latest-stage artifact. The flow is a single uniform 9-phase sequence (every stage mandatory — no Quick/Standard split):
 
-| Artifact present | Standard path (8 phases) | Quick path (7 phases) |
-|---|---|---|
-| `ticket.md` carries `**Status: Done**` | P8 Finalize | P7 Finalize |
-| `feedback/addressed_feedback.md` | P7 Polish | P6 Polish |
-| `feedback/review_v*.md` | P6 Review | P5 Review |
-| `agent_test_session.md` or `testing_plan.md` | P5 Test | P4 Test |
-| `implementation_plan.md` | P3 Plan | *(n/a — Quick has no Plan)* |
-| `spec.md` | P2 Spec | P2 Spec |
-| `ticket.md` | P1 Intake | P1 Intake |
+| Artifact present | Phase |
+|---|---|
+| `ticket.md` carries `**Status: Done**` | P9 Finalize |
+| `feedback/addressed_feedback.md` | P8 Polish |
+| `feedback/review_v*.md` | P7 Review |
+| `agent_test_session.md` | P6 Test |
+| `user_test_plan.md` or `testing_plan.md` | P4 Test Plan |
+| `implementation_plan.md` | P3 Plan |
+| `spec.md` | P2 Spec |
+| `ticket.md` | P1 Intake |
 
-Phase 4 (Build) has no dedicated artifact; the cascade shows the last-completed artifact's phase while Build is in flight.
+Phase 5 (Build) has no dedicated artifact; the cascade shows the last-completed artifact's phase while Build is in flight.
 
 ---
 Validated 2026-05-28 — Phase 12 implementation loop. Touched by Phase 12: PO-flow section back-fill (hierarchy diagram, four-command table, folder layout, back-ref handoff, individually-testable rubric, architecture-impact flag, status-line PO modes subsection); priors preserved from Phase 9.

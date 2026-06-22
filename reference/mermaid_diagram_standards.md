@@ -16,7 +16,7 @@ For ready-to-use templates per diagram type, see `mermaid_recipes.md`.
 - It has more than ~8 nodes or branches
 - It is a sequence, state, or ER diagram (ASCII degrades fast for these)
 - The story will produce or evolve the diagram as a long-lived artifact (a Mermaid block is editable; an ASCII grid is not)
-- The story is on the **Standard path** and touches architecture (any architecture-relevant diagram is Mermaid)
+- The story touches architecture (any architecture-relevant diagram is Mermaid)
 
 When in doubt, Mermaid. The cost is low.
 
@@ -124,4 +124,4 @@ Every diagram in a spec or context lives next to its Mermaid source. Do not embe
 - Reviewers can edit the diagram during validation without round-tripping through an external tool.
 - The next agent reading the artifact can re-render or diff the diagram.
 
-Render verification: when an existing Mermaid diagram is recorded in `active_artifacts.md`, the Standard-path spec validation confirms it renders (no syntax errors), every node and edge is source-backed, it does not contradict spec / context, and it conforms to this file. See `validation_exit_criteria.md` for the dimension list.
+Render verification: when an existing Mermaid diagram is recorded in `active_artifacts.md`, the spec validation confirms it renders (no syntax errors), every node and edge is source-backed, it does not contradict spec / context, and it conforms to this file. See `validation_exit_criteria.md` for the dimension list.

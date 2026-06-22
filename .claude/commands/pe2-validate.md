@@ -33,7 +33,7 @@ Resolve `{slug}` to its epic folder per §PO-tree resolution (the same resolutio
 
 ### Step 2 — Run the `/validate-artifact` Pattern-1 loop on `epic.md`
 
-Run the **same Pattern-1 validation loop `/validate-artifact` runs** against `epics/{epic-folder}/epic.md`. **Cite the sibling command [`validate-artifact.md`](validate-artifact.md) (Steps 1–8) as the source of truth** for the loop mechanics — do **not** re-derive or re-enumerate the Pattern-1 dimensions here. Epic-validate always takes the **Standard** path (primary clean round + one adversarial `validation-checker` Haiku sub-agent confirmation; no one-LOW allowance). On a clean exit, the loop stamps the two-line footer block on `epic.md` exactly as `/validate-artifact` Step 8 does:
+Run the **same Pattern-1 validation loop `/validate-artifact` runs** against `epics/{epic-folder}/epic.md`. **Cite the sibling command [`validate-artifact.md`](validate-artifact.md) (Steps 1–8) as the source of truth** for the loop mechanics — do **not** re-derive or re-enumerate the Pattern-1 dimensions here. Epic-validate runs the uniform validation exit (primary clean round + one adversarial `validation-checker` Haiku sub-agent confirmation; no one-LOW allowance). On a clean exit, the loop stamps the two-line footer block on `epic.md` exactly as `/validate-artifact` Step 8 does:
 
 ```text
 ---

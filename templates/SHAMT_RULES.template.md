@@ -12,9 +12,8 @@
 Shamt is a quality framework for AI-assisted development under Claude Code. It defines:
 
 - **5 core patterns** — validation loops, severity classification, spec protocol, code review, implementation planning.
-- **Two role flows** — an **Engineer flow** (Quick path 7 phases / Standard path 8 phases — testing is a **required** phase) and a **Product Owner flow** (Epic → Feature → Story decomposition).
+- **Two role flows** — an **Engineer flow** (a uniform 9-phase linear sequence, e1–e9; every phase is mandatory for story completion) and a **Product Owner flow** (Epic → Feature → Story decomposition).
 - **The story** as the handoff artifact between the two roles.
-- **A path system inside the Engineer flow** — every story runs the **Quick path** (default, low-ceremony) unless a risk trigger escalates it to the **Standard path**.
 
 The Engineer flow is the load-bearing surface. The PO flow exists for initiatives large enough to warrant top-down decomposition. There are no top-level orphans: every feature nests under an epic and every story under a feature (see §PO-tree resolution). One-off / standalone work (bugs, quick wins, tech stories) lives under the standing **Tech Stories** epic and runs the Engineer flow from there. Within the PO flow, **decomposition catalogs breadth-context** and **define-\* deepens depth** from that seed before its terminal gate — see the `/pe3-decompose`/`/pf3-decompose` and `/pf1-define`/`/e1` command bodies for per-altitude detail.
 
@@ -70,80 +69,48 @@ Shamt is multi-session and parallel by design: multiple agents author and update
 
 ---
 
-# Engineer Flow — Path Selection
+# Engineer Flow — Phase Map
 
-Determine the path after Phase 1 (Intake).
-
-**Quick path (default):** Use when all are true:
-
-- expected implementation is ≤10 steps;
-- one repo or deployable surface;
-- no new service, database table, auth/tenant boundary, public API contract, or data migration;
-- no unresolved design decision after targeted research;
-- user did not explicitly request the Standard path.
-
-**Standard path:** Use when any risk trigger applies:
-
-- \>10 implementation steps;
-- multiple deployment boundaries with ordering risk;
-- new service, new significant module, or significant handler refactor;
-- database table creation, destructive migration, or data backfill;
-- auth, security, or tenant-isolation behavior;
-- public API or event contract change;
-- material architecture boundary crossing;
-- significant design ambiguity remaining after targeted research;
-- user explicitly requests the Standard path.
-
-When uncertain, default to Standard.
-
-### Quick path map
-
-| Phase | Artifact | Gate |
-|---|---|---|
-| 1. Intake | `stories/{ID}-{slug}-{brief-description}/ticket.md` | User confirms slug + content |
-| 2. Compact Spec | `stories/{slug}/spec.md` (Evidence, Code Shapes, Build Checklist, Verification inline) | Gate 2b: user approves spec/checklist |
-| 3. Build | code changes | Verification checklist in spec |
-| 4. Test | `stories/{slug}/agent_test_session.md` (+ inline automated checklist when present) | Phase 4 (Test) PASSes (agent-as-user; automated when present) |
-| 5. Review | chat/spec summary; `feedback/review_v1.md` only on findings, risk, or user request | Review completed |
-| 6. Polish | no-op unless feedback exists | TODO scan passes; feedback handled if present |
-| 7. Finalize | scoped commit + work item marked done (`ticket.md` `**Status: Done**`) | `/e8-finalize-story`: prior phases complete, scoped clean-tree commit, explicit confirmation |
-
-### Standard path map
+The Engineer flow is a uniform, linear **nine-phase** sequence, e1–e9. Every phase is **mandatory for a story to be considered complete** — there is no Quick/Standard split, no skipped planning, no optional context. (Mandatory means required-for-completion, not driver-auto-run: `/e-all` drives e1 → e7 and stops at Review; Polish (e8) and Finalize (e9) are operator-initiated — see §Finalize phase.)
 
 | Phase | Artifact | Gate |
 |---|---|---|
 | 1. Intake | `stories/{ID}-{slug}-{brief-description}/ticket.md` | User confirms slug + content |
 | 2. Spec | `stories/{slug}/spec.md` + `stories/{slug}/context.md` | Gate 2a design approval; Gate 2b validated-spec approval |
 | 3. Plan | `stories/{slug}/implementation_plan.md` | Gate 3 approved |
-| 4. Build | code changes | Verification checklist in plan |
-| 5. Test | `stories/{slug}/agent_test_session.md` + `testing_plan.md` (when automated suites present) | Phase 5 (Test) PASSes |
-| 6. Review | `stories/{slug}/feedback/review_v1.md` | Review artifact exists after Test |
-| 7. Polish | `feedback/addressed_feedback.md` + commits | User signals complete |
-| 8. Finalize | scoped commit + work item marked done (`ticket.md` `**Status: Done**`) | `/e8-finalize-story`: prior phases complete, scoped clean-tree commit, explicit confirmation |
+| 4. Test Plan | `stories/{slug}/user_test_plan.md` (always) + `testing_plan.md` (when `TESTING_STANDARDS.md` declares suites) | Each plan validated (Pattern 1) |
+| 5. Build | code changes | Verification checklist in plan |
+| 6. Test | `stories/{slug}/agent_test_session.md` (user-simulator executes `user_test_plan.md`) + `testing_plan.md` run (when suites present) | Phase 6 (Test) PASSes |
+| 7. Review | `stories/{slug}/feedback/review_v1.md`; opens the PR when `pr_provider == github` | Review artifact exists after Test |
+| 8. Polish | `feedback/addressed_feedback.md` + commits | User signals complete |
+| 9. Finalize | scoped commit + work item marked done (`ticket.md` `**Status: Done**`) | `/e9-finalize-story`: prior phases complete, scoped clean-tree commit, explicit confirmation |
 
-### Testing (Phase 5 — required)
+### Testing (Phase 6 — required)
 
-**Phase 5 (Test)** is **required** on every story and **blocks until green**: the `user-simulator` persona
-drives the project per `TESTING_STANDARDS.md` (source of truth; no `testing` flag), writing
-`agent_test_session.md`, plus the **automated** `testing_plan.md` when that doc declares suites. A failure
-routes to `/e7-resolve-feedback` with a **required root-cause section** (which of Spec/Plan/Build let it
-through + the prevention). Full detail in [`reference/testing.md`](reference/testing.md).
+**Phase 6 (Test)** is **required** on every story and **blocks until green**: the `user-simulator` persona
+**executes the `user_test_plan.md` scenarios** authored in Phase 4 (driving the project per
+`TESTING_STANDARDS.md` as conventions input), writing `agent_test_session.md`, plus the **automated**
+`testing_plan.md` run by `test-executor` when `TESTING_STANDARDS.md` declares suites. A failure routes to
+`/e8-resolve-feedback` with a **required root-cause section** (which of Spec/Plan/Build let it through + the
+prevention). Full detail in [`reference/testing.md`](reference/testing.md).
 
-### Optional post-Build artifact
+### Test Plan (Phase 4 — required)
 
-Manual-test-plan detail: see [`reference/testing.md`](reference/testing.md).
+**Phase 4 (Test Plan)** is **required** on every story: it authors `user_test_plan.md` (agent-as-user
+scenarios — always) and `testing_plan.md` (automated suites — when `TESTING_STANDARDS.md` declares them),
+each validated under Pattern 1. The `user_test_plan.md` is the script the Phase-6 `user-simulator`
+executes; it is not a human-only walkthrough. Full detail in [`reference/testing.md`](reference/testing.md).
 
 ### Context-clear breakpoints
 
-- **Standard path:** strong breakpoints after Gate 2b and after Gate 3.
-- **Quick path:** strong breakpoint after Gate 2b.
+- **Strong** breakpoints after Gate 2b and after Gate 3.
 - **Advisory** anywhere: before spec validation, after Gate 2b, before plan validation, after Build, after Review.
 
 ### Finalize phase (terminal)
 
 Both role flows end with a **Finalize** command modelled on `/f6-archive-proposal`, each behind explicit user confirmation (per-tracker and clean-tree mechanics in the command bodies):
 
-- **`/e8-finalize-story {slug}`** — the Engineer flow's terminal phase: commits the story's work as a scoped unit (clean-tree guard), confirms prior phases complete (Test PASSes — required; Review + feedback resolved), marks the work item done via the active tracker, and writes `**Status: Done**` into `ticket.md` — the profile-independent signal the status line reads. When `pr_provider == github` it also merges the story's PR (`gh pr merge --squash`, mergeable-guarded, behind the same confirm) — independent of the `work_item_tracker`-routed close.
+- **`/e9-finalize-story {slug}`** — the Engineer flow's terminal phase: commits the story's work as a scoped unit (clean-tree guard), confirms prior phases complete (Test PASSes — required; Review + feedback resolved), marks the work item done via the active tracker, and writes `**Status: Done**` into `ticket.md` — the profile-independent signal the status line reads. When `pr_provider == github` it also merges the story's PR (`gh pr merge --squash`, mergeable-guarded, behind the same confirm) — independent of the `work_item_tracker`-routed close.
 - **`/pe4-finalize {slug}`** — the PO flow's terminal command at the Epic altitude: after confirming every child feature/story is finalized, marks the epic done and **moves the epic folder into `epics/archive/`** as a **whole-subtree move** (features/stories ride along — parentage is the path, nothing dangles). There is no per-feature finalize command (features close implicitly when their stories are done); `epics/archive/` is excluded from active-epic status-line resolution.
 
 ### §PO-tree resolution
@@ -176,7 +143,7 @@ The standing **Tech Stories** epic (introduced above) is the home for one-off wo
 
 - **Standing fixtures, fixed reserved names.** `epics/{tech-stories-folder}/` holds two standing features, **Bugs** and **Quick Wins**, under fixed reserved folder names (`tech-stories`, `bugs`, `quick-wins`) — *not* the `{ID}-{slug}-{brief}` convention, since they carry no ticket ID. Seeded once (create-if-absent) by the install/sync flow (`init-shamt.sh` / `import-shamt.sh`), never per-initiative by `/pe1-define`; their globally-unique reserved slugs make the existing collision checks refuse any reuse.
 - **Local-only, tracker-agnostic.** The standing epic + features never map to tracker work items — only the tickets filed under them do, per the active profile (a bug = a GitHub issue / ADO bug).
-- **Entry + archive.** Entry is via `/ps0-draft [bugs|quick-wins]` (seeds a ticket stub under the chosen feature, hands to `/e1-start-story`, bypassing the `/pe1-define`→`/pf3-decompose` cascade); archive-on-finalize moves the folder into the feature's `archive/`. Mechanics live in the `/ps0-draft` + `/e8-finalize-story` command bodies.
+- **Entry + archive.** Entry is via `/ps0-draft [bugs|quick-wins]` (seeds a ticket stub under the chosen feature, hands to `/e1-start-story`, bypassing the `/pe1-define`→`/pf3-decompose` cascade); archive-on-finalize moves the folder into the feature's `archive/`. Mechanics live in the `/ps0-draft` + `/e9-finalize-story` command bodies.
 
 ---
 
@@ -199,12 +166,7 @@ Apply across Spec, Plan, Build, Test, Review, and Polish:
 
 **Purpose:** Iterative self-review until the artifact meets the quality threshold.
 
-**Exit criteria:**
-
-- **Quick path:** one primary self-review before build and one post-build review against spec/diff. Add an adversarial sub-agent only when a risk trigger applies.
-- **Standard path or risk-triggered validation:** primary clean round + 1 independent adversarial sub-agent confirmation.
-
-**Risk triggers:** security / auth / tenant isolation / permissions; database schema, migrations, or backfills; new service or significant module creation; public API or event contracts; multi-repo or multi-deploy ordering; irreversible deletes or destructive edits; payment, billing, regulated, safety-critical, or other high-risk behavior.
+**Exit criteria:** every validation is uniform — a **primary clean round + 1 independent adversarial sub-agent confirmation**. There is no lower-rigor single-pass tier; the sub-agent always runs (no one-LOW allowance). The former Quick/Standard rigor selector is retired framework-wide.
 
 ### The 8-Step Validation Process
 
@@ -246,30 +208,25 @@ Exactly one LOW issue fixed still counts as a clean primary round. Any sub-agent
 
 The seven steps — ingest the ticket, targeted research, draft skeletons, **Gate 2a** design dialog, flesh out spec/context, validate, **Gate 2b** approval — have their full per-step walkthrough (including Step 2's required research captures and Step 5's per-surface prevention requirements + schema/lineage detail + spec/context split) in [`reference/spec_protocol_reference.md`](reference/spec_protocol_reference.md). The normative contract stays here:
 
-**Step 3 — artifact shape per path:**
-
-| Path | Required artifact shape |
-|---|---|
-| Standard | `spec.md` (from `templates/spec.template.md`) + `context.md` (from `templates/context.template.md`). `spec.md` is the approval contract; `context.md` is evidence/planning handoff. Approval-relevant persistence design and review-prevention requirements must appear in `spec.md`, not only `context.md`. Key Design Decision IDs appear in both. |
-| Quick | `spec.md` only — populate Evidence, compact Review Prevention Evidence, Code Shapes, Review Prevention Checklist, Build Checklist, and Verification inline. Do not create `context.md` or `implementation_plan.md` unless the story escalates or a risk trigger applies. |
+**Step 3 — required artifact shape (every story).** Produce `spec.md` (from `templates/spec.template.md`) **and** `context.md` (from `templates/context.template.md`). `spec.md` is the approval contract; `context.md` is the evidence/planning handoff. Approval-relevant persistence design and review-prevention requirements must appear in `spec.md`, not only `context.md`. Key Design Decision IDs appear in both.
 
 **Gate 2a (Step 4).** Present 1–3 design options inline in chat (not in `spec.md` yet) — each with description, pros, cons, effort (S/M/L), and a recommendation; 2–3 required for non-trivial user-facing forks. **Wait for explicit user confirmation before proceeding.**
 
-**Step 6 — validation pair checks (Standard path).** Run Pattern 1 on the `spec.md` + `context.md` pair using spec dimensions plus five pair checks — every factual claim in `spec.md` is supported by `context.md`; every Key Design Decision ID appears in both without contradiction; approval-relevant schema/persistence in `context.md` appears in `spec.md` unless deferred/out of scope; implementation-relevant prevention evidence in `context.md` appears in `spec.md` when approval-relevant; multi-option comparisons give each option explicit pros/cons. Treat schema-only-in-context, approval-relevant prevention-only-in-context, and missing per-option pros/cons as HIGH by default. Exit: primary clean + 1 adversarial sub-agent; footer both files. (Quick path: Pattern 1 on `spec.md` alone; one primary clean pass unless a risk trigger requires an adversarial sub-agent.)
+**Step 6 — validation pair checks.** Run Pattern 1 on the `spec.md` + `context.md` pair using spec dimensions plus five pair checks — every factual claim in `spec.md` is supported by `context.md`; every Key Design Decision ID appears in both without contradiction; approval-relevant schema/persistence in `context.md` appears in `spec.md` unless deferred/out of scope; implementation-relevant prevention evidence in `context.md` appears in `spec.md` when approval-relevant; multi-option comparisons give each option explicit pros/cons. Treat schema-only-in-context, approval-relevant prevention-only-in-context, and missing per-option pros/cons as HIGH by default. Exit: primary clean + 1 adversarial sub-agent; footer both files.
 
-**Gate 2b (Step 7).** Present the validated `spec.md` as the approval artifact and link `context.md` as supporting detail (Standard path). If a new service is in scope, standard monitoring requirements must appear in Requirements or be explicitly Deferred with reason.
+**Gate 2b (Step 7).** Present the validated `spec.md` as the approval artifact and link `context.md` as supporting detail. If a new service is in scope, standard monitoring requirements must appear in Requirements or be explicitly Deferred with reason.
 
 ## Pattern 4: Code Review Process
 
 **Purpose:** Structured review with validated, copy-paste-ready feedback.
 
-**Story mode:** Review code just built for an active story. Output `stories/{slug}/feedback/review_v1.md` only when findings, risk, or user request require it; re-reviews use `review_v2.md`, etc. No `overview.md`. Before findings, perform Plan Alignment: resolve the active plan, read it alongside the diff, and check Step Coverage, Change Fidelity, Scope Discipline, Verification Passage, and Zero Builder Design Decisions. Write `## Plan Alignment` at the top of the review. If no plan exists (Quick path), record N/A. Story-mode validation uses 7 dimensions (the 7th is Plan Alignment). **When `pr_provider == github`**, story-mode Review also opens the PR after the review validates (push branch + `gh pr create`, confirm-gated, PR number recorded in the story folder); Polish (`/e7`) is then an **iterative** loop that re-pulls the latest PR comments each run and pushes fix commits (pull-only — no thread postback); Finalize (`/e8`) **merges** the PR (`gh pr merge --squash`, mergeable-guarded). `/e-all` stops at the end of Review. When `pr_provider != github`, all three keep today's local-only behavior.
+**Story mode:** Review code just built for an active story. Output `stories/{slug}/feedback/review_v1.md` only when findings, risk, or user request require it; re-reviews use `review_v2.md`, etc. No `overview.md`. Before findings, perform Plan Alignment: resolve the active plan (always present — Plan is a mandatory phase), read it alongside the diff, and check Step Coverage, Change Fidelity, Scope Discipline, Verification Passage, and Zero Builder Design Decisions. Write `## Plan Alignment` at the top of the review. Story-mode validation uses 7 dimensions (the 7th is Plan Alignment). **When `pr_provider == github`**, story-mode Review also opens the PR after the review validates (push branch + `gh pr create`, confirm-gated, PR number recorded in the story folder); Polish (`/e8`) is then an **iterative** loop that re-pulls the latest PR comments each run and pushes fix commits (pull-only — no thread postback); Finalize (`/e9`) **merges** the PR (`gh pr merge --squash`, mergeable-guarded). `/e-all` stops at the end of Review. When `pr_provider != github`, all three keep today's local-only behavior.
 
 **Formal mode:** Review someone else's branch or PR. Never check out the branch; use read-only `git fetch`, `merge-base`, `log`, and `diff`. Resolve the review base in this order: explicit user-provided base; active PR target branch when available; project default formal-review base from `.shamt-core/project-specific-files/ARCHITECTURE.md`; repository default branch otherwise. Fetch base and target branch read-only, then diff against the fetched remote base (e.g., `origin/<base>...<feature-branch>`). If fetch fails or base/branch cannot be resolved, halt and report. Output `code_reviews/<sanitized-branch>/overview.md` + `review_vN.md`.
 
 ### Formal steps
 
-The formal-mode procedure is executed by the `review-executor` persona — full steps live in that agent body + the `/e6-review-changes` command + `reference/review_categories.md`: a read-only fetch with a changed-file inventory, a validated `overview.md`, then `review_vN.md` with findings grouped by severity then category at **BLOCKING / CONCERN / SUGGESTION / NITPICK**, each artifact validated with Pattern 1. v2 does not post formal-mode reviews back to external trackers — the artifact stays local.
+The formal-mode procedure is executed by the `review-executor` persona — full steps live in that agent body + the `/e7-review-changes` command + `reference/review_categories.md`: a read-only fetch with a changed-file inventory, a validated `overview.md`, then `review_vN.md` with findings grouped by severity then category at **BLOCKING / CONCERN / SUGGESTION / NITPICK**, each artifact validated with Pattern 1. v2 does not post formal-mode reviews back to external trackers — the artifact stays local.
 
 Every review must consider all 16 categories even when no finding is recorded; the category list, the mechanical checks, and the finding format all live in `reference/review_categories.md`.
 
@@ -277,9 +234,7 @@ Every review must consider all 16 categories even when no finding is recorded; t
 
 **Purpose:** Create mechanical plans that separate planning from execution.
 
-The Quick path skips `implementation_plan.md` by default and executes the spec Build Checklist directly. Escalate to a full plan if the checklist exceeds 10 steps, a builder sub-agent is needed, exact locate/replace details are necessary, verification is complex, or the user asks for Gate 3 planning.
-
-The Standard path requires a validated implementation plan after spec approval and before Build.
+Every story requires a validated `implementation_plan.md` (Phase 3) after spec approval and before Build — planning is mandatory; there is no inline-build shortcut.
 
 ### The 5-Step Process
 
@@ -315,17 +270,16 @@ Shamt treats token cost as a design constraint. Every flow / persona / phase has
 
 ## Operational rules
 
-- Use the **Quick path** for ≤10 low-risk steps to avoid unnecessary `context.md`, `implementation_plan.md`, clean `review_v1.md`, and no-op `addressed_feedback.md`.
 - Generated host skills should route to canonical rules/templates rather than duplicate full protocol text.
 - Read `.shamt-core/project-specific-files/ARCHITECTURE.md` and `.shamt-core/project-specific-files/CODING_STANDARDS.md` once during research, record story-specific standards digest inline, and reuse the digest.
-- The Standard-path mechanical Build is executed by the cheap-tier builder persona; the architect plans, the builder executes.
+- The mechanical Build is executed by the cheap-tier builder persona; the architect plans, the builder executes.
 
 ## Default tier mapping
 
 | Tier | Model | When to use |
 |------|-------|-------------|
 | **Cheap** | Haiku | File ops, git ops, mechanical execution, sub-agent confirmations, status rollups, intake / freeform ticket capture, test execution |
-| **Balanced** | Sonnet | Code reading, structural analysis, spec research, plan creation, medium-complexity validation, formal-mode code-review metadata, manual-testing-plan authoring |
+| **Balanced** | Sonnet | Code reading, structural analysis, spec research, plan creation, medium-complexity validation, formal-mode code-review metadata, user-test-plan authoring |
 | **Reasoning** | Opus | Primary validation loops (artifact validation), root-cause analysis, design decisions, multi-dimensional checks, formal-mode review issue-finding, design dialog (Gate 2a), epic/feature decomposition |
 
 Sub-agent confirmations **always** use Cheap tier — these are zero-bias re-reads, not deep reasoning.
@@ -338,7 +292,7 @@ The per-phase model tiers for the Engineer flow live in `reference/model_selecti
 
 # Part 3: Engineer Flow — Phase Narratives
 
-Each phase's purpose, minimum-viable artifact, gate, recommended model, and per-phase invariants live authoritatively in its **command body** — `/e1-start-story`, `/e2-define-spec`, `/e3-plan-implementation` (+ `/e3b-write-testing-plan`), `/e4-execute-plan`, `/e5-execute-tests`, `/e6-review-changes`, `/e7-resolve-feedback` (under `host/templates/claude/commands/`). Gates are summarized in the Quick / Standard path-map tables above; per-phase model tiers are in `reference/model_selection.md`. Resume any phase with its slug-first command (e.g. `/e4-execute-plan {slug}`).
+Each phase's purpose, minimum-viable artifact, gate, recommended model, and per-phase invariants live authoritatively in its **command body** — `/e1-start-story`, `/e2-define-spec`, `/e3-plan-implementation`, `/e4-write-test-plan`, `/e5-execute-plan`, `/e6-execute-tests`, `/e7-review-changes`, `/e8-resolve-feedback`, `/e9-finalize-story` (under `host/templates/claude/commands/`). Gates are summarized in the Phase Map table above; per-phase model tiers are in `reference/model_selection.md`. Resume any phase with its slug-first command (e.g. `/e5-execute-plan {slug}`).
 
 ---
 
@@ -365,12 +319,11 @@ Every epic, feature, and story is a **ticket** with a short, globally-unique **t
 
 Core naming rules:
 
-- `spec.md`, `context.md`, `implementation_plan.md`, and `testing_plan.md` are always baseline v1;
-- `spec_vN.md`, `context_vN.md`, `implementation_plan_vN.md`, `testing_plan_vN.md` are re-baselined artifacts;
+- `spec.md`, `context.md`, `implementation_plan.md`, `testing_plan.md`, and `user_test_plan.md` are always baseline v1;
+- `spec_vN.md`, `context_vN.md`, `implementation_plan_vN.md`, `testing_plan_vN.md`, `user_test_plan_vN.md` are re-baselined artifacts;
 - `active_artifacts.md` is the authoritative pointer once multiple baselines exist;
 - `review_vN.md` files are append-only versioned review artifacts;
-- `manual_test_plan.md` is single-baseline; if re-baselined, follow the same `_vN.md` convention.
-- `agent_test_session.md` is the required Phase-5 agent-as-user run log; single-baseline (`_vN.md` if re-baselined).
+- `agent_test_session.md` is the required Phase-6 agent-as-user run log; single-baseline (`_vN.md` if re-baselined).
 
 ---
 

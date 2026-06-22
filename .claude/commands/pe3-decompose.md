@@ -192,7 +192,7 @@ Each feature stub is **independently resumable**. The PO can drive `/pf1-define`
 - **No tracker fetch.** This command operates entirely on the already-written `epic.md`. The tracker freeform-fallback rule does not apply at this altitude — there is no tracker payload to fall through from.
 - **No per-feature deep dialog here.** That is `/pf1-define`'s job per the stub-list-then-drill-in decomposition. Resist the urge to start drafting feature scope or success criteria — it produces low-value batched dialog at this altitude and pre-empts the open-questions iterative dialog at the next altitude.
 - **Single-add alternative — `/pf0-draft`.** To add just **one** feature to an already-decomposed epic, prefer `/pf0-draft {epic-slug}` (the incremental single-stub producer, which appends one feature stub to this epic's `## Target Features` without re-gating) rather than re-running this batch decompose. Re-running `/pe3-decompose` re-presents and re-gates the *entire* feature list (Step 3 re-decomposition partition); the single-add path skips that.
-- **No epic-level review phase.** Per Pattern 4, the 16-category code-review framework stays story-level. This command does not invoke `/e6-review-changes`.
+- **No epic-level review phase.** Per Pattern 4, the 16-category code-review framework stays story-level. This command does not invoke `/e7-review-changes`.
 - **No `/pf1-define` auto-invocation.** Per Principle 1, every command stays independently runnable. Chaining would force a multi-phase session and would couple resumability across altitudes.
 - **Parallelization is PO-flow output, not runtime coordination.** The `Parallelizable` callout informs the PO; running features concurrently is a "second terminal tab" exercise.
 

@@ -28,14 +28,13 @@ The rules file keeps Pattern 1's exit criteria, the risk-trigger list, the Step-
 
 ---
 
-## Exit Criterion (by path)
+## Exit Criterion (uniform)
 
-- **Standard path:** Primary clean round + **1 independent Haiku adversarial review sub-agent confirmation**. Applies to all Standard-path validation loops (specs, plans, code reviews, and ad-hoc artifacts).
-- **Quick path:** A single primary self-review pass. An adversarial sub-agent is only required if a risk trigger applies (e.g. database migrations, security controls, new service creation, auth/tenant boundary changes, etc.).
+Every validation loop exits the same way: **a primary clean round + 1 independent Haiku adversarial review sub-agent confirmation**. There is no path-based rigor selector — this uniform exit applies to all validation loops (specs, plans, test plans, code reviews, and ad-hoc artifacts) regardless of story size or risk.
 
 ---
 
-## Counter Logic (Standard path or risk-triggered)
+## Counter Logic
 
 ```text
 Initial state: consecutive_clean = 0
@@ -58,7 +57,7 @@ Sub-agent finds ANY issue (even LOW):
 
 ### Example Sequences
 
-**Scenario 1: Quick exit (2 rounds)**
+**Scenario 1: Fast exit (2 rounds)**
 ```
 Round 1: 3 MEDIUM issues → consecutive_clean = 0 → Fix → Continue
 Round 2: 0 issues → consecutive_clean = 1 → Spawn Haiku adversarial review sub-agent

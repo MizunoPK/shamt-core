@@ -35,7 +35,7 @@ description: Story stage-0 draft (replaces the former Tech Stories fast-path com
 ps0 supports **two parent modes**, both writing the **same story-ticket stub shape `/pf3-decompose` emits**:
 
 1. **Feature-parent mode** — `{feature-slug}` resolves to an existing feature. Write one story stub under it and additively append to that feature's `## Target Stories`.
-2. **Tech-story mode** (absorbs the former tech-story fast-path) — `bugs` / `quick-wins` resolves the standing Tech Stories epic's reserved feature (`epics/{tech-stories-folder}/features/{bugs|quick-wins}/`). Write the stub there. Carry forward the former tech-story fast-path's tracker-template selection (ado / github / local — read `work_item_tracker` from `.shamt-core/shamt-config.json`), its standing-fixture prerequisite check (halt + direct to re-run `import-shamt` if the standing containers are absent), and its completion-archive note (finalize via `/e8-finalize-story` moves the story into the feature's `archive/`).
+2. **Tech-story mode** (absorbs the former tech-story fast-path) — `bugs` / `quick-wins` resolves the standing Tech Stories epic's reserved feature (`epics/{tech-stories-folder}/features/{bugs|quick-wins}/`). Write the stub there. Carry forward the former tech-story fast-path's tracker-template selection (ado / github / local — read `work_item_tracker` from `.shamt-core/shamt-config.json`), its standing-fixture prerequisite check (halt + direct to re-run `import-shamt` if the standing containers are absent), and its completion-archive note (finalize via `/e9-finalize-story` moves the story into the feature's `archive/`).
 
 ## Step-by-step
 
@@ -98,7 +98,7 @@ Next: /ps1-define {story-slug} to flesh it out and define the story.
 - **Single-story-stub incremental.** Add one story at a time without re-decomposing the whole feature. Contrast with `/pf3-decompose` (the batch producer).
 - **Tech Stories fast-path unified.** `/ps0-draft` absorbs the former tech-story fast-path — the two modes are now one command. A tech story is just a story under the standing Tech Stories epic's `bugs` / `quick-wins` feature.
 - **Tracker-template selection per active profile.** Same template-selection semantics as `/pf3-decompose` Step 8 and the former tech-story fast-path.
-- **Completion archive for tech stories.** When a tech story is finalized via `/e8-finalize-story`, it is moved into the feature's `archive/` folder — keeping the standing features from growing without bound (same semantics as the former fast-path).
+- **Completion archive for tech stories.** When a tech story is finalized via `/e9-finalize-story`, it is moved into the feature's `archive/` folder — keeping the standing features from growing without bound (same semantics as the former fast-path).
 - **Non-destructive by construction.** The collision halt reflects the PO-flow design where slugs are user-chosen and globally unique.
 - **Fresh-agent runnable** — the config, tracker templates, and standing epic are sufficient. No conversation history required.
 

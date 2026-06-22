@@ -8,7 +8,7 @@ Expanded formatting and execution details for Pattern 5. `SHAMT_RULES.template.m
 
 The rules file keeps the required-plan-contract bullets, the operation-contract names (CREATE/EDIT/DELETE/MOVE), the hard-check names, and the builder contract/report strings; this is the expanded per-step prose.
 
-**Step 1 — Read spec/context and confirm decisions.** Apply active artifacts and global story-folder resolution. Read the active spec/context completely. Research repo conventions for file placement, sibling shapes, naming, and deployment. For new services, add the standard monitoring template to the manifest, verify outbound auth from siblings, and confirm required configuration. For EDIT steps, look up only the 5–10 lines around each target symbol; use code shapes recorded in `context.md` / Quick-path `spec.md`.
+**Step 1 — Read spec/context and confirm decisions.** Apply active artifacts and global story-folder resolution. Read the active spec/context completely. Research repo conventions for file placement, sibling shapes, naming, and deployment. For new services, add the standard monitoring template to the manifest, verify outbound auth from siblings, and confirm required configuration. For EDIT steps, look up only the 5–10 lines around each target symbol; use code shapes recorded in `context.md`.
 
 **Step 2 — Create the mechanical plan.** Use `templates/implementation_plan.template.md`. Every step must be executable without design judgment. The required plan contract (no optional/if/when/consider branches or executor judgment; stop planning if implementation is unclear; verification failure is stop-and-escalate; index + validated phase files for plans over one deploy boundary / any phase over 10 steps / ~1500+ lines; per-repo `Step 0-A`/`Step 0-B` steps following the Story branch baseline rule with `#{slug}: {message}` commits; metadata, pre-execution checklist, files manifest, review-prevention gate mapping, numbered steps, verification, Notes, and `CODING_STANDARDS` compliance mapping) is kept verbatim in the rules file as the normative contract. Skeleton-first authoring is recommended for plans with 5+ steps: write all headers, sanity-check structure, then fill locate strings and verification just-in-time.
 
@@ -22,21 +22,17 @@ The rules file keeps the required-plan-contract bullets, the operation-contract 
 
 **Step 3 — Validate plan.** Run Pattern 1 using the 8 plan dimensions. Exit: primary clean + 1 adversarial sub-agent. Add footer.
 
-**Step 4 — Hand off to builder.** In the Standard path, builder handoff is unconditional after Gate 3. Single-file plans hand off `implementation_plan.md`; phase-decomposed plans hand off one phase at a time in deploy order. In the Quick path, the primary agent executes the Build Checklist unless delegation is explicitly requested. The builder contract (follow steps exactly, execute sequentially, run specified verification, stop on failed verification or ambiguity; report strings `All steps completed. Verification passed.` / `Step N failed: ...` / `Step N is ambiguous: ...` / `Plan defect at Step N: ...`; cheap-tier builder) is kept in the rules file; the full handoff template is under [Builder handoff template](#builder-handoff-template) below.
+**Step 4 — Hand off to builder.** Builder handoff is unconditional after Gate 3 — every story plans, and `plan-executor` always executes the plan. Single-file plans hand off `implementation_plan.md`; phase-decomposed plans hand off one phase at a time in deploy order. The builder contract (follow steps exactly, execute sequentially, run specified verification, stop on failed verification or ambiguity; report strings `All steps completed. Verification passed.` / `Step N failed: ...` / `Step N is ambiguous: ...` / `Plan defect at Step N: ...`; cheap-tier builder) is kept in the rules file; the full handoff template is under [Builder handoff template](#builder-handoff-template) below.
 
 **Step 5 — Verify completeness.** Test against spec requirements, verify no unintended side effects, confirm all verifications passed. If the builder reports failure or ambiguity, diagnose, fix the plan, and re-hand off.
 
-## Checklist vs Full Plan Escalation
+## Plan decomposition
 
-The **Quick path** embeds a compact `## Build Checklist` inside `spec.md` instead of creating `implementation_plan.md`.
+Every story produces a full `implementation_plan.md` at `stories/{slug}/implementation_plan.md` (the resolved story folder, per §PO-tree resolution) — Plan is mandatory; there is no inline-checklist alternative. Decompose the single plan into an index + validated phase files (`{slug}_PLAN.md` + `_PLAN_phase_*.md`) when the plan crosses more than one deploy boundary, any phase exceeds ~10 steps, or the plan approaches ~1500 lines (the index + phase-file rule kept in the rules file). Use the index/phase split especially when:
 
-**Escalate to a full Implementation Plan at `stories/{slug}/implementation_plan.md` (the resolved story folder, per §PO-tree resolution) when:**
-
-- The build checklist exceeds 10 steps.
-- The build will be delegated to a builder sub-agent.
+- The plan exceeds ~10 steps in any single phase.
 - Exact locate / replace strings or byte-for-byte copy-file compatibility checks are necessary to prevent ambiguity in shared files.
 - Verification steps depend on a complex multi-step deployment or database migration sequence.
-- The user explicitly requests Gate 3 planning.
 
 ## Recommended plan structure
 

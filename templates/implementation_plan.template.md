@@ -1,13 +1,12 @@
 # Implementation Plan
 
-**Note:** Optional for Quick path (embedded Build Checklist in spec.md is used instead). Required for Standard path, delegated builder execution, or when the checklist exceeds 10 steps.
+**Note:** Always produced — the mandatory Phase-3 (Plan) build artifact. Executed by the `plan-executor` builder during Phase 5 (Build).
 
 **Created:** [Date]
 **Story:** stories/{slug}/
 <!-- Paths are relative to the resolved story folder (located per templates/SHAMT_RULES.template.md §PO-tree resolution; the folder nests under epics/.../features/.../). -->
 **Spec:** stories/{slug}/spec.md (or `spec_vN.md` for re-baselined stories)
-**Context:** stories/{slug}/context.md (or `context_vN.md` for re-baselined stories) (Optional/N/A for Quick path)
-**Path:** Quick path (escalation only) | Standard path
+**Context:** stories/{slug}/context.md (or `context_vN.md` for re-baselined stories)
 **Baseline:** v1
 **Baseline status:** Active
 
@@ -117,7 +116,7 @@ No optional rows. If a path is not in this manifest, it must not be created or e
 
 <!-- Cross-phase / whole-plan invariants ONLY — checks depending on more than one step's (or phase's) output: whole-tree zero-match sweeps, expected file/footer counts, link-resolution sweeps. Per-step verifications stay on each step's **Verification:** line above and are the builder's. -->
 
-**Owner: the architect, run at Phase 4 (Build) post-build** — `/e4-execute-plan` Step 4 (story altitude) / `/f3-implement-update` post-build (framework altitude). **Never the builder:** `plan-executor` is handed a single phase and cannot observe the other phases' output. **For a phase-decomposed plan this section lives in the *index* file, not any phase file**, and the architect runs it after the final phase reports `All steps completed. Verification passed.`
+**Owner: the architect, run at Phase 5 (Build) post-build** — `/e5-execute-plan` Step 4 (story altitude) / `/f3-implement-update` post-build (framework altitude). **Never the builder:** `plan-executor` is handed a single phase and cannot observe the other phases' output. **For a phase-decomposed plan this section lives in the *index* file, not any phase file**, and the architect runs it after the final phase reports `All steps completed. Verification passed.`
 
 - [ ] [Whole-tree zero-match sweep, expected count, or link sweep — the cross-phase invariant(s) this plan must satisfy, or "None" for a single-step plan with no global invariant.]
 

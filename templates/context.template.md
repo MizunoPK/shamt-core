@@ -1,6 +1,6 @@
 # Context: {slug}
 
-**Note:** Optional for Quick path (embedded Evidence section in spec.md is used instead). Created for Standard path, escalation, or when evidence becomes too large to keep inline.
+**Note:** Always produced — one of the mandatory spec-time artifacts (alongside `spec.md` and `implementation_plan.md`). Holds the story's research evidence, design rationale, and review-prevention investigation.
 
 **Created:** [Date]
 **Story:** stories/{slug}/

@@ -102,7 +102,7 @@ gh pr view {id} --repo <org>/<repo> \
   --json number,title,body,state,headRefName,baseRefName,headRefOid,baseRefOid,commits,files,labels,milestone,assignees,reviewRequests,reviews,url
 ```
 
-For the diff (used by `/e6-review-changes`):
+For the diff (used by `/e7-review-changes`):
 
 ```bash
 gh pr diff {id} --repo <org>/<repo>
@@ -114,7 +114,7 @@ gh pr diff {id} --repo <org>/<repo>
 
 ## PR create
 
-Used by `/e6-review-changes` (story mode) at the end of the Review stage when `pr_provider == github`: push the story branch and open the PR. Confirm-gated by the consuming command (outward action).
+Used by `/e7-review-changes` (story mode) at the end of the Review stage when `pr_provider == github`: push the story branch and open the PR. Confirm-gated by the consuming command (outward action).
 
 ```bash
 # Push the story's current (feature) branch and open the PR
@@ -127,7 +127,7 @@ gh pr create --repo <org>/<repo> --base <base> --head <head> \
 
 ## PR comment fetch
 
-Used by `/e7-resolve-feedback` when a PR is recorded for the story and `pr_provider == github`: fetch the latest PR comments + review threads to fold into the feedback inventory. Pull-only — `/e7` never posts back (see `## PR comment posting`).
+Used by `/e8-resolve-feedback` when a PR is recorded for the story and `pr_provider == github`: fetch the latest PR comments + review threads to fold into the feedback inventory. Pull-only — `/e8` never posts back (see `## PR comment posting`).
 
 ```bash
 # Conversation comments + review summaries
@@ -141,7 +141,7 @@ Each returned comment carries a stable `id` — the consuming command dedups aga
 
 ## PR merge
 
-Used by `/e8-finalize-story` when `pr_provider == github`: merge the story's PR. Confirm-gated by the consuming command (outward, irreversible action), and preceded by a mergeability check.
+Used by `/e9-finalize-story` when `pr_provider == github`: merge the story's PR. Confirm-gated by the consuming command (outward, irreversible action), and preceded by a mergeability check.
 
 ```bash
 # Mergeability guard — halt if not mergeable (unresolved reviews / failing checks)
@@ -155,7 +155,7 @@ gh pr merge {id} --repo <org>/<repo> --squash --delete-branch
 
 ## PR comment posting
 
-**Not invoked by v2.** Documented for future use only — `/e6-review-changes` produces a local artifact at `code_reviews/` and does not post upstream (resolved open question). `/e7-resolve-feedback` is **pull-only** (see `## PR comment fetch`): it fetches comments and pushes fix commits, but never replies to or resolves threads.
+**Not invoked by v2.** Documented for future use only — `/e7-review-changes` produces a local artifact at `code_reviews/` and does not post upstream (resolved open question). `/e8-resolve-feedback` is **pull-only** (see `## PR comment fetch`): it fetches comments and pushes fix commits, but never replies to or resolves threads.
 
 For reference, the command shapes are:
 
@@ -163,7 +163,7 @@ For reference, the command shapes are:
 # Single comment on the PR conversation (not a review)
 gh pr comment {id} --repo <org>/<repo> --body "<markdown body>"
 
-# A full review with comments (preferred for /e6-review-changes findings if/when posting is added)
+# A full review with comments (preferred for /e7-review-changes findings if/when posting is added)
 gh pr review {id} --repo <org>/<repo> --comment --body "<markdown body>"
 ```
 

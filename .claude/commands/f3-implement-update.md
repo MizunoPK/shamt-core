@@ -9,7 +9,7 @@ description: Phase 4 of the framework-update flow — apply a validated proposal
 **Recommended models:**
 
 - Orchestration (this command, ≤10 file ops): Balanced (Sonnet) — reads the proposal, applies edits, monitors verification.
-- Standard-path orchestration (when Phase 3 ran): Balanced (Sonnet) — same architect/builder split as the story-level Build phase; the architect monitors the builder.
+- Plan-present orchestration (when Phase 3 ran): Balanced (Sonnet) — same architect/builder split as the story-level Build phase; the architect monitors the builder.
 - Executor (Phase 3 ran): Cheap (Haiku) via [`agents/plan-executor.md`](../agents/plan-executor.md), reused.
 
 See [`reference/model_selection.md`](../../../../reference/model_selection.md).
@@ -108,7 +108,7 @@ Creating a branch is not a commit — the "No commits here" rule (Notes) still h
 
 ### Step 3 — Post-build verification (architect/builder path)
 
-After the builder reports `All steps completed. Verification passed.` (the final phase's report, for a phase-decomposed plan), the architect (this orchestrator) **independently** runs the plan's post-execution `## Verification` section — mirroring `/e4-execute-plan` Step 4:
+After the builder reports `All steps completed. Verification passed.` (the final phase's report, for a phase-decomposed plan), the architect (this orchestrator) **independently** runs the plan's post-execution `## Verification` section — mirroring `/e5-execute-plan` Step 4:
 
 1. Walk the plan's post-execution `## Verification` section end-to-end. Every item must pass. **For a phase-decomposed plan this is the *index* file's whole-plan `## Verification (post-execution, whole plan)` section** — the cross-phase invariants (whole-tree zero-match sweeps, expected footer/link counts, link-resolution sweeps) that depend on more than one phase's output and that the builder, handed only its single phase file, structurally cannot own. Re-run each verification yourself rather than accepting the builder's report for it.
 2. Any failure here is a **`Step failed`** — diagnose, patch the plan and re-validate (or invoke the re-baseline protocol on the proposal), re-hand off. **Never** delegate the whole-plan verification back to `plan-executor`: the builder owns only the per-step / per-phase verifications inside the phase file it was handed (see [`agents/plan-executor.md`](../agents/plan-executor.md) Post-execution Step 1), and `plan-executor`'s `All steps completed. Verification passed.` attests only to those — never to the index's whole-plan section.

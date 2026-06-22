@@ -17,7 +17,7 @@ Apply these gates for any new or changed:
 - Test data, branching logic, or verification strategy
 - Removed or weakened validation, tenant scoping, role check, redirect allowlist, session/token check, or other security gate
 
-If one of these surfaces is a Shamt risk trigger, use the **Standard path**. If the story still qualifies for the **Quick path**, record compact evidence and checklist items inline in `spec.md`.
+When one of these surfaces applies, record the prevention requirement in `spec.md` and the detailed evidence in `context.md`.
 
 ## Spec Risk Inventory
 
@@ -31,7 +31,7 @@ Specs should include an approval-facing inventory. Each applicable surface needs
 | Database read/write | Yes / No | Database role/credential, replication/writer behavior, transitive write paths, and cross-service read/write lineage are planned. | `context.md` section or researched file path |
 | Infrastructure / deployment | Yes / No | Entry point, application stack, route/networking, monitoring, packaging/build, env vars, permissions, log retention, and deployment topology are covered or N/A. | `context.md` section or researched file path |
 | Frontend safety | Yes / No | Fetch errors, safe DOM rendering, secrets/config exposure, cookies/cache/CORS, and auth-flow expectations are covered. | `context.md` section or researched file path |
-| Testing / test data | Yes / No | Automated tests, manual verification, and synthetic-only test-data obligations are stated. | `context.md` section or researched file path |
+| Testing / test data | Yes / No | Automated tests, agent-as-user verification, and synthetic-only test-data obligations are stated. | `context.md` section or researched file path |
 | Removed / weakened checks | Yes / No | Existing boundary is preserved or a replacement boundary is specified before code edits. | `context.md` section or researched file path |
 
 ## Context Evidence Matrix
@@ -43,7 +43,7 @@ Use `templates/context.template.md` for the detailed evidence shape. The context
 - **Persistence and writer routing:** Which paths read or write? Which helpers perform transitive writes? Which database role or credential applies? Which migration, replication, or read-replica behavior applies? Have you traced the end-to-end read/write lineage across service boundaries (e.g., a sibling service's configuration-retrieval API)?
 - **Infrastructure completion:** Which entry point, application stack, route, monitoring template, packaging path, environment variable, access policy / permission, log retention, networking, and deployment-stage surfaces are in scope?
 - **Frontend safety:** How are fetch failures handled? Is DOM rendering safe? Are secrets/config, cookies, cache, CORS, and auth-flow expectations preserved?
-- **Verification and test data:** Which tests or manual checks cover the change? Is all test data synthetic?
+- **Verification and test data:** Which tests or agent-as-user checks cover the change? Is all test data synthetic?
 - **Removed / weakened checks:** What check existed, what boundary did it protect, and what replacement or preservation proves the boundary still holds?
 
 ## Plan Prevention Gates
@@ -56,7 +56,7 @@ Hard expectations:
 - New or changed deployment units / routes require manifest coverage or explicit N/A for entry point, application stack, route/networking, monitoring, packaging, environment variables, permissions, log retention, and deployment-stage updates.
 - Tenant / path / object / document changes require a tenant-A-to-tenant-B bypass verification when feasible, or a stated reason why it cannot be run.
 - Removed or weakened checks require a replacement-analysis step before the code-edit step.
-- Testing gates must name the test command, manual check, or accepted reason for no automated test.
+- Testing gates must name the test command, agent-as-user check, or accepted reason for no automated test.
 
 ## Examples
 

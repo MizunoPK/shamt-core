@@ -36,7 +36,7 @@ Resolve `{slug}` per §PO-tree resolution and branch on the altitude of the fold
 
 ### Step 2 — Run the `/validate-artifact` Pattern-1 loop on `feature.md`
 
-Run the **same Pattern-1 validation loop `/validate-artifact` runs** against `epics/{epic-folder}/features/{feature-folder}/feature.md`. **Cite the sibling command [`validate-artifact.md`](validate-artifact.md) (Steps 1–8) as the source of truth** for the loop mechanics — do **not** re-derive the dimensions. Standard path (primary clean round + one adversarial `validation-checker` Haiku sub-agent; no one-LOW allowance). On a clean exit, stamp the two-line footer block on `feature.md` exactly as `/validate-artifact` Step 8 does.
+Run the **same Pattern-1 validation loop `/validate-artifact` runs** against `epics/{epic-folder}/features/{feature-folder}/feature.md`. **Cite the sibling command [`validate-artifact.md`](validate-artifact.md) (Steps 1–8) as the source of truth** for the loop mechanics — do **not** re-derive the dimensions. Uniform validation exit (primary clean round + one adversarial `validation-checker` Haiku sub-agent; no one-LOW allowance). On a clean exit, stamp the two-line footer block on `feature.md` exactly as `/validate-artifact` Step 8 does.
 
 ### Step 3 — Refresh the epic STATUS.md
 

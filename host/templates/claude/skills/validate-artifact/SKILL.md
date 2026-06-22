@@ -2,10 +2,10 @@
 name: validate-artifact
 description: >
   Run a Shamt Pattern 1 validation loop on any named artifact — spec, spec/
-  context pair, implementation plan, testing plan, manual test plan, code
-  review, framework-update proposal, or general document. Quick path = single
-  primary pass; Standard or risk-triggered = primary clean + 1 Haiku adversarial
-  sub-agent confirmation (no one-LOW allowance). Stamps the validation footer.
+  context pair, implementation plan, testing plan, user test plan, code
+  review, framework-update proposal, or general document. Uniform rigor: one
+  primary clean round + 1 Haiku adversarial sub-agent confirmation, always (no
+  Quick/Standard selector, no one-LOW allowance). Stamps the validation footer.
   Invoke when the user wants to validate, re-validate, run a validation loop,
   apply Pattern 1, sub-agent-check, or footer an artifact.
 triggers:
@@ -13,7 +13,7 @@ triggers:
   - "validate the spec"
   - "validate the plan"
   - "validate the testing plan"
-  - "validate the manual test plan"
+  - "validate the user test plan"
   - "validate the review"
   - "validate the proposal"
   - "run a validation loop"
@@ -44,7 +44,7 @@ See [`reference/model_selection.md`](../../../../../reference/model_selection.md
 
 ## Exit criteria
 
-Required `consecutive_clean` reached for the chosen path; validation footer appended. No separate `_VALIDATION_LOG.md` artifact — the footer is the only persistent record.
+Required `consecutive_clean` reached (one primary clean round + one adversarial sub-agent confirmation, always); validation footer appended. No separate `_VALIDATION_LOG.md` artifact — the footer is the only persistent record.
 
 ---
 Validated 2026-05-28 — 2 rounds, 1 adversarial sub-agent confirmed (Phase 5 implementation loop)

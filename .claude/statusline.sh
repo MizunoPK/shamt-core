@@ -34,21 +34,16 @@ cd "$PROJECT_DIR" 2>/dev/null || { printf 'Shamt | idle'; exit 0; }
 
 idle() { printf 'Shamt | idle'; exit 0; }
 
-# ---- Numbering scheme (Quick path = 7 phases, Standard path = 8 phases) -----
+# ---- Numbering scheme (uniform 9 phases — every stage mandatory) ------------
 #
-# Testing is a REQUIRED phase (Test) on every story past Build. The phase count is
-# determined by PATH, not a config flag:
-#   Standard: Intake(1) Spec(2) Plan(3) Build(4) Test(5) Review(6) Polish(7) Finalize(8)
-#   Quick   : Intake(1) Spec(2)         Build(3) Test(4) Review(5) Polish(6) Finalize(7)
+# The Engineer flow is a single-integer e1…e9 linear sequence; every stage is
+# mandatory for a story to be considered complete (no Quick/Standard split). The
+# phase count is fixed — there is no config flag and no path detection:
+#   Intake(1) Spec(2) Plan(3) Test Plan(4) Build(5) Test(6) Review(7) Polish(8) Finalize(9)
 #
-# Standard adds Phase 3 (Plan); Quick has no Plan. Detect Standard by the presence
-# of an implementation plan in the resolved story folder (`has_any_artifact
-# implementation_plan`); otherwise Quick. Default to Quick so projects without a
-# plan artifact get the correct numbering shown by default.
-
-# Phase numbering is determined by PATH, not a config flag. The path flag
-# (STANDARD_PATH) is computed inside the story-rendering block below, where the
-# `has_any_artifact` helper that detects the implementation plan is in scope.
+# Build (5) produces code, not a story artifact, so it has no distinct on-disk
+# signal — a story mid-build shows the last artifact-backed phase (Test Plan)
+# until a Test artifact (agent_test_session.md) appears.
 
 # ---- Resolve the active folder under a given parent directory ---------------
 #
@@ -118,29 +113,25 @@ if [ -n "$ACTIVE_STORY_DIR" ]; then
   PHASE_NUM=""
   PHASE_NAME=""
 
-  # Path detection: Standard iff an implementation plan exists in this story folder
-  # (Standard adds Phase 3 Plan → 8 phases; Quick has no Plan → 7).
-  STANDARD_PATH=0
-  if has_any_artifact implementation_plan; then STANDARD_PATH=1; fi
-
   if [ -f "$ACTIVE_STORY_DIR/ticket.md" ] && grep -qE '\*\*Status:.*Done' "$ACTIVE_STORY_DIR/ticket.md" 2>/dev/null; then
-    # Finalize is terminal: /e8-finalize-story writes **Status: Done** into
+    # Finalize is terminal: /e9-finalize-story writes **Status: Done** into
     # ticket.md (profile-independent signal). Checked first — it outranks every
     # earlier-phase artifact a finalized story still carries on disk.
-    PHASE_NAME=Finalize
-    PHASE_NUM=$([ "$STANDARD_PATH" -eq 1 ] && echo 8 || echo 7)
+    PHASE_NUM=9; PHASE_NAME=Finalize
   elif [ -f "$ACTIVE_STORY_DIR/feedback/addressed_feedback.md" ]; then
-    PHASE_NAME=Polish
-    PHASE_NUM=$([ "$STANDARD_PATH" -eq 1 ] && echo 7 || echo 6)
+    PHASE_NUM=8; PHASE_NAME=Polish
   elif compgen -G "$ACTIVE_STORY_DIR/feedback/review_v*.md" >/dev/null 2>&1; then
-    PHASE_NAME=Review
-    PHASE_NUM=$([ "$STANDARD_PATH" -eq 1 ] && echo 6 || echo 5)
-  elif has_any_artifact agent_test_session || has_any_artifact testing_plan; then
-    # Test is a REQUIRED phase on every story past Build. The agent-as-user run
-    # log (agent_test_session.md) signals it always; testing_plan.md is a
-    # secondary automated signal. Numbered 5 on Standard, 4 on Quick.
-    PHASE_NAME=Test
-    PHASE_NUM=$([ "$STANDARD_PATH" -eq 1 ] && echo 5 || echo 4)
+    PHASE_NUM=7; PHASE_NAME=Review
+  elif has_any_artifact agent_test_session; then
+    # Test (6) is a REQUIRED phase: the agent-as-user run log
+    # (agent_test_session.md) signals it. Build (5) produces code, not a story
+    # artifact, so it has no on-disk signal — a mid-build story shows the last
+    # artifact-backed phase (Test Plan) until this appears.
+    PHASE_NUM=6; PHASE_NAME=Test
+  elif has_any_artifact user_test_plan || has_any_artifact testing_plan; then
+    # Test Plan (4) is a REQUIRED phase: user_test_plan.md is always authored;
+    # testing_plan.md is a secondary automated-suite signal.
+    PHASE_NUM=4; PHASE_NAME="Test Plan"
   elif has_any_artifact implementation_plan; then
     PHASE_NUM=3; PHASE_NAME=Plan
   elif has_any_artifact spec; then

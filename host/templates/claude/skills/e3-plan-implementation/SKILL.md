@@ -1,13 +1,12 @@
 ---
 name: e3-plan-implementation
 description: >
-  Run Phase 3 (Plan) of the Shamt Engineer flow — Standard path only — turning
-  an approved spec into a mechanical, validated implementation plan ready for
-  builder handoff at Gate 3. Chains into /e3b-write-testing-plan when TESTING_STANDARDS.md declares
-  automated suites. Invoke when the user wants to plan the implementation, draft the
+  Run Phase 3 (Plan) of the Shamt Engineer flow — mandatory for every story —
+  turning an approved spec into a mechanical, validated implementation plan ready
+  for builder handoff at Gate 3. Testing-plan authoring moves to /e4-write-test-plan
+  (the next phase). Invoke when the user wants to plan the implementation, draft the
   implementation plan, run the plan phase, prepare the builder handoff, or
-  break the spec into mechanical steps. Skips with a clear notice on Quick-path
-  stories (build directly from spec.md).
+  break the spec into mechanical steps.
 triggers:
   - "plan the implementation"
   - "implementation plan for"
@@ -36,7 +35,7 @@ See [`reference/model_selection.md`](../../../../../reference/model_selection.md
 
 ## Exit criteria
 
-Validated `implementation_plan.md` (and `testing_plan.md` when TESTING_STANDARDS.md declares automated suites) approved at Gate 3; Open Questions empty or deferred with reason. Builder handoff is unconditional after Gate 3 — the architect plans, the cheap-tier builder executes.
+Validated `implementation_plan.md` approved at Gate 3; Open Questions empty or deferred with reason. Test-plan authoring (`user_test_plan.md` always, `testing_plan.md` when TESTING_STANDARDS.md declares suites) is the next phase, `/e4-write-test-plan`. Builder handoff is unconditional after Gate 3 — the architect plans, the cheap-tier builder executes.
 
 ---
 Validated 2026-05-28 — 2 rounds, 1 adversarial sub-agent confirmed (Phase 5 implementation loop)

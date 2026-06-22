@@ -72,8 +72,7 @@ Validated YYYY-MM-DD — N rounds, 1 adversarial sub-agent confirmed
 [Story mode only:
 ## Plan Alignment
 
-- **Quick path (no plan):** Plan Alignment: N/A — Quick path used the spec Build Checklist instead of `implementation_plan.md`.
-- **Standard path (plan exists):** [Run the Plan-Alignment Pre-Pass and list check results: Step Coverage, Change Fidelity, Scope Discipline, Verification Passage, Zero Builder Design Decisions]
+[Run the Plan-Alignment Pre-Pass and list check results: Step Coverage, Change Fidelity, Scope Discipline, Verification Passage, Zero Builder Design Decisions. Every story has an `implementation_plan.md` (Plan is a mandatory stage), so Plan Alignment is always run.]
 ]
 
 ---
@@ -178,7 +177,7 @@ Validated YYYY-MM-DD — N rounds, 1 adversarial sub-agent confirmed
 
 ## Documentation Impact
 
-[Story mode only — the Documentation Impact Assessment from `/e6-review-changes` Step 4. Omit in formal mode.]
+[Story mode only — the Documentation Impact Assessment from `/e7-review-changes` Step 4. Omit in formal mode.]
 
 - **.shamt-core/project-specific-files/ARCHITECTURE.md:** Required | Not required — <one-line reason>
 - **.shamt-core/project-specific-files/CODING_STANDARDS.md:** Required | Not required — <one-line reason>

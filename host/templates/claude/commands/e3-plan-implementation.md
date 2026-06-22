@@ -1,10 +1,10 @@
 ---
-description: Phase 3 (Plan, Standard path) — turn an approved spec into a mechanical, validated implementation plan; chains to /e3b-write-testing-plan when TESTING_STANDARDS.md declares automated suites
+description: Phase 3 (Plan) — turn an approved spec into a mechanical, validated implementation plan; mandatory for every story; next phase is /e4-write-test-plan
 ---
 
 # /e3-plan-implementation
 
-**Purpose:** Run the Pattern 5 Implementation Planning protocol on a story whose spec has been approved at Gate 2b. Produce a mechanical, validated `implementation_plan.md` ready for builder handoff. When `TESTING_STANDARDS.md` declares automated suites, this command also invokes `/e3b-write-testing-plan {slug}` as a sub-phase before exit.
+**Purpose:** Run the Pattern 5 Implementation Planning protocol on a story whose spec has been approved at Gate 2b. Produce a mechanical, validated `implementation_plan.md` ready for builder handoff. Plan is **mandatory for every story** — there is no path that skips it. Test-plan authoring (the agent-as-user `user_test_plan.md` always, plus `testing_plan.md` when `TESTING_STANDARDS.md` declares automated suites) is the next phase, `/e4-write-test-plan {slug}`.
 
 **Recommended models:**
 
@@ -25,36 +25,21 @@ See [`reference/model_selection.md`](../../../../reference/model_selection.md).
 
 - `{id-or-slug}` (required) — story ticket ID (`T{N}`) or slug. Resolved via the global story-folder rules (ID glob `stories/{ID}-*/`, else the both-positions slug glob; halt on multiple or zero matches).
 
-## Path applicability
-
-**Standard path only.** Quick-path stories skip Phase 3 entirely — the spec's `Build Checklist` is the executable artifact. If the active spec declares `Path: Quick path`, report:
-
-```text
-Quick path is active for {slug}; skipping separate implementation plan.
-Execute the spec's Build Checklist directly. Escalate to a full plan if the
-checklist exceeds 10 steps, you need a builder sub-agent, exact locate/replace
-detail is required, verification is complex, or the user asks for Gate 3.
-```
-
-…then exit without writing `implementation_plan.md`.
-
-If the user explicitly requests Gate 3 planning on a Quick story, escalate to Standard for this command's run and continue with the steps below.
-
 ## Prerequisites
 
 - Resolve the story folder per `templates/SHAMT_RULES.template.md` §PO-tree resolution (tree-wide glob + legacy-flat fallback); `stories/{slug}/` below denotes that resolved folder. If `stories/{slug}/active_artifacts.md` exists, read it first and use the Active Files instead of unversioned baselines.
 - `spec.md` (or the active baseline) exists, has a validation footer, and is approved at Gate 2b. If not, halt and direct the user to `/e2-define-spec {slug}`.
-- On Standard path, `context.md` (or the active baseline) exists with a validation footer.
+- `context.md` (or the active baseline) exists with a validation footer.
 - `Open Questions` in the active spec is empty (or contains only explicitly deferred items with reasons). If unresolved questions remain, halt and ask.
 
-## The 5-step process
+## The 4-step process
 
 ### Step 1 — Read spec / context and confirm decisions
 
 1. Apply the active-artifact pointer.
 2. Read the active spec and context completely. Re-read sections referenced by Key Design Decision IDs.
 3. Research repo conventions for file placement, sibling shapes, naming, and deployment. For new services, plan the standard monitoring template, verify outbound auth from siblings, confirm required configuration.
-4. For EDIT steps, look up only the 5–10 lines around each target symbol; reuse code shapes recorded in `context.md` (or in Quick-path `spec.md` if this is a Quick-to-Standard escalation).
+4. For EDIT steps, look up only the 5–10 lines around each target symbol; reuse code shapes recorded in `context.md`.
 
 ### Step 2 — Create the mechanical plan
 
@@ -94,17 +79,11 @@ Draft `stories/{slug}/implementation_plan.md` from [`templates/implementation_pl
 
 ### Step 3 — Validate the plan
 
-Invoke `/validate-artifact stories/{slug}/implementation_plan.md`. Uses the 8 plan dimensions. Exit: primary clean + 1 adversarial sub-agent (Standard path is the default for plan validation; the plan never runs Quick-path validation). Footer the plan.
+Invoke `/validate-artifact stories/{slug}/implementation_plan.md`. Uses the 8 plan dimensions. Exit: primary clean + 1 adversarial sub-agent (uniform validation — primary clean + adversarial sub-agent, always). Footer the plan.
 
 If validation finds CRITICAL / HIGH issues that originate in the spec, halt and either re-baseline (per the Re-baseline Protocol in [`SHAMT_RULES.template.md`](../../../../templates/SHAMT_RULES.template.md)) or patch the spec via `/e2-define-spec` and re-validate.
 
-### Step 4 — Write the testing plan (when automated suites present)
-
-Read `TESTING_STANDARDS.md`'s Automated section. If it declares suites present, invoke `/e3b-write-testing-plan {slug}` as a sub-phase. It produces `stories/{slug}/testing_plan.md` (or escalates the Quick-path inline checklist when scope is small) and runs its own validation loop before returning. Do not advance to Gate 3 until the testing plan is validated.
-
-If `TESTING_STANDARDS.md` declares no automated suites, skip this step. `/e3b-write-testing-plan` would be a no-op anyway, but skipping the invocation keeps the chat output clean.
-
-### Step 5 — Gate 3 (user approval)
+### Step 4 — Gate 3 (user approval)
 
 Present the validated plan (and, when applicable, the validated testing plan) for user approval. Highlight:
 
@@ -115,12 +94,11 @@ Present the validated plan (and, when applicable, the validated testing plan) fo
 
 Wait for explicit user approval at Gate 3.
 
-On approval, suggest a context-clear breakpoint: `/clear`, then `/e4-execute-plan {slug}` (Phase 4, Build). Builder handoff is **unconditional** after Gate 3 — the architect plans, the cheap-tier builder executes.
+On approval, suggest a context-clear breakpoint: `/clear`, then `/e4-write-test-plan {slug}` (Phase 4 — Test Plan). Build (Phase 5) follows the test plan: the architect plans, the cheap-tier builder executes after the test plan is authored.
 
 ## Exit criteria
 
 - `stories/{slug}/implementation_plan.md` exists, fully populated, with the validation footer.
-- When `TESTING_STANDARDS.md` declares automated suites, `stories/{slug}/testing_plan.md` (or the spec's inline checklist on Quick escalations) exists with its validation footer.
 - Open Questions in the plan is empty (or contains only explicitly deferred items with reasons).
 - User has approved at Gate 3.
 
@@ -129,7 +107,7 @@ On approval, suggest a context-clear breakpoint: `/clear`, then `/e4-execute-pla
 - This command is **fresh-agent runnable**: every input lives on disk (active artifacts pointer, spec, context, governing docs, config). State is determined by artifact presence; no conversation history required.
 - **Single-session sizing constraint:** if the plan would compact within a session, split it. Either decompose into phase files (`implementation_plan_phase_1.md`, `…_phase_2.md`, …) with an index, or hand individual phases to a builder one at a time after Gate 3.
 - Builder handoff is **unconditional** after Gate 3 — the architect does not execute steps themselves. Single-file plans hand off `implementation_plan.md`; phase-decomposed plans hand off one phase at a time in deploy order.
-- Plans never run Quick-path validation — the 1-LOW-allowance grace + sub-agent confirmation pattern applies because the plan determines mechanical execution.
+- Plan validation is uniform — primary clean + adversarial sub-agent, always (no Quick/Standard rigor selector), because the plan determines mechanical execution.
 - Multi-repo plans include `Step 0-A`, `Step 0-B`, etc. — each branch-prep step fetches the configured remote development branch and creates `feature/{slug}/<owner-or-team>` from it.
 
 ---
