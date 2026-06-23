@@ -28,14 +28,14 @@ description: Story stage-0 draft (replaces the former Tech Stories fast-path com
 
 - `.shamt-core/shamt-config.json` exists (for the `work_item_tracker` default).
 - **Feature-parent mode:** `epics/*/features/{feature-slug}-*/feature.md` exists (the target parent feature), resolved per §PO-tree resolution.
-- **Tech-story mode:** The standing **Tech Stories** epic exists at `epics/{tech-stories-folder}/` with `features/bugs/` and `features/quick-wins/` (seeded by `init-shamt.sh` / `import-shamt.sh`). If absent, halt and direct the user to re-run `import-shamt` — `/ps0-draft` does not create the standing containers itself.
+- **Tech-story mode:** The standing **Tech Stories** epic exists — resolve the reserved slug under any `T{N}-` prefix per §PO-tree resolution: `epics/*-tech-stories/` (∪ legacy bare `epics/tech-stories/`) with `features/*-bugs/` and `features/*-quick-wins/` (the standing containers are numbered `{ID}-{reserved-slug}` tickets, seeded by `init-shamt.sh` / `import-shamt.sh`). If absent, halt and direct the user to re-run `import-shamt` — `/ps0-draft` does not create the standing containers itself.
 
 ## Parent modes
 
 ps0 supports **two parent modes**, both writing the **same story-ticket stub shape `/pf3-decompose` emits**:
 
 1. **Feature-parent mode** — `{feature-slug}` resolves to an existing feature. Write one story stub under it and additively append to that feature's `## Target Stories`.
-2. **Tech-story mode** (absorbs the former tech-story fast-path) — `bugs` / `quick-wins` resolves the standing Tech Stories epic's reserved feature (`epics/{tech-stories-folder}/features/{bugs|quick-wins}/`). Write the stub there. Carry forward the former tech-story fast-path's tracker-template selection (ado / github / local — read `work_item_tracker` from `.shamt-core/shamt-config.json`), its standing-fixture prerequisite check (halt + direct to re-run `import-shamt` if the standing containers are absent), and its completion-archive note (finalize via `/e9-finalize-story` moves the story into the feature's `archive/`).
+2. **Tech-story mode** (absorbs the former tech-story fast-path) — `bugs` / `quick-wins` resolves the standing Tech Stories epic's reserved feature, globbing the reserved slug under any `T{N}-` prefix per §PO-tree resolution (`epics/*-tech-stories/features/*-bugs/` ∪ `…/features/*-quick-wins/`, with the bare legacy name as a fallback). Write the stub there. Carry forward the former tech-story fast-path's tracker-template selection (ado / github / local — read `work_item_tracker` from `.shamt-core/shamt-config.json`), its standing-fixture prerequisite check (halt + direct to re-run `import-shamt` if the standing containers are absent), and its completion-archive note (finalize via `/e9-finalize-story` moves the story into the feature's `archive/`).
 
 ## Step-by-step
 

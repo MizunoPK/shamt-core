@@ -512,16 +512,60 @@ else
 fi
 
 # ---- Seed the standing Tech Stories epic (project work tree) -----------------
-# The home for one-off bugs / quick wins filed via /ps0-draft. Fixed
-# reserved folder names (no ticket ID). Create-if-absent, idempotent. This is the
+# The home for one-off bugs / quick wins filed via /ps0-draft. The standing
+# containers are now numbered T{N} tickets like every other ticket — they take
+# the first available ticket numbers (T1/T2/T3 at a fresh init, where the tree is
+# empty) via a real max+1 disk-scan. Create-if-absent, idempotent (skip when a
+# reserved-slug container already exists under ANY T{N}- prefix). This is the
 # first init step that writes project-work-tree content (.shamt-core/epics/...),
 # so it is SKIPPED on self-host — the shamt-core repo itself does no PO work. In a
 # child the work tree is rooted under .shamt-core/ (the Shamt work root), so the
 # project root holds only CLAUDE.md + .claude/.
+
+# Scan the work tree for the highest existing T{N} ticket number and echo max+1
+# (or 1 when none). Enumerates the leading T[0-9]+- run on every work-tree folder
+# name across the nested layout plus the legacy-flat fallbacks, per
+# SHAMT_RULES §Ticket IDs. Kept BYTE-IDENTICAL to the same helper in
+# import-shamt.sh so init and import allocate identically (D2/D7).
+next_ticket_id() {
+  local root="$1"
+  local max=0 d name n
+  for d in \
+    "$root"/epics/*/ \
+    "$root"/epics/*/features/*/ \
+    "$root"/epics/*/features/*/stories/*/ \
+    "$root"/features/*/ \
+    "$root"/stories/*/ ; do
+    [ -d "$d" ] || continue
+    name="$(basename "$d")"
+    case "$name" in
+      T[0-9]*-*)
+        n="${name#T}"; n="${n%%-*}"
+        case "$n" in
+          ''|*[!0-9]*) ;;
+          *) [ "$n" -gt "$max" ] && max="$n" ;;
+        esac
+        ;;
+    esac
+  done
+  echo $((max + 1))
+}
+
 seed_tech_stories_epic() {
   local root="$1"
-  local ts="$root/epics/tech-stories"
-  [ -f "$ts/epic.md" ] || { mkdir -p "$ts" && cat > "$ts/epic.md" <<'EOF'
+  # Idempotent: skip entirely if a reserved-slug tech-stories container already
+  # exists under ANY prefix (bare legacy or numbered) — never re-seed / re-number.
+  local existing
+  for existing in "$root"/epics/tech-stories "$root"/epics/T[0-9]*-tech-stories; do
+    [ -d "$existing" ] && return 0
+  done
+  # Allocate three consecutive IDs: epic, then bugs, then quick-wins.
+  local id1 id2 id3
+  id1="$(next_ticket_id "$root")"
+  id2="$((id1 + 1))"
+  id3="$((id1 + 2))"
+  local ts="$root/epics/T${id1}-tech-stories"
+  mkdir -p "$ts" && cat > "$ts/epic.md" <<'EOF'
 # Epic: Tech Stories
 
 **Status:** Standing
@@ -531,11 +575,11 @@ bug fixes and small standalone improvements. Not created per-initiative; seeded
 once at install. File work under it with `/ps0-draft [bugs|quick-wins]`.
 A local-only organizational container (no tracker work item).
 EOF
-  }
-  local f
+  local f fid
   for f in bugs quick-wins; do
-    local fd="$ts/features/$f"
-    [ -f "$fd/feature.md" ] || { mkdir -p "$fd" && cat > "$fd/feature.md" <<EOF
+    [ "$f" = bugs ] && fid="$id2" || fid="$id3"
+    local fd="$ts/features/T${fid}-$f"
+    mkdir -p "$fd" && cat > "$fd/feature.md" <<EOF
 # Feature: ${f}
 
 **Status:** Standing
@@ -543,12 +587,11 @@ EOF
 Standing Tech Stories feature. $( [ "$f" = bugs ] && echo "Catches one-off bug fixes." || echo "Catches small standalone improvements (quick wins)." )
 Tickets are filed here via \`/ps0-draft $f\` and archived into \`archive/\` on finalize.
 EOF
-    }
   done
 }
 
 if [ "$SELF_HOST" -eq 0 ]; then
-  log "Seeding standing Tech Stories epic (.shamt-core/epics/tech-stories/) …"
+  log "Seeding standing Tech Stories epic (.shamt-core/epics/T{N}-tech-stories/) …"
   # Child work tree is rooted under the Shamt work root (.shamt-core/).
   seed_tech_stories_epic "$TARGET_DIR/.shamt-core"
 fi

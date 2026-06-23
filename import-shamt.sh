@@ -403,14 +403,106 @@ else
   warn "regenerate-framework.sh not found at $regen_script — .claude/ NOT regenerated."
 fi
 
-# ---- Re-seed the standing Tech Stories epic (idempotent) --------------------
-# Existing children that predate the Tech Stories epic get it on next import.
-# Create-if-absent — never overwrite an existing epic.md / feature.md (preserves
-# any in-progress tickets the child has filed under it). The child work tree is
-# rooted under the Shamt work root (.shamt-core/); it sits outside MASTER_SYNC_DIRS,
-# so the sync passes above never clobber or warn on it.
-ts="$TARGET_DIR/.shamt-core/epics/tech-stories"
-if [ ! -f "$ts/epic.md" ]; then
+# ---- Re-seed / migrate the standing Tech Stories epic (idempotent) ----------
+# Existing children that predate the Tech Stories epic get it on next import; the
+# standing containers are now numbered T{N} tickets (they take the first available
+# ticket numbers via a max+1 disk-scan), so this block has THREE branches keyed on
+# the reserved-slug container's state:
+#   (a) absent          → seed numbered via the max+1 scan.
+#   (b) present-but-unnumbered (bare epics/tech-stories/) → migrate: mv the epic +
+#       two feature folders to their {ID}-{slug} form (next free numbers) and
+#       rewrite shamt-state/active-* pointers + any in-progress ticket paths whose
+#       prefix changed (plain mv — .shamt-core/ is git-ignored in children, so
+#       there is no git history to preserve).
+#   (c) already numbered (epics/T{N}-tech-stories/) → no-op.
+# Idempotent across repeated imports. The child work tree is rooted under the Shamt
+# work root (.shamt-core/); it sits outside MASTER_SYNC_DIRS, so the sync passes
+# above never clobber or warn on it.
+
+# Scan the work tree for the highest existing T{N} ticket number and echo max+1
+# (or 1 when none). Enumerates the leading T[0-9]+- run on every work-tree folder
+# name across the nested layout plus the legacy-flat fallbacks, per
+# SHAMT_RULES §Ticket IDs. Kept BYTE-IDENTICAL to the same helper in
+# init-shamt.sh so init and import allocate identically (D2/D7).
+next_ticket_id() {
+  local root="$1"
+  local max=0 d name n
+  for d in \
+    "$root"/epics/*/ \
+    "$root"/epics/*/features/*/ \
+    "$root"/epics/*/features/*/stories/*/ \
+    "$root"/features/*/ \
+    "$root"/stories/*/ ; do
+    [ -d "$d" ] || continue
+    name="$(basename "$d")"
+    case "$name" in
+      T[0-9]*-*)
+        n="${name#T}"; n="${n%%-*}"
+        case "$n" in
+          ''|*[!0-9]*) ;;
+          *) [ "$n" -gt "$max" ] && max="$n" ;;
+        esac
+        ;;
+    esac
+  done
+  echo $((max + 1))
+}
+
+# Rewrite an old path prefix → new path prefix inside the shamt-state/active-*
+# pointer files (each holds a work-root-relative path). In-place, only when the
+# stored path begins with the renamed prefix.
+rewrite_active_pointers() {
+  local state_dir="$1" old="$2" new="$3" p cur
+  for p in "$state_dir"/active-epic "$state_dir"/active-feature "$state_dir"/active-story; do
+    [ -f "$p" ] || continue
+    cur="$(cat "$p" 2>/dev/null)"
+    case "$cur" in
+      "$old"|"$old"/*)
+        printf '%s\n' "${new}${cur#"$old"}" > "$p"
+        log "  rewrote pointer $(basename "$p"): $cur → ${new}${cur#"$old"}"
+        ;;
+    esac
+  done
+}
+
+work_root="$TARGET_DIR/.shamt-core"
+state_dir="$work_root/shamt-state"
+ts_bare="$work_root/epics/tech-stories"
+
+# Detect an already-numbered standing epic (any T{N}- prefix).
+ts_numbered=""
+for _cand in "$work_root"/epics/T[0-9]*-tech-stories; do
+  [ -d "$_cand" ] && { ts_numbered="$_cand"; break; }
+done
+
+if [ -n "$ts_numbered" ]; then
+  : # (c) already numbered — no-op, idempotent across repeated imports.
+elif [ -d "$ts_bare" ]; then
+  # (b) present-but-unnumbered — migrate to the numbered {ID}-{slug} form.
+  id1="$(next_ticket_id "$work_root")"
+  id2="$((id1 + 1))"
+  id3="$((id1 + 2))"
+  ts_new="$work_root/epics/T${id1}-tech-stories"
+  mv "$ts_bare" "$ts_new"
+  rewrite_active_pointers "$state_dir" "epics/tech-stories" "epics/T${id1}-tech-stories"
+  log "Migrated standing Tech Stories epic → epics/T${id1}-tech-stories/."
+  _fid=$id2
+  for _f in bugs quick-wins; do
+    if [ -d "$ts_new/features/$_f" ]; then
+      mv "$ts_new/features/$_f" "$ts_new/features/T${_fid}-$_f"
+      rewrite_active_pointers "$state_dir" \
+        "epics/T${id1}-tech-stories/features/$_f" \
+        "epics/T${id1}-tech-stories/features/T${_fid}-$_f"
+      log "  migrated feature → features/T${_fid}-$_f/."
+    fi
+    _fid=$id3
+  done
+else
+  # (a) absent — seed numbered via the same max+1 scan.
+  id1="$(next_ticket_id "$work_root")"
+  id2="$((id1 + 1))"
+  id3="$((id1 + 2))"
+  ts="$work_root/epics/T${id1}-tech-stories"
   mkdir -p "$ts" && cat > "$ts/epic.md" <<'EOF'
 # Epic: Tech Stories
 
@@ -420,11 +512,9 @@ The permanent home for one-off work that does not belong to any real initiative 
 bug fixes and small standalone improvements. File work under it with
 `/ps0-draft [bugs|quick-wins]`. A local-only organizational container.
 EOF
-  log "Seeded standing Tech Stories epic (was absent)."
-fi
-for _f in bugs quick-wins; do
-  _fd="$ts/features/$_f"
-  if [ ! -f "$_fd/feature.md" ]; then
+  _fid=$id2
+  for _f in bugs quick-wins; do
+    _fd="$ts/features/T${_fid}-$_f"
     mkdir -p "$_fd" && cat > "$_fd/feature.md" <<EOF
 # Feature: ${_f}
 
@@ -433,8 +523,10 @@ for _f in bugs quick-wins; do
 Standing Tech Stories feature. Tickets are filed via \`/ps0-draft $_f\`
 and archived into \`archive/\` on finalize.
 EOF
-  fi
-done
+    _fid=$id3
+  done
+  log "Seeded standing Tech Stories epic (was absent) → epics/T${id1}-tech-stories/."
+fi
 
 # ---- Summary ----------------------------------------------------------------
 

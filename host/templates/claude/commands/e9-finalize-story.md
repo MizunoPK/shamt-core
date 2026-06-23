@@ -79,7 +79,7 @@ If the remote close command fails, halt and report the git/CLI output — do not
 
 ### Step 5b — Tech-story completion archive
 
-If the resolved story folder is nested under the standing **Tech Stories** epic (its path is `epics/{tech-stories-folder}/features/{bugs|quick-wins}/stories/…`), **move the finalized story folder into its feature's `archive/`** — `epics/{tech-stories-folder}/features/{f}/archive/{same-folder-name}/` (`git mv` when tracked) — within the same Step 3 commit. This keeps the standing Bugs / Quick Wins features from growing without bound (mirroring how `/pe4-finalize` archives a done epic and `/f6-archive-proposal` archives an implemented proposal). For a normal (non-Tech-Stories) story, **skip this step** — the story folder stays in place.
+If the resolved story folder is nested under the standing **Tech Stories** epic — the `{tech-stories-folder}` / `{bugs|quick-wins}` segments are the **numbered** `{ID}-tech-stories` / `{ID}-bugs` / `{ID}-quick-wins` folders, resolved by globbing the reserved slug under any `T{N}-` prefix per §PO-tree resolution (its path matches `epics/*-tech-stories/features/*-bugs/stories/…` ∪ `…/features/*-quick-wins/stories/…`) — **move the finalized story folder into its feature's `archive/`** — `epics/{tech-stories-folder}/features/{f}/archive/{same-folder-name}/` (`git mv` when tracked) — within the same Step 3 commit. This keeps the standing Bugs / Quick Wins features from growing without bound (mirroring how `/pe4-finalize` archives a done epic and `/f6-archive-proposal` archives an implemented proposal). For a normal (non-Tech-Stories) story, **skip this step** — the story folder stays in place.
 
 ### Step 5c — Refresh the epic STATUS.md
 
