@@ -86,7 +86,7 @@ Reproduce that summary in chat verbatim, then list:
 
 After the file sync, `import-shamt.sh` runs `regenerate-framework.sh --target <target>` internally. The regen output appears in the script's stdout. Apply the same surface rules as `/f4-regen-framework`:
 
-- `wrote`, `removed`, `unchanged` lines — informational, summary only.
+- `wrote`, `removed`, `unchanged` lines — informational, summary only. This includes the root rules-file render lines `wrote    CLAUDE.md` / `unchanged CLAUDE.md` — surface them so the user can see the refreshed root rules file (the synced `SHAMT_RULES.template.md` is rendered into `<child>/CLAUDE.md` on every pull).
 - `WARN: preserving unmanaged file (no 'Managed by Shamt' footer)` — list verbatim.
 - `WARN: jq not installed — leaving settings.json unchanged.` — show the user the snippet to paste manually.
 - `WARN: settings.json failed to parse …` — surface and stop suggesting follow-ups until they fix it.

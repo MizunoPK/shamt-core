@@ -3,7 +3,7 @@
 **Version:** v2 (template)
 **Purpose:** Canonical agent rules: story workflow, validation, spec, code review, implementation planning, and the three cross-cutting design principles.
 
-> This file is a **template** rendered into a child project's `CLAUDE.md` (or a managed section of it) at install or regen time. Edit only here, in `shamt-core/templates/`. Generated copies are overwritten; the canonical source is this file.
+> This file is a **template** rendered into a child project's `CLAUDE.md` at install or regen time. Edit only here, in `shamt-core/templates/`. Generated copies are overwritten; the canonical source is this file.
 
 ---
 

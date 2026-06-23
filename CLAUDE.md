@@ -13,13 +13,13 @@ shamt-core/
 ├── CLAUDE.md                       # this file — master-dev primer
 ├── README.md                       # hand-written quick reference (commands, skills, personas)
 ├── templates/                      # artifact skeletons + the child-facing rules template
-│   └── SHAMT_RULES.template.md     # canonical rules; rendered into a child's CLAUDE.md
+│   └── SHAMT_RULES.template.md     # canonical rules; rendered whole-file into a child's CLAUDE.md (always overwritten)
 ├── reference/                      # expanded examples, standards, recipes
 ├── host/templates/claude/          # Claude-Code-specific managed-file templates (skills, commands, personas)
 └── shamt-config.example.json       # schema-by-example for the per-project config
 ```
 
-A child project that installs Shamt keeps just two Shamt entries at its project root — `CLAUDE.md` (a managed section rendered from `SHAMT_RULES.template.md`) and the generated `.claude/` directory (which Claude Code requires at the root). Everything else lives under a hidden `.shamt-core/` directory: the copied canonical sources, `shamt-config.json` (initialized from the example), `README.md`, the `proposals/` working area, `project-specific-files/{ARCHITECTURE,CODING_STANDARDS,TESTING_STANDARDS}.md`, the PO/Engineer **work tree** (`epics/`, `features/`, `stories/`, `code_reviews/`), and the `shamt-state/` active-item pointers. `.shamt-core/` is the **Shamt work root** in a child — every `epics/`/`features/`/`stories/`/`code_reviews/`/`shamt-state/` path the commands and rules write resolves relative to it (the repo root on master/self-host); the framework never writes a work-tree artifact at a child's project root. A child install **git-ignores** all of this generated footprint — `/.shamt-core/`, `/.claude/`, and the seeded `/CLAUDE.md` (a pre-existing child `CLAUDE.md` is preserved and stays tracked) — via a managed block `init-shamt.sh` adds to the child's `.gitignore`; all of it is re-derivable from master (`import-shamt`) + regen.
+A child project that installs Shamt keeps just two Shamt entries at its project root — `CLAUDE.md` (rendered whole-file from `SHAMT_RULES.template.md` and always overwritten on init and every regen/sync) and the generated `.claude/` directory (which Claude Code requires at the root). Everything else lives under a hidden `.shamt-core/` directory: the copied canonical sources, `shamt-config.json` (initialized from the example), `README.md`, the `proposals/` working area, `project-specific-files/{ARCHITECTURE,CODING_STANDARDS,TESTING_STANDARDS}.md`, the PO/Engineer **work tree** (`epics/`, `features/`, `stories/`, `code_reviews/`), and the `shamt-state/` active-item pointers. `.shamt-core/` is the **Shamt work root** in a child — every `epics/`/`features/`/`stories/`/`code_reviews/`/`shamt-state/` path the commands and rules write resolves relative to it (the repo root on master/self-host); the framework never writes a work-tree artifact at a child's project root. A child install **git-ignores** all of this generated footprint — `/.shamt-core/`, `/.claude/`, and `/CLAUDE.md` (always git-ignored and always overwritten — the root rules file is fully Shamt-managed) — via a managed block `init-shamt.sh` adds to the child's `.gitignore`; all of it is re-derivable from master (`import-shamt`) + regen.
 
 ---
 
@@ -30,7 +30,7 @@ Shamt has **canonical sources** (in this folder), **generated artifacts** (in ch
 | Surface | Lives in | Edited by | Notes |
 |---------|----------|-----------|-------|
 | Canonical | `shamt-core/` (this folder) | Framework contributors via the framework-update flow | Single source of truth |
-| Generated | A child project's `.claude/`, its managed-section `CLAUDE.md`, its installed `.shamt-core/README.md` | Never edited directly | Regenerated from canonical sources |
+| Generated | A child project's `.claude/`, its whole-file regenerated `CLAUDE.md` (rendered from `SHAMT_RULES.template.md`, always overwritten), its installed `.shamt-core/README.md` | Never edited directly | Regenerated from canonical sources |
 | Child-owned | A child project's `.shamt-core/project-specific-files/` (ARCHITECTURE.md, CODING_STANDARDS.md, TESTING_STANDARDS.md) | Via the **project-specific proposal class** — `/f1-propose-update` routes here when the change is scoped to this project only | Neither canonical (not framework sources) nor generated (not regen output); evolved via the project-specific proposal class, archived locally, never go upstream |
 
 **Hard rules — unchanged:**

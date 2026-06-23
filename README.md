@@ -12,8 +12,8 @@ A child project that has installed Shamt looks like this:
 
 ```text
 <child-project>/
-├── CLAUDE.md                       # rendered from SHAMT_RULES.template.md at init
-│                                   #   (the ONLY Shamt file left at the project root)
+├── CLAUDE.md                       # rendered from SHAMT_RULES.template.md at init and every regen/sync
+│                                   #   (always overwritten; the ONLY Shamt file left at the project root)
 ├── .claude/                        # generated wiring (must stay at root — Claude Code requirement)
 │   ├── commands/                   # rendered from .shamt-core/host/templates/claude/commands/
 │   ├── agents/                     # rendered persona definitions
@@ -55,10 +55,11 @@ child (shown above), at the repo root on master/self-host. Only `CLAUDE.md` and
 
 **Git-ignored in a child.** A child install does **not** track Shamt's generated
 footprint: `init-shamt.sh` adds a managed `.gitignore` block for `/.shamt-core/`,
-`/.claude/`, and `/CLAUDE.md` (the last only when init *seeded* it — a
-pre-existing child `CLAUDE.md` is preserved and kept tracked). All of it is
-re-derivable — `.shamt-core/` via `import-shamt`, `.claude/` via
-`/f4-regen-framework` — so a fresh clone restores the wiring with one regen/import.
+`/.claude/`, and `/CLAUDE.md` (always — the root rules file is fully
+Shamt-managed and always overwritten). All of it is
+re-derivable — `.shamt-core/` via `import-shamt`, `.claude/` and the root
+`CLAUDE.md` via `/f4-regen-framework` — so a fresh clone restores the wiring with
+one regen/import.
 
 The master repo has additional `proposals/` subfolders that **never appear in a child project**: `incoming/` (child-submitted proposals awaiting triage), `archive/` (implemented proposals), `rejected/` (closed with a top-of-file note), and `deferred/` (on hold). Master's presence is what `/sync-proposals` and `/sync-triage-proposals` use to discriminate the two sides — child projects rely on the absence of `proposals/incoming/` as the master-side check.
 
@@ -275,9 +276,9 @@ Behavior:
 - Halts if the install config already exists (`<target>/shamt-config.json` on self-host, `<target>/.shamt-core/shamt-config.json` otherwise). Re-init is not supported; use `import-shamt.sh` for updates.
 - Prompts interactively for every `.shamt-core/shamt-config.json` field (no flag-based unattended mode).
 - Copies canonical sources from `<source>/shamt-core/` into `<target>/.shamt-core/` (skipped on self-host).
-- Seeds the child's `CLAUDE.md` at `<target>/` (from `templates/SHAMT_RULES.template.md`), and the three project-specific docs `ARCHITECTURE.md` + `CODING_STANDARDS.md` + `TESTING_STANDARDS.md` (with `Last Updated` set to today) under `<target>/.shamt-core/project-specific-files/`. `README.md` and `proposals/_template.md` travel inside the `.shamt-core/` canonical-source copy — they are not separately seeded. Skipped on self-host.
+- Renders the child's `CLAUDE.md` at `<target>/` (from `templates/SHAMT_RULES.template.md`, always overwritten), and seeds the three project-specific docs `ARCHITECTURE.md` + `CODING_STANDARDS.md` + `TESTING_STANDARDS.md` (with `Last Updated` set to today) under `<target>/.shamt-core/project-specific-files/`. `README.md` and `proposals/_template.md` travel inside the `.shamt-core/` canonical-source copy — they are not separately seeded. Skipped on self-host.
 - Writes the install config (`<target>/shamt-config.json` on self-host, `<target>/.shamt-core/shamt-config.json` otherwise) from the prompted answers. Ends with a copy/pastable completion prompt that drives an agent to fill in and `/validate-artifact` all three project-specific docs.
-- Appends a managed `# >>> Shamt (managed)` block to the child's `.gitignore` (create-if-absent, idempotent — skipped if already present) that ignores `/.shamt-core/` + `/.claude/`, plus `/CLAUDE.md` **only when init seeded it** (a pre-existing child `CLAUDE.md` stays tracked). Skipped on self-host.
+- Appends a managed `# >>> Shamt (managed)` block to the child's `.gitignore` (create-if-absent, idempotent — skipped if already present) that ignores `/.shamt-core/` + `/.claude/` + `/CLAUDE.md` (always — the root rules file is fully Shamt-managed and always overwritten). Skipped on self-host.
 - Runs `regenerate-framework.sh --target <target>` to produce `<target>/.claude/`.
 
 ### `import-shamt.sh` — framework pull
@@ -303,14 +304,14 @@ Or via `/sync-import-shamt`. Behavior:
 
 ## Regen
 
-`.shamt-core/scripts/regenerate-framework.sh` renders canonical Claude wiring (`.shamt-core/host/templates/claude/`) into a child project's `.claude/` directory. Bash-first; a PowerShell wrapper may follow later.
+`.shamt-core/scripts/regenerate-framework.sh` renders canonical Claude wiring (`.shamt-core/host/templates/claude/`) into a child project's `.claude/` directory, and renders the child's root `CLAUDE.md` from `templates/SHAMT_RULES.template.md` (always overwritten; skipped in self-host, where the root `CLAUDE.md` is the master-dev primer). Bash-first; a PowerShell wrapper may follow later.
 
 ### Modes
 
 | Invocation | Effect |
 |------------|--------|
-| `regenerate-framework.sh` | Default. Renders canonical → `<cwd>/.claude/`. Writes/overwrites managed files; prunes managed files no longer in canonical; preserves unmanaged user files. |
-| `regenerate-framework.sh --check` | Dry-run drift report. Prints `DRIFT <path>` for content mismatch, `STALE <path>` for managed-but-removed-from-canonical, `UNMANAGED <path>` for user-authored files (preserved). Exits 1 on any DRIFT or STALE, 0 otherwise. |
+| `regenerate-framework.sh` | Default. Renders canonical → `<cwd>/.claude/`. Writes/overwrites managed files; prunes managed files no longer in canonical; preserves unmanaged user files. Also renders the root `CLAUDE.md` from `SHAMT_RULES.template.md` (always overwritten; skipped in self-host). |
+| `regenerate-framework.sh --check` | Dry-run drift report. Prints `DRIFT <path>` for content mismatch (including `DRIFT CLAUDE.md` for the root rules file), `STALE <path>` for managed-but-removed-from-canonical, `UNMANAGED <path>` for user-authored files (preserved). Exits 1 on any DRIFT or STALE, 0 otherwise. |
 | `regenerate-framework.sh --bootstrap --source <.claude-dir>` | Reverse seed: capture managed files from a hand-built `.claude/` back into `shamt-core/host/templates/claude/`. Used during initial master-dev to round-trip changes. |
 | `--target <dir>` | Override the target project directory (default: cwd). Regen writes `<target>/.claude/`. |
 | `-h`, `--help` | Show usage. |

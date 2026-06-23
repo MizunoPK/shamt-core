@@ -4,7 +4,7 @@ description: Phase 5 of the framework-update flow (slugless) — wrap scripts/re
 
 # /f4-regen-framework
 
-**Purpose:** Run Phase 5 of the framework-update flow. Propagate canonical edits under `shamt-core/host/templates/claude/` (and the `statusline.sh` companion) into the target project's `.claude/` directory by invoking `scripts/regenerate-framework.sh`, then re-run the script in `--check` mode to confirm zero drift. Also available as a standalone command for routine regen / drift checks outside the framework-update flow.
+**Purpose:** Run Phase 5 of the framework-update flow. Propagate canonical edits under `shamt-core/host/templates/claude/` (and the `statusline.sh` companion) into the target project's `.claude/` directory by invoking `scripts/regenerate-framework.sh`, then re-run the script in `--check` mode to confirm zero drift. Regen also renders the child's root `CLAUDE.md` from `templates/SHAMT_RULES.template.md` (always overwritten, self-host-guarded — skipped when the target is the master repo). Also available as a standalone command for routine regen / drift checks outside the framework-update flow.
 
 **Recommended model:** Cheap (Haiku). Regen is mechanical — running the script, reading its output, surfacing drift findings. No design judgment. See [`reference/model_selection.md`](../../../../reference/model_selection.md).
 
@@ -53,7 +53,7 @@ Invoke the script in default mode:
 bash {script} --target {target_dir}    # {script} resolved in Step 1: scripts/… on the self-host master, .shamt-core/scripts/… in a child
 ```
 
-Capture the full output. Surface to the user any `wrote`, `removed`, `unchanged`, or `WARN:` lines.
+Capture the full output. Surface to the user any `wrote`, `removed`, `unchanged`, or `WARN:` lines — including the root rules-file render lines `wrote    CLAUDE.md` / `unchanged CLAUDE.md` (absent in self-host, where the render is skipped).
 
 Common warnings to surface explicitly:
 
@@ -74,7 +74,7 @@ Expected output: `no drift` (exit 0). Any other output is a Phase 5 failure.
 Output cases:
 
 - **`no drift`** — Phase 5 exit gate met. Proceed to Step 5.
-- **`DRIFT {path}`** lines — canonical and target diverged after regen. This is a script defect or an external write between the regen and the check. Halt, report the drifting paths, and ask the user to investigate before proceeding to Phase 6.
+- **`DRIFT {path}`** lines — canonical and target diverged after regen. This is a script defect or an external write between the regen and the check. Halt, report the drifting paths, and ask the user to investigate before proceeding to Phase 6. (`DRIFT CLAUDE.md` is the root rules-file render's own drift signal — same disposition; it never appears in self-host, where the render is skipped.)
 - **`STALE {path}`** lines — target has a managed file the canonical root no longer carries, but the regen didn't prune it. Same disposition as DRIFT: halt and report.
 - **`UNMANAGED {path} (preserved)`** lines — informational. Lists files preserved without the managed footer. Do not treat as drift; surface only if the user explicitly asks.
 

@@ -14,13 +14,20 @@
 #
 # PowerShell aliases also accepted: -Check, -BootstrapTemplates.
 #
-# Footer contract: every generated file ends with a "Managed by Shamt" marker
-# in its last few lines. Regen and prune only touch files carrying that marker;
-# user-authored files without the marker are preserved.
+# Footer contract: every generated .claude/ file ends with a "Managed by Shamt"
+# marker in its last few lines. Regen and prune only touch files carrying that
+# marker; user-authored files without the marker are preserved.
 #   - In regen mode, a warning is emitted only when canonical and target collide
 #     on the same path (target lacks the footer; canonical wants to write).
 #   - In --check mode, every preserved unmanaged file is reported as
 #     "UNMANAGED <path> (preserved)" without counting as drift.
+#
+# Root CLAUDE.md render: the child's root <target>/CLAUDE.md is rendered as a
+# verbatim copy of templates/SHAMT_RULES.template.md on every regen — always
+# overwritten (write-if-different), NOT footer-gated (unlike the .claude/ files
+# above). The only guard is self-host: when SHAMT_CORE_ROOT == TARGET_DIR the
+# target is the master repo and <target>/CLAUDE.md is the master-dev primer, not
+# a child rules rendering, so the render is skipped there.
 
 set -euo pipefail
 
@@ -249,11 +256,52 @@ do_regen() {
     fi
   done < <(target_managed_relpaths)
 
-  # 3) Wire statusLine into settings.json (regen only, not check — settings.json
+  # 3) Render the root CLAUDE.md from the rules template (always overwritten,
+  #    self-host-guarded). Runs in BOTH regen and check modes.
+  render_root_claude_md "$check_only"
+
+  # 4) Wire statusLine into settings.json (regen only, not check — settings.json
   #    is partially user-owned, so drift on it isn't a regen failure).
   if [ "$check_only" -eq 0 ]; then
     wire_status_line
   fi
+}
+
+render_root_claude_md() {
+  # render_root_claude_md <check_only> — render <target>/CLAUDE.md as a verbatim
+  # copy of templates/SHAMT_RULES.template.md (write-if-different). Always
+  # overwrites in a child (NOT footer-gated). Skipped in self-host, where
+  # <target>/CLAUDE.md is the master-dev primer rather than a child rendering.
+  local check_only="$1"
+
+  # Self-host guard: in a child the script lives at <child>/.shamt-core/scripts/
+  # so SHAMT_CORE_ROOT != TARGET_DIR; in self-host the script lives at
+  # <master>/scripts/ and they are equal — skip the render to protect the primer.
+  if [ "$SHAMT_CORE_ROOT" = "$TARGET_DIR" ]; then
+    return 0
+  fi
+
+  local src="$SHAMT_CORE_ROOT/templates/SHAMT_RULES.template.md"
+  local dst="$TARGET_DIR/CLAUDE.md"
+
+  if [ ! -f "$src" ]; then
+    warn "rules template not found: $src — CLAUDE.md not rendered."
+    return 0
+  fi
+
+  if [ -f "$dst" ] && cmp -s "$src" "$dst"; then
+    [ "$check_only" -eq 1 ] || log "unchanged CLAUDE.md"
+    return 0
+  fi
+
+  if [ "$check_only" -eq 1 ]; then
+    log "DRIFT CLAUDE.md"
+    HAD_DRIFT=1
+    return 0
+  fi
+
+  cp "$src" "$dst"
+  log "wrote    CLAUDE.md"
 }
 
 wire_status_line() {
