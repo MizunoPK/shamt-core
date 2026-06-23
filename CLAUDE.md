@@ -23,16 +23,19 @@ A child project that installs Shamt keeps just two Shamt entries at its project 
 
 ---
 
-## The two surfaces
+## The surfaces
 
-Shamt has **canonical sources** (in this folder) and **generated artifacts** (in child projects). These are not the same thing.
+Shamt has **canonical sources** (in this folder), **generated artifacts** (in child projects), and a child's **child-owned** project-specific files. These are not the same thing.
 
 | Surface | Lives in | Edited by | Notes |
 |---------|----------|-----------|-------|
 | Canonical | `shamt-core/` (this folder) | Framework contributors via the framework-update flow | Single source of truth |
 | Generated | A child project's `.claude/`, its managed-section `CLAUDE.md`, its installed `.shamt-core/README.md` | Never edited directly | Regenerated from canonical sources |
+| Child-owned | A child project's `.shamt-core/project-specific-files/` (ARCHITECTURE.md, CODING_STANDARDS.md, TESTING_STANDARDS.md) | Via the **project-specific proposal class** — `/f1-propose-update` routes here when the change is scoped to this project only | Neither canonical (not framework sources) nor generated (not regen output); evolved via the project-specific proposal class, archived locally, never go upstream |
 
-**Hard rule:** Never edit generated files in a child project. All changes go to canonical sources here, then the child re-runs the import script (or `regenerate-framework`) to pick them up. Editing a generated file is always wrong — it will be overwritten on the next regen, and the canonical source still bears the old version.
+**Hard rules — unchanged:**
+- Never edit generated files (`.claude/`) in a child project. All framework changes go to canonical sources here, then the child re-runs import + regen. Editing a generated file is always wrong — it will be overwritten on the next regen, and the canonical source still bears the old version.
+- Never edit canonical sources in a child project directly. They are read-only copies re-derived from master via `import-shamt`. A change meant for the framework goes through the framework-update flow (upstream via `/sync-proposals`); a change scoped to this project only goes through the project-specific proposal class (see the third row above).
 
 ---
 

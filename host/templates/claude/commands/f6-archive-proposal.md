@@ -18,7 +18,10 @@ description: Phase 7 of the framework-update flow — move proposals/{slug}.md (
 
 ## Arguments
 
-- `{slug}` (required) — proposal slug (bare descriptive slug or numbered stem `{NN}-{slug}`). Resolves the implemented proposal exact-then-glob — `proposals/{slug}.md`, then `proposals/*-{slug}.md` (master-side proposals carry a `{NN}-` prefix; matches at most one, halt on multiple) — and archives it to `proposals/archive/{resolved-filename}`, preserving the `{NN}-` prefix (or its absence for a grandfathered proposal).
+- `{slug}` (required) — proposal slug (bare descriptive slug or numbered stem `{NN}-{slug}`). Resolves the implemented proposal by class:
+  - **Framework class:** exact-then-glob — `proposals/{slug}.md`, then `proposals/*-{slug}.md` (master-side proposals carry a `{NN}-` prefix; matches at most one, halt on multiple) — archives to `proposals/archive/{resolved-filename}`, preserving the `{NN}-` prefix.
+  - **project-specific class (child only):** exact — `.shamt-core/proposals/project-specific/{slug}.md` — archives to `.shamt-core/proposals/project-specific/archive/{slug}.md`.
+  - Class is determined by location of the resolved file (the same disk-authoritative rule as `/f3-implement-update`).
 
 ## Prerequisites
 
@@ -39,14 +42,20 @@ description: Phase 7 of the framework-update flow — move proposals/{slug}.md (
 
 ### Step 2 — Move to archive
 
+**Archive destination is class-dependent** (Step 1 / Arguments determined the class by resolved-file location):
+- **Framework class:** `proposals/archive/` (items 1–3 below).
+- **Project-specific class (child only):** `.shamt-core/proposals/project-specific/archive/` — substitute this path for `proposals/archive/` throughout items 1–3 (created on first use), move the proposal file plus any companion `_PLAN.md` (rare for this class but produced normally if the proposal ever exceeds 10 file ops — the >10-row plan gating is class-agnostic), and use plain `mv` (the file is git-ignored / untracked in a child).
+
 1. Ensure `proposals/archive/` exists. If not, create it.
 2. Move the resolved proposal file → `proposals/archive/{same-filename}` (preserving the `{NN}-` prefix when present; use `git mv` when the proposal is tracked, plain `mv` when untracked).
 3. Move any companion `{NN}-{slug}_PLAN.md` / `{NN}-{slug}_PLAN_phase_*.md` (or the unnumbered forms for a grandfathered proposal) to `proposals/archive/` alongside the proposal.
 4. Confirm the validation footer is intact in each archived file — it must not be stripped by the move. **(This read is the pre-commit *early* check; it runs against the working tree while the validated content is still present and so cannot catch a commit that stages the wrong blob. The Step 3 post-commit gate below is the authoritative assertion.)**
 
-### Step 3 — Commit, squash-merge, and delete the branch
+### Step 3 — Commit, squash-merge, and delete the branch (framework class only)
 
-The archive is the landing point. `/f6-archive-proposal` now commits the change, squash-merges the proposal branch into the base branch, and deletes the branch — replacing the old "suggest a commit, don't run it" behavior. This is an irreversible git-state mutation; evaluate every pre-merge guard before touching git, and **halt** (do not merge) on any failure.
+**This step is skipped for the project-specific class.** A project-specific proposal's edits touch only `.shamt-core/project-specific-files/`, which is git-ignored in a child. There are no tracked canonical edits to commit and no `proposal/{slug}` branch was created. For a project-specific proposal, skip this step entirely and proceed to Step 4 (Exit).
+
+For the **framework class:** the archive is the landing point. `/f6-archive-proposal` now commits the change, squash-merges the proposal branch into the base branch, and deletes the branch — replacing the old "suggest a commit, don't run it" behavior. This is an irreversible git-state mutation; evaluate every pre-merge guard before touching git, and **halt** (do not merge) on any failure.
 
 **Pre-merge guards** (all must hold):
 
@@ -108,8 +117,8 @@ No next-phase suggestion. The framework-update flow ends at Phase 7.
 
 ## Exit criteria
 
-- `proposals/{slug}.md` (and companions) moved to `proposals/archive/` with validation footers intact, preserving the `{NN}-` prefix.
-- The change has been committed and squash-merged to the base branch, and the `proposal/{NN}-{slug}` branch deleted (after all pre-merge guards held).
+- **Framework class:** `proposals/{slug}.md` (and companions) moved to `proposals/archive/` with validation footers intact, preserving the `{NN}-` prefix; the change committed and squash-merged to the base branch, and the `proposal/{NN}-{slug}` branch deleted (after all pre-merge guards held).
+- **project-specific class (child only):** `.shamt-core/proposals/project-specific/{slug}.md` moved to `.shamt-core/proposals/project-specific/archive/{slug}.md` with the validation footer intact and `Status: Implemented`; no branch created, no commit, no squash-merge.
 
 ## Notes
 

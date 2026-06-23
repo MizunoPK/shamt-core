@@ -24,7 +24,10 @@ See [`reference/model_selection.md`](../../../../reference/model_selection.md).
 
 ## Arguments
 
-- `{slug}` (required) — proposal slug (bare descriptive slug or numbered stem `{NN}-{slug}`). Resolves the proposal exact-then-glob — `proposals/{slug}.md`, then `proposals/*-{slug}.md` (master-side proposals carry a `{NN}-` prefix; matches at most one, halt on multiple) — and the companion `proposals/{NN}-{slug}_PLAN.md` (or phase files) with the same stem.
+- `{slug}` (required) — proposal slug (bare descriptive slug or numbered stem `{NN}-{slug}`). Resolves the proposal by class:
+  - **Framework class:** exact-then-glob — `proposals/{slug}.md`, then `proposals/*-{slug}.md` (master-side proposals carry a `{NN}-` prefix; matches at most one, halt on multiple) — and the companion `proposals/{NN}-{slug}_PLAN.md` (or phase files) with the same stem.
+  - **Project-specific class (child only):** exact — `.shamt-core/proposals/project-specific/{slug}.md`. No numbered prefix. A project-specific proposal commonly has no companion `_PLAN.md` (it rarely exceeds 10 file ops); but the >10-row plan gating is class-agnostic — if one ever does, `/f2` runs normally and produces a plan targeting `project-specific-files/` paths, and `/f3` resolves the companion plan the same way it does for framework proposals.
+  - Class is determined by location of the resolved file: `proposals/project-specific/` → project-specific; anything else → framework.
 
 ## Prerequisites
 
@@ -47,7 +50,9 @@ Decide which path to run, state it in one line before any edit:
 1. Read `proposals/{slug}.md` top-to-bottom. Re-confirm the validation footer is present.
 2. Walk the **Proposed Changes** table. Build a local checklist mirroring it — one row, one verification slot. This is the artifact of record for the exit gate.
 3. Confirm path selection (inline vs. architect/builder).
-4. **Hard rule — canonical-only**: enumerate the set of paths the proposal (or plan) will touch. For every path, confirm it lives under one of:
+4. **Hard rule — path whitelist (class-dependent):** enumerate the set of paths the proposal (or plan) will touch and apply the whitelist for the resolved class:
+
+   **Framework class whitelist** — every path must live under one of:
    - `shamt-core/templates/`
    - `shamt-core/reference/`
    - `shamt-core/host/templates/claude/`
@@ -56,11 +61,17 @@ Decide which path to run, state it in one line before any edit:
    - `shamt-core/CLAUDE.md`, `shamt-core/README.md`, `shamt-core/shamt-config.example.json` (root-level canonical docs)
    - Any path under `shamt-core/` outside the above list **only if** the proposal explicitly justifies it in Validation Considerations or Risks.
 
-   If any path falls under generated `.claude/` (or its child-side equivalent), **halt immediately**. Edits to generated files are always wrong — they get overwritten on the next regen and the canonical source still carries the old version. Fix the offending row to point at the canonical source, strip the proposal's prior footer, and re-run `/validate-artifact` — an **[in-place amendment](f1-propose-update.md#in-place-amendment)** path-correction (the row already exists, so this corrects it rather than appending), no full `/f1-propose-update` re-run.
+   **Project-specific class whitelist (child only)** — every path must live under:
+   - `.shamt-core/project-specific-files/`
+   Canonical sources, generated `.claude/`, and `shamt-config.json` are **all off-limits** for this class. Halt immediately on any out-of-whitelist path.
 
-### Step 1.5 — Create the proposal branch
+   For either class: if any path falls under generated `.claude/` (or its child-side equivalent), **halt immediately**. Edits to generated files are always wrong — they get overwritten on the next regen and the canonical source still carries the old version. Fix the offending row to point at the correct path, strip the proposal's prior footer, and re-run `/validate-artifact` — an **[in-place amendment](f1-propose-update.md#in-place-amendment)** path-correction, no full `/f1-propose-update` re-run.
 
-Branch creation moved to this command — it is **not** done at `/f1-propose-update` or `/sync-triage-proposals`. Create the branch from the base branch immediately before applying canonical edits:
+### Step 1.5 — Create the proposal branch (framework class only)
+
+**This step is skipped for the project-specific class.** A project-specific proposal's edits touch only `.shamt-core/project-specific-files/`, which is git-ignored in a child (`init-shamt.sh` managed `.gitignore` block). There are no tracked canonical edits to branch for, and `/f6-archive-proposal` will skip the squash-merge for this class. Proceed directly to Step 2 for a project-specific proposal.
+
+For the **framework class:** branch creation moved to this command — it is **not** done at `/f1-propose-update` or `/sync-triage-proposals`. Create the branch from the base branch immediately before applying canonical edits:
 
 - **Branch name:** `proposal/{NN}-{slug}` using the proposal's resolved numbered stem (`proposal/{slug}` for a grandfathered/unnumbered proposal with no `{NN}-` prefix). Read numbered-ness from the resolved filename's leading `^[0-9]+-` run: present = numbered, absent = grandfathered.
 - **Inline path:** create it directly — `git checkout -b proposal/{NN}-{slug}` from the base branch (the branch framework changes land on). Halt and report if the branch already exists.
@@ -128,13 +139,15 @@ If any row is uncovered, treat it as a `Step failed` — diagnose. **Unrelated t
 
 Suggest a context-clear and the next command:
 
-- `/clear`, then `/f4-regen-framework` (Phase 5 — propagate canonical edits into `.claude/`).
+- **Framework class:** `/clear`, then `/f4-regen-framework` (Phase 5 — propagate canonical edits into `.claude/`).
+- **Project-specific class:** `/clear`, then `/f6-archive-proposal {slug}` (skip `/f4-regen-framework` — project-specific files are not propagated to `.claude/`). Note to the user that `/f6` will skip the branch squash-merge for this class (nothing tracked to merge).
 
 ## Exit criteria
 
-- Every Proposed Changes row covered by a change in the working tree.
-- No edits in generated `.claude/` paths.
-- The next phase (`/f4-regen-framework`) has been suggested.
+- Every Proposed Changes row covered by a change in the working tree (or confirmed already-correct for each target path).
+- No edits in generated `.claude/` paths (either class).
+- For the **framework class**: the next phase (`/f4-regen-framework`) has been suggested.
+- For the **project-specific class**: the next phase (`/f6-archive-proposal {slug}`) has been suggested, with a note that `/f4` is skipped.
 
 ## Notes
 

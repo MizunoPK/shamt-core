@@ -28,7 +28,7 @@ None — the command is slugless and batches every active top-level proposal.
 
 - This command runs **on the child side**. Master-side projects do not submit upstream — they author proposals locally and run the framework-update flow directly. Detect master vs. child by checking for `proposals/incoming/` at the cwd: the incoming folder is master's, and child projects never have it. If `proposals/incoming/` exists, halt and direct the user to `/f1-propose-update` + the rest of the Part 3 framework-update flow instead.
 - `.shamt-core/shamt-config.json` exists at the project root and declares `project_name`. If missing, halt and direct the user to set it: `project_name` namespaces upstream submissions.
-- At least one active proposal exists at top-level `.shamt-core/proposals/*.md` (excluding `_template.md` and the `submitted/ archive/ already-merged/ rejected/ deferred/` subfolders). If none, report "No active proposals to submit." and exit cleanly.
+- At least one active proposal exists at top-level `.shamt-core/proposals/*.md` (excluding `_template.md` and the `submitted/ archive/ already-merged/ rejected/ deferred/ project-specific/` subfolders). If none, report "No active proposals to submit." and exit cleanly.
 
 ## Step-by-step
 
@@ -56,7 +56,7 @@ This command **direct-writes** into a *local* master checkout. Resolve it now an
 ### Step 2 — Enumerate the active proposal set
 
 1. List the **top-level** files matching `.shamt-core/proposals/*.md`.
-2. **Exclude** `_template.md` and anything under the `submitted/`, `archive/`, `already-merged/`, `rejected/`, and `deferred/` subfolders (these are not active — `*.md` is a top-level glob, so subfolders are already excluded; the explicit list documents intent).
+2. **Exclude** `_template.md` and anything under the `submitted/`, `archive/`, `already-merged/`, `rejected/`, `deferred/`, and **`project-specific/`** subfolders (these are not active — `*.md` is a top-level glob, so subfolders are already excluded; the explicit list documents intent). `project-specific/` proposals are strictly local and are **never** submitted upstream; the existing top-level `*.md` glob already excludes them, and this entry makes that exclusion explicit (mirroring how `submitted/` / `archive/` / `already-merged/` are listed).
 3. For each remaining file, compute its **submission slug**: take the filename without `.md`, and strip any leading `{NN}-` numeric run (a `^[0-9]+-` prefix). The result is the unnumbered slug. Child-side proposals are unnumbered by convention, but a proposal that originated on master or was hand-numbered must shed its number before going upstream so master assigns its own at triage.
 4. If the set is empty, report "No active proposals to submit." and exit cleanly.
 

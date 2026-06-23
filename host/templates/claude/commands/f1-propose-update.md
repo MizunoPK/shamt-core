@@ -36,6 +36,17 @@ Modes 2 and 3 only change the *seed*; the rest of the flow — Proposed Changes,
 - Run from the shamt-core repository root (master-side) — the repo with a top-level `proposals/` directory — or from a project with a synced framework + `.shamt-core/proposals/` folder (child-side). If neither exists, halt and direct the user to either run this from the shamt-core repo root or install Shamt first.
 - `.shamt-core/proposals/_template.md` must exist. If not, halt and report — the template is the source of truth for proposal shape.
 
+## Proposal class (child-side only)
+
+Shamt supports two proposal classes. **Class is detected by folder, not a status marker** (disk-authoritative, least-machinery):
+
+| Class | Folder | Proposed Changes rows | Goes upstream? |
+|-------|--------|-----------------------|----------------|
+| **Framework** | `.shamt-core/proposals/{slug}.md` (child) or `proposals/{slug}.md` (master) | Canonical sources only (`shamt-core/templates/`, `shamt-core/reference/`, `shamt-core/host/templates/claude/`, `shamt-core/scripts/`, root docs) — never `.claude/` | Yes — via `/sync-proposals` |
+| **Project-specific** | `.shamt-core/proposals/project-specific/{slug}.md` | `.shamt-core/project-specific-files/` only — never canonical sources, never `.claude/` | **Strictly local** — never goes upstream |
+
+**On the master side this distinction does not exist.** Every master-side proposal is a framework proposal. The routing question below is child-side only; master-side runs skip it entirely and proceed as today.
+
 ## Slug resolution
 
 Proposals are **flat files**, not folders. There is no `_PLAN.md` companion at this phase; that comes in Phase 3.
@@ -59,6 +70,21 @@ The discovering command does the mechanical edit and then **halts for re-validat
 **Amendment vs. re-baseline.** In-place amendment covers a *missing* or *wanted* row. It is distinct from the [Re-baseline Protocol](../../../../templates/SHAMT_RULES.template.md#requirement-re-baseline-protocol), which applies when an existing row is *wrong*. Append-and-re-validate for the former; re-baseline for the latter.
 
 ## Step-by-step
+
+### Step 0 — Routing question (child-side only)
+
+**This step runs only on the child side** (no top-level `proposals/` directory at cwd). Master-side runs skip this step entirely and proceed to Step 1 as today.
+
+Ask via `AskUserQuestion`:
+
+> Is this a **project-specific** change (edit this project's own `.shamt-core/project-specific-files/` docs — ARCHITECTURE.md, CODING_STANDARDS.md, TESTING_STANDARDS.md) or a **framework** change (would benefit master Shamt and every project)?
+
+- **Framework** → proposal at `.shamt-core/proposals/{slug}.md`. Proceed to Step 1 as normal. Proposed Changes rows must target canonical sources only (never `project-specific-files/`, never `.claude/`). Upstream-bound via `/sync-proposals`.
+- **Project-specific** → proposal at `.shamt-core/proposals/project-specific/{slug}.md`. Proceed to Step 1 with this alternate path: seed the template there instead. Proposed Changes rows must target `.shamt-core/project-specific-files/` only (never canonical sources, never `.claude/`). **Strictly local** — never submitted upstream; `/sync-proposals` excludes `proposals/project-specific/` (see §"Proposal class" above). The Step 3 path-discipline check (item 2 — "Generated `.claude/` paths never appear") applies equally; the project-specific class's rows are instead validated against the `project-specific-files/`-only whitelist, and `/f3-implement-update` enforces this whitelist at edit time.
+
+The `proposals/project-specific/` folder is created on first use (folders are not committed empty in a child, where `.shamt-core/` is git-ignored). If the folder doesn't exist yet, create it as part of seeding the proposal.
+
+**Reclassification escape hatch (no machinery).** If a project-specific concern turns out to generalize, manually `mv` the file from `proposals/project-specific/` up to top-level `proposals/` and re-run `/f1-propose-update` — folder location alone reclassifies it. No special command.
 
 ### Step 1 — Seed from the template
 
@@ -151,7 +177,7 @@ Before exiting, verify:
 
 - [ ] Proposal exists at `.shamt-core/proposals/{slug}.md` and is non-empty.
 - [ ] **Problem** is concrete and cites at least one specific canonical file / section.
-- [ ] **Proposed Changes** lists at least one row, and every row gives a canonical (non-`.claude/`) path.
+- [ ] **Proposed Changes** lists at least one row, and every row gives a path appropriate for the proposal class: canonical (non-`.claude/`) path for a framework proposal; `.shamt-core/project-specific-files/` path for a project-specific proposal.
 - [ ] If row count > 10, the Phase 3 note is present.
 - [ ] **Risks**, **Rollback Plan**, **Validation Considerations** are filled.
 - [ ] **Open Questions** is empty (all questions resolved, with answers folded into the proposal and the originals moved to **Resolved Questions**).
@@ -163,12 +189,14 @@ If any item fails, return to the relevant step.
 
 Suggest a context-clear and the next command:
 
-- Row count ≤ 10 → `/clear`, then `/validate-artifact {path}`, where `{path}` is the proposal's actual on-disk path (`proposals/{NN}-{slug}.md` on master, `.shamt-core/proposals/{slug}.md` on child).
+- Row count ≤ 10 → `/clear`, then `/validate-artifact {path}`, where `{path}` is the proposal's actual on-disk path (`proposals/{NN}-{slug}.md` on master, `.shamt-core/proposals/{slug}.md` on child, `.shamt-core/proposals/project-specific/{slug}.md` for a project-specific proposal).
 - Row count > 10 → `/clear`, then `/validate-artifact {path}` (same path), then `/f2-plan-update-implementation {slug}` (resolves the proposal by bare slug or numbered stem).
 
 ## Exit criteria
 
-- `.shamt-core/proposals/{slug}.md` exists, non-empty, no open questions, all Proposed Changes rows on canonical paths.
+- The proposal file exists, non-empty, no open questions:
+  - Framework class: `.shamt-core/proposals/{slug}.md` (child) or `proposals/{NN}-{slug}.md` (master), all Proposed Changes rows on canonical (non-`.claude/`) paths.
+  - Project-specific class: `.shamt-core/proposals/project-specific/{slug}.md`, all Proposed Changes rows on `.shamt-core/project-specific-files/` paths.
 - The next phase has been suggested in chat.
 
 ## Notes

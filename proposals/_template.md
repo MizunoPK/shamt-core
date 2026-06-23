@@ -10,12 +10,26 @@ proposals/ folder layout (created on first use; folders are not committed empty)
   ├── rejected/{NN}-{slug}.md                   (explicit rejections with a top-of-file note)
   └── deferred/{NN}-{slug}.md                   (on hold)
 
+  Child-side only (.shamt-core/proposals/ — git-ignored in a child):
+  ├── {slug}.md                                 (framework-class proposals — unnumbered; upstream-bound via /sync-proposals)
+  ├── submitted/{slug}.md                       (submitted to master, awaiting decision)
+  ├── already-merged/{slug}.md                  (came back via master sync — auto-moved on import)
+  └── project-specific/                         (project-specific class — strictly local; never go upstream)
+      ├── {slug}.md                             (active project-specific proposals — unnumbered)
+      └── archive/{slug}.md                     (post-implementation, set by /f6-archive-proposal for this class)
+
 Active proposals live at the top level. /f6-archive-proposal moves implemented
 proposals (and any companion *_PLAN.md / *_PLAN_phase_N.md files) into
 archive/; /f1-propose-update moves abandoned drafts into archive/ with a
 .draft-{timestamp} infix when the user picks "start over" on re-entry. The
 rejected/ and deferred/ folders are populated manually by the user (or by
 /sync-triage-proposals on the master side, when that ships).
+
+Project-specific proposals (child-only, .shamt-core/proposals/project-specific/):
+stay unnumbered; Proposed Changes rows target .shamt-core/project-specific-files/
+only; implemented via /f3 (no branch) and archived via /f6 (no squash-merge) to
+project-specific/archive/; excluded from /sync-proposals. To reclassify as a
+framework proposal, mv the file up to .shamt-core/proposals/ and re-run /f1.
 
 Numbering + branch convention (master-side only; see shamt-core/CLAUDE.md
 §Conventions): each master-side proposal carries a filename prefix {NN}- and a
@@ -24,7 +38,7 @@ archive/, deferred/, rejected/) + 1 at /f1-propose-update (master-local) or
 /sync-triage-proposals promote (child-submitted). Child-side proposals under
 .shamt-core/proposals/ stay unnumbered {slug}.md. /f3-implement-update creates
 the proposal/{NN}-{slug} branch; /f6-archive-proposal squash-merges it to the
-base branch and deletes it.
+base branch and deletes it. (Neither applies to the project-specific class.)
 -->
 
 # Proposal: {slug}

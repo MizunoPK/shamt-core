@@ -1,15 +1,17 @@
 ---
 name: f3-implement-update
 description: >
-  Phase 4 of the Shamt framework-update flow. Read a validated proposal at
-  proposals/{slug}.md (and validated proposals/{slug}_PLAN.md when Phase 3
-  ran) and apply the canonical edits — either inline by the primary agent
-  (≤10 file ops) or via handoff to the plan-executor builder persona
-  (architect/builder split, when a plan is present). Hard rule: edits go to
-  canonical sources only; generated .claude/ files are NEVER edited
-  directly. Invoke when the user wants to implement a framework update,
+  Phase 4 of the Shamt framework-update flow. Read a validated proposal and
+  apply the edits — framework class (proposals/{slug}.md): canonical sources
+  only, either inline (≤10 file ops) or via plan-executor (architect/builder
+  split); project-specific class (child only,
+  proposals/project-specific/{slug}.md): .shamt-core/project-specific-files/
+  only (inline or via plan-executor the same way, per row count), no branch
+  created, next phase is /f6 (skips /f4 regen). Hard rule: generated .claude/
+  files are NEVER edited directly for
+  either class. Invoke when the user wants to implement a framework update,
   apply the proposal, execute the proposal's plan, or land the canonical
-  edits for proposals/{slug}.md.
+  edits for any proposal.
 triggers:
   - "implement the framework update"
   - "implement the proposal"
@@ -37,11 +39,13 @@ See [`reference/model_selection.md`](../../../../../reference/model_selection.md
 
 ## Exit criteria
 
-Every Proposed Changes row covered by a real diff entry; no generated-file edits; `/f4-regen-framework` suggested. This command creates the `proposal/{NN}-{slug}` branch (or `proposal/{slug}` grandfathered) before editing but makes **no commit** — the commit + squash-merge to the base branch land at `/f6-archive-proposal` (Phase 7), after regen.
+Every Proposed Changes row covered by a real diff entry; no generated-file edits.
+- **Framework class:** `/f4-regen-framework` suggested; `proposal/{NN}-{slug}` branch created before editing, no commit — commit + squash-merge land at `/f6-archive-proposal` (Phase 7), after regen.
+- **Project-specific class (child only):** `/f6-archive-proposal {slug}` suggested (skips `/f4`); no branch created (`.shamt-core/` is git-ignored); no commit.
 
 ## Hard rule
 
-**Never edit generated `.claude/` files.** Edits go to canonical sources; regen (Phase 5) propagates. Editing a generated file is always wrong — it gets overwritten on the next regen and the canonical source still carries the old version. If a step's path looks like `.claude/...`, halt unconditionally and report the path back as a proposal scope issue.
+**Never edit generated `.claude/` files** — for either proposal class. For the **framework class**, edits go to canonical sources; regen (Phase 5) propagates. For the **project-specific class**, edits go to `.shamt-core/project-specific-files/` only; no regen is run. If a step's path looks like `.claude/...`, halt unconditionally and report the path back as a proposal scope issue.
 
 ---
 Validated 2026-05-28 — 4 rounds, 1 adversarial sub-agent confirmed (Phase 8 implementation loop)

@@ -38,7 +38,9 @@ A child project that has installed Shamt looks like this:
 │   ├── proposals/                  # framework-update proposals (locally authored)
 │   │   ├── _template.md            #   (master-owned — resynced by /sync-import-shamt; do not edit locally)
 │   │   ├── submitted/              # submitted to master, awaiting decision
-│   │   └── already-merged/         # came back via master sync (auto-moved on import)
+│   │   ├── already-merged/         # came back via master sync (auto-moved on import)
+│   │   └── project-specific/       # strictly local proposals (child-only; never go upstream)
+│   │       └── archive/            # archived project-specific proposals (/f6 moves here)
 │   ├── epics/                      # runtime — PO-flow work tree (when used)
 │   ├── features/                   # runtime — PO-flow work tree (when used)
 │   ├── stories/                    # runtime — per-story artifacts
@@ -59,6 +61,8 @@ re-derivable — `.shamt-core/` via `import-shamt`, `.claude/` via
 `/f4-regen-framework` — so a fresh clone restores the wiring with one regen/import.
 
 The master repo has additional `proposals/` subfolders that **never appear in a child project**: `incoming/` (child-submitted proposals awaiting triage), `archive/` (implemented proposals), `rejected/` (closed with a top-of-file note), and `deferred/` (on hold). Master's presence is what `/sync-proposals` and `/sync-triage-proposals` use to discriminate the two sides — child projects rely on the absence of `proposals/incoming/` as the master-side check.
+
+**Project-specific proposals (child-only).** A child may author a **project-specific** proposal — scoped to its own `.shamt-core/project-specific-files/` docs (ARCHITECTURE.md, CODING_STANDARDS.md, TESTING_STANDARDS.md) rather than the Shamt canonical sources. `/f1-propose-update` asks a routing question at the start (child-side only): *project-specific* (fix it here, in this project's owned docs) or *framework* (would benefit master Shamt and every project)? Project-specific proposals live at `.shamt-core/proposals/project-specific/{slug}.md`, are implemented by `/f3-implement-update` against `project-specific-files/` only (no branch, no regen), archived by `/f6-archive-proposal` to `proposals/project-specific/archive/` (no squash-merge — nothing tracked in a git-ignored child), and are **excluded** from `/sync-proposals` (strictly local, never go upstream). To reclassify a project-specific proposal as a framework change, manually `mv` it from `proposals/project-specific/` up to top-level `proposals/` and re-run `/f1-propose-update` — folder location alone reclassifies it.
 
 Files with a `Managed by Shamt` footer (or files in `.shamt-core/`'s master sync set) are owned by master / regen — they get overwritten by `import-shamt` and `/f4-regen-framework`. The master-owned subtrees (`scripts/`, `templates/`, `reference/`, `host/`) are **mirrored**: child files there that master no longer ships are removed. Files **outside** the managed subtrees are user-owned and preserved.
 

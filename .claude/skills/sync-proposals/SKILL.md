@@ -2,15 +2,17 @@
 name: sync-proposals
 description: >
   Child-side step of the v2 master/child sync. Batch-prepare every active
-  child-local proposal under .shamt-core/proposals/ for upstream submission to
-  master. Iterates all top-level *.md proposals regardless of status (f0 draft,
-  validated, or in-progress Draft — no validation-footer gate), strips any
-  numeric ID, reads project_name + master_url from .shamt-core/shamt-config.json,
-  and direct-writes each proposal into the local master's
-  proposals/incoming/{project}-{slug}.md behind an overwrite guard (prompt on a
-  differing target, no-op if identical), then moves each written/unchanged local
-  copy to .shamt-core/proposals/submitted/{slug}.md to mark "awaiting decision"
-  (a skipped proposal stays active). Assumes a local master_url and halts with
+  top-level child-local proposal under .shamt-core/proposals/*.md for upstream
+  submission to master — top-level only, explicitly excluding the
+  project-specific/ subfolder (those proposals are strictly local and never go
+  upstream). Iterates regardless of status (f0 draft, validated, or in-progress
+  Draft — no validation-footer gate), strips any numeric ID, reads project_name
+  + master_url from .shamt-core/shamt-config.json, and direct-writes each
+  proposal into the local master's proposals/incoming/{project}-{slug}.md
+  behind an overwrite guard (prompt on a differing target, no-op if identical),
+  then moves each written/unchanged local copy to
+  .shamt-core/proposals/submitted/{slug}.md to mark "awaiting decision" (a
+  skipped proposal stays active). Assumes a local master_url and halts with
   actionable guidance when it is a git URL or other non-local path — no
   copy-paste fallback. Does NOT push to a remote master, open PRs, or file
   issues; the user reviews / commits / pushes the written files by hand. Invoke
